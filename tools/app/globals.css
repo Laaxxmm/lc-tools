@@ -1,0 +1,114 @@
+/* Learn Crew brand system — per brand doc, 25 Aug 2026.
+   Canonical source of truth for /tools/. Do not invent colours; extend here.
+
+   FONT CONFLICT (flagged for owner): the brand doc specifies Poppins only, and that is
+   what ships below. learncrew.org itself currently renders Lexend, so /tools/ will differ
+   from the adjacent blog and homepage. Flip --font to unify — one line, either direction. */
+:root {
+  --font: 'Poppins', -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* --font: 'Lexend', system-ui, sans-serif;   <- matches live learncrew.org instead */
+
+  --forest: #0E3B2E;   /* PGCET ground, footer, headings */
+  --teal:   #0B2A34;   /* MAT ground, secondary panels   */
+  --amber:  #E8A33D;   /* CTAs, prices, eyebrows, rules  */
+  --burnt:  #C9772C;   /* hover, secondary accent        */
+  --cream:  #FAF7F2;   /* page paper, text on dark       */
+  --ink:    #1A1A1A;   /* text on amber, body text       */
+  --muted:  #4A5A52;   /* sub-copy, captions             */
+  --line:   #E3DDD2;   /* hairlines, card borders        */
+
+  /* Body copy on dark grounds. Brand rule — do not use flat cream. */
+  --on-dark: rgba(250, 247, 242, .80);
+
+  --radius-sm: 12px; --radius: 18px; --radius-lg: 26px;
+  --shadow-sm: 0 1px 2px rgba(14,59,46,.05), 0 2px 6px rgba(14,59,46,.05);
+  --shadow: 0 10px 30px -12px rgba(14,59,46,.18);
+  --shadow-lg: 0 30px 60px -22px rgba(14,59,46,.30);
+
+  --s1: 8px; --s2: 16px; --s3: 24px; --s4: 32px;
+  --s5: 48px; --s6: 64px; --s7: 96px;
+  --container: 1140px;
+}
+
+/* Exam-family grounds. PGCET on forest, MAT on deep teal — the one rule that
+   visually separates the two exam families. Everything else is shared. */
+.lcp .ground-pgcet { background: var(--forest); color: var(--on-dark); }
+.lcp .ground-mat   { background: var(--teal);   color: var(--on-dark); }
+.lcp .ground-pgcet h1, .lcp .ground-pgcet h2, .lcp .ground-pgcet h3,
+.lcp .ground-mat h1, .lcp .ground-mat h2, .lcp .ground-mat h3 { color: var(--cream); }
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font);
+  font-weight: 600;              /* brand: body/sub-copy is 600 */
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.lcp h1, .lcp h2, .lcp h3, .lcp h4 { margin: 0; font-weight: 800; color: var(--ink); }
+.lcp h1 { font-size: clamp(30px, 4.6vw, 46px); line-height: 1.08; letter-spacing: -.02em; }
+.lcp h2 { font-size: clamp(24px, 3.4vw, 34px); line-height: 1.12; letter-spacing: -.015em; }
+.lcp h3 { font-size: 18px; font-weight: 700; }
+.lcp p { margin: 12px 0; }
+.lcp a { color: inherit; }
+
+.lcp .container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 var(--s3); }
+.lcp .section { padding: var(--s6) 0; }
+.lcp .section-head { max-width: 70ch; margin-bottom: var(--s5); }
+.lcp .section-head p { margin-top: 14px; color: var(--muted); font-size: 17.5px; }
+
+/* Eyebrow: amber, uppercase, wide tracking. Amber text is permitted here only
+   because brand spec sets it at 14.5px+ 700 weight as a kicker, never body copy. */
+.lcp .eyebrow {
+  display: inline-flex; align-items: center; gap: var(--s1);
+  font-size: 14.5px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .2em; color: var(--burnt);
+}
+.lcp .ground-pgcet .eyebrow, .lcp .ground-mat .eyebrow { color: var(--amber); }
+.lcp .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+
+/* Price figure — brand spec: 800, amber, never wraps. Large enough for amber. */
+.lcp .price { font-size: 52px; font-weight: 800; color: var(--burnt); white-space: nowrap; }
+.lcp .ground-pgcet .price, .lcp .ground-mat .price { color: var(--amber); }
+
+.lcp .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer;
+  padding: 14px 22px; border: 1.5px solid transparent; border-radius: 999px;
+  text-decoration: none; transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.lcp .btn-amber { background: var(--amber); color: var(--ink); box-shadow: 0 8px 20px -8px rgba(232,163,61,.7); }
+.lcp .btn-amber:hover { transform: translateY(-2px); background: var(--burnt); color: var(--cream); }
+.lcp .btn-forest { background: var(--forest); color: var(--cream); }
+.lcp .btn-forest:hover { transform: translateY(-2px); background: #16543f; box-shadow: var(--shadow); }
+.lcp .btn-outline { background: transparent; color: var(--forest); border-color: rgba(14,59,46,.25); }
+.lcp .btn-outline:hover { border-color: var(--forest); background: rgba(14,59,46,.05); transform: translateY(-2px); }
+.lcp .btn-block { width: 100%; }
+
+.lcp a:focus-visible, .lcp .btn:focus-visible,
+.lcp input:focus-visible, .lcp select:focus-visible {
+  outline: 2px solid var(--burnt); outline-offset: 2px;
+}
+.lcp .ground-pgcet :focus-visible, .lcp .ground-mat :focus-visible { outline-color: var(--amber); }
+
+@media (prefers-reduced-motion: reduce) {
+  .lcp .btn, .lcp .btn:hover { transition: none; transform: none; }
+}
+
+.lcp .card {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius); padding: var(--s4); box-shadow: var(--shadow-sm);
+}
+.lcp label { display: block; font-size: 14px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.lcp input, .lcp select {
+  width: 100%; font-family: inherit; font-weight: 600; font-size: 16px; color: var(--ink);
+  padding: 12px 14px; border: 1.5px solid var(--line);
+  border-radius: var(--radius-sm); background: #fff;
+}
+.lcp .field { margin-bottom: var(--s3); }
+.lcp .error { color: #8A3E12; font-size: 14px; font-weight: 600; margin-top: 6px; }
+.lcp .muted { color: var(--muted); font-size: 14px; }
