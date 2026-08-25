@@ -61,12 +61,16 @@ body {
 .lcp .section-head { max-width: 70ch; margin-bottom: var(--s5); }
 .lcp .section-head p { margin-top: 14px; color: var(--muted); font-size: 17.5px; }
 
-/* Eyebrow: amber, uppercase, wide tracking. Amber text is permitted here only
-   because brand spec sets it at 14.5px+ 700 weight as a kicker, never body copy. */
+/* Eyebrow: uppercase, wide tracking, 700 per brand spec for eyebrows and labels.
+   Amber never appears as text on cream. Plain --burnt does not either: measured
+   against --cream it is 3.19:1, below the 4.5:1 AA floor for 14.5px text. Deepening
+   it toward --ink lands at 4.76:1 and keeps the accent in the same family without
+   declaring a ninth swatch. On the dark grounds amber is already 5.78:1, so the
+   override below stands. */
 .lcp .eyebrow {
   display: inline-flex; align-items: center; gap: var(--s1);
-  font-size: 14.5px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: .2em; color: var(--burnt);
+  font-size: 14.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .2em; color: color-mix(in srgb, var(--burnt) 75%, var(--ink));
 }
 .lcp .ground-pgcet .eyebrow, .lcp .ground-mat .eyebrow { color: var(--amber); }
 .lcp .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
@@ -112,3 +116,114 @@ body {
 .lcp .field { margin-bottom: var(--s3); }
 .lcp .error { color: #8A3E12; font-size: 14px; font-weight: 600; margin-top: 6px; }
 .lcp .muted { color: var(--muted); font-size: 14px; }
+
+/* ── Shell ────────────────────────────────────────────────────────────────────
+   Header, footer and tool-page furniture. Tokens only — no colour is defined
+   here, every value above is reused. */
+
+.lcp .skip { position: absolute; left: -9999px; }
+.lcp .skip:focus { left: var(--s3); top: var(--s2); z-index: 9; background: var(--cream); padding: 10px 16px; border-radius: 999px; }
+
+.lcp .lc-header { border-bottom: 1px solid var(--line); }
+.lcp .lc-header .container {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s3); min-height: 68px; flex-wrap: wrap;
+}
+.lcp .lc-nav { display: flex; align-items: center; gap: var(--s3); }
+.lcp .lc-nav a { font-size: 14px; font-weight: 700; color: var(--muted); text-decoration: none; }
+.lcp .lc-nav a:hover { color: var(--forest); }
+
+/* Wordmark: 800, uppercase, 0.2em tracking. */
+.lcp .wordmark {
+  font-weight: 800; text-transform: uppercase; letter-spacing: .2em;
+  font-size: 15px; text-decoration: none; color: var(--forest);
+}
+
+.lcp .lc-footer { background: var(--forest); color: var(--on-dark); padding: var(--s6) 0 var(--s5); }
+.lcp .lc-footer .wordmark {
+  display: block; font-size: 32px; line-height: 1.1;
+  color: color-mix(in srgb, var(--cream) 42%, transparent);
+}
+.lcp .lc-footer p { max-width: 56ch; }
+.lcp .lc-footer .lc-nav { margin-top: var(--s3); flex-wrap: wrap; }
+.lcp .lc-footer .lc-nav a { color: var(--on-dark); }
+.lcp .lc-footer .lc-nav a:hover { color: var(--cream); }
+.lcp .lc-footer small { font-size: 13.5px; }
+
+.lcp .tool-hero { padding: var(--s6) 0 var(--s5); }
+.lcp .tool-hero h1 { margin-top: 14px; }
+.lcp .tool-hero .lead { margin-top: var(--s2); font-size: 18.5px; max-width: 62ch; }
+.lcp .meta { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s3); font-size: 13.5px; font-weight: 700; }
+.lcp .rule { height: 3px; width: 56px; margin: 0 0 var(--s3); background: var(--amber); border: 0; border-radius: 2px; }
+
+.lcp .prose { max-width: 68ch; }
+.lcp .prose p { font-size: 17px; }
+.lcp .prose h2 { margin-top: var(--s5); }
+.lcp .prose h3 { margin-top: var(--s4); }
+
+.lcp .faq { max-width: 68ch; border-top: 1px solid var(--line); }
+.lcp .faq details { border-bottom: 1px solid var(--line); }
+.lcp .faq summary {
+  display: flex; justify-content: space-between; gap: var(--s2);
+  padding: var(--s3) 0; cursor: pointer; list-style: none;
+  font-size: 17px; font-weight: 700;
+}
+.lcp .faq summary::-webkit-details-marker { display: none; }
+.lcp .faq summary::after { content: '+'; color: var(--burnt); font-weight: 800; }
+.lcp .faq details[open] summary::after { content: '\2013'; }
+.lcp .faq details p { margin: 0 0 var(--s3); max-width: 62ch; color: var(--muted); }
+
+.lcp .grid { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.lcp .tool-card { display: block; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease; }
+.lcp .tool-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.lcp .tool-card h3 { margin-top: var(--s2); }
+.lcp .tool-card p { margin-bottom: var(--s2); color: var(--muted); font-size: 15px; }
+
+.lcp .cta-block { padding: var(--s5); border-radius: var(--radius-lg); }
+.lcp .cta-block p { max-width: 52ch; font-size: 17px; }
+.lcp .cta-block .btn { margin-top: var(--s2); }
+
+.lcp .sources { max-width: 68ch; font-size: 14px; color: var(--muted); }
+.lcp .sources a { color: var(--forest); }
+
+/* Explainer furniture: the worked-example callout and the estimate disclaimer.
+   Cream-2 is mixed from the two brand colours rather than declared as a ninth
+   swatch — retint by moving the percentage, not by adding a hex. */
+.lcp .worked-example {
+  max-width: 68ch; margin: var(--s4) 0;
+  padding: var(--s3) var(--s4);
+  background: color-mix(in srgb, var(--amber) 7%, var(--cream));
+  border-left: 4px solid var(--amber);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.lcp .worked-example h3 { margin: 0 0 var(--s1); }
+.lcp .worked-example > :last-child { margin-bottom: 0; }
+
+.lcp .disclaimer {
+  max-width: 68ch; margin: var(--s3) 0;
+  padding: var(--s3); border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-size: 14.5px; color: var(--muted);
+}
+.lcp .disclaimer p { margin: 0 0 var(--s1); }
+.lcp .disclaimer p:last-child { margin-bottom: 0; }
+.lcp .disclaimer strong { color: var(--ink); font-weight: 800; }
+.lcp .disclaimer a { color: var(--forest); }
+
+/* Lead gate. The consent row overrides the block-label and full-width-input defaults. */
+.lcp .gate { max-width: 480px; }
+.lcp .consent {
+  display: flex; align-items: flex-start; gap: 10px; margin-bottom: var(--s3);
+  font-size: 15px; font-weight: 600; color: var(--ink);
+}
+.lcp .consent input { flex: none; width: 18px; height: 18px; margin: 3px 0 0; }
+.lcp .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lcp .tool-card, .lcp .tool-card:hover { transition: none; transform: none; }
+}
+
+/* A row of equal-weight CTAs, used on the hub and the 404. The block-level rule
+   above gives a single button its top margin; the row owns the spacing instead. */
+.lcp .cta-row { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s3); }
+.lcp .cta-row .btn { margin-top: 0; }

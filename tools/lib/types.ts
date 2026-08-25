@@ -11,6 +11,11 @@ export interface ToolConfig {
   tagline: string;              // one line under the h1
   eyebrow: string;              // uppercase kicker
   family: ExamFamily;           // drives ground colour: pgcet=forest, mat=teal
+  // A page has one visual ground but can serve more than one exam. The study plan
+  // generator builds both CAT and MAT plans, so it must appear under MAT too --
+  // otherwise the MAT group renders empty while MAT is the nearest exam on the
+  // calendar. Grouping only, never colour.
+  alsoServes?: ExamFamily[];
   description: string;          // meta description, <=155 chars
   keywords: string[];
   readMinutes: number;          // brand blog convention shows read time

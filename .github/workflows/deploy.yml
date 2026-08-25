@@ -1,0 +1,55 @@
+name: Deploy tools
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time. Two FTP uploads writing into public_html/tools/ at once
+# would interleave files and leave the live site in a state neither build produced.
+concurrency:
+  group: deploy-tools
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Node 22, not 20. The test suite is TypeScript run directly by node --test,
+      # which relies on native type stripping — unflagged from 22.18 onward. Node 20
+      # cannot load a .ts file at all, so npm test would fail on every run and the
+      # deploy would never ship. Change this only alongside a build step for tests.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tools/package-lock.json
+
+      - name: Install
+        working-directory: tools
+        run: npm ci
+
+      # The gate. A failing test stops the job here, so nothing reaches the server.
+      - name: Test
+        working-directory: tools
+        run: npm test
+
+      - name: Build
+        working-directory: tools
+        env:
+          # Public measurement ID, not a secret — it ends up in the page source
+          # either way. Unset means lib/analytics.ts stays inert and loads nothing.
+          NEXT_PUBLIC_GA4_ID: ${{ vars.NEXT_PUBLIC_GA4_ID }}
+        run: npm run build
+
+      - name: Upload to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          protocol: ftps
+          server: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          password: ${{ secrets.HOSTINGER_PASS }}
+          local-dir: ./tools/out/
+          server-dir: /public_html/tools/
