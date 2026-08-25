@@ -165,41 +165,60 @@ release.
 
 ## 6. Data pipeline — highest-risk component
 
-### 6.1 What KEA actually publishes — spike result, 2026-08-26
+### 6.1 What KEA publishes - resolved 2026-08-26
 
-Probed directly. The spec's original assumption (cutoffs published as PDFs) is **wrong**.
+Initial HTTP probing suggested the data was unreachable: `cutoff.aspx` 301s to an
+extensionless route that serves the generic KEA landing shell, and the year pages carry
+only stale, irrelevant PDFs. That conclusion was wrong. The cutoff PDFs exist; they are
+linked from each year page under Kannada labels (`MBA CUT-OFF`), which the first
+English-keyword scan missed.
 
-- Year paths are inconsistent: `pgcet2019`, `pgcet2023`, `pgcet2025`, `pgcet2026` return 200;
-  `pgcet2020`–`2022` and `pgcet2024` return 404. 2024 exists as `pgcet24` — naming is not systematic.
-- Every year page is the same template carrying the same three stale, irrelevant PDFs
-  (`pget_cancellation.pdf`, `archive.pdf`, `vikasana_timetable.pdf`). No cutoff PDFs.
-- Cutoff data sits behind `cutoff.aspx` and `cutoffanalyser.aspx`, which 301 to extensionless
-  `/kea/pgcet<year>/cutoff`.
-- That route returns the generic KEA landing shell — byte-identical (196,749 bytes) to what
-  `cutoff.aspx` served. No title, one table, and the only `<select>` is `ddlLanguage`
-  (Kannada default, English secondary) driving an ASP.NET `__doPostBack`.
+Each year uses a DIFFERENT naming scheme. Do not assume a pattern generalises:
 
-**Conclusion: the data is not reachable over plain HTTP.** It renders through WebForms postbacks
-within an established session, and plausibly only during active counselling windows.
+| Year | Directory | Cutoff filename pattern |
+|---|---|---|
+| 2023 | `pgcet2023` | `PGCET_cutoff_2023_r1_mba_fin.pdf` |
+| 2024 | `pgcet24`   | `PGCET_cutoff_2024_r1_mba_finkannada.pdf` |
+| 2025 | `pgcet2025` | `PROF_CODE_{B\|C\|T}_{R\|H}_FIN.pdf` |
 
-### 6.2 Revised acquisition approach
+Base: `https://cetonline.karnataka.gov.in/keawebentry456/<dir>/`.
+Course codes B=MBA, C=MCA, T=MTech. Quota R=Rest of Karnataka, H=Hyderabad-Karnataka.
 
-Browser automation, not HTTP scraping. A real session must execute the page JS, switch language to
-English, drive the postback UI across course x category x round, and read the rendered tables.
+2019 is listed by KEA but every cutoff file 404s - dead links. 2020-2022 were never
+published. 2026 counselling had not begun as of 2026-08-26 (provisional result 19 Aug),
+so no 2026 cutoffs exist yet; the fetcher must be re-run once allotment rounds publish.
 
-Secondary paths if that fails: KEA's per-exam endpoints (`Pgcet22.aspx` and siblings) expose other
-years under separate names and are worth enumerating; the Internet Archive may hold cutoff pages for
-the 404 years; and KEA publishes counselling data through channels not yet surveyed.
+### 6.2 Extraction
 
-### 6.3 Gate status: TRIPPED
+`pypdf` with `extraction_mode="layout"`. The default mode reads the 2023/24 tables
+column-wise and silently shreds every row while still producing plausible-looking text -
+the most dangerous failure available here.
 
-Zero clean years obtained. Per the gate, the PGCET college predictor is **descoped from the starter
-three** and replaced by tool 27 (percentage/CGPA converter). Starter tools 1 and 2 carry no data
-dependency and proceed unchanged.
+Two block layouts, both handled by `data/pipeline/parse.py`:
+- 2025: `College: <code> <name>`, header prefixed `Course Name`, 9 categories, HK quota
+  in a separate file.
+- 2023/24: `<serial> <code> <name>`, bare category header, 19 categories with the HK
+  quota folded in as `*H` columns.
 
-This is reversible: once browser-based extraction yields three verified years for MBA and MCA, the
-predictor returns to the queue. The predictor engine it was meant to prove is deferred with it, so
-tools 19-26 need that engine built when the data arrives.
+Categories are parsed from each block's header rather than hardcoded, because the set
+genuinely differs by year. A `--` yields no row at all, never a zero.
+
+### 6.3 Gate status: PASSED
+
+Three clean years for both MBA and MCA - the threshold was three.
+
+| Year | Rows | Colleges |
+|---|---|---|
+| 2023 | 3,401 | 394 |
+| 2024 | 3,367 | 455 |
+| 2025 | 2,526 | 419 |
+
+**9,294 rows total.** `data/pipeline/verify.py` asserts 14 values read by eye from the
+source PDFs, including a negative case confirming `--` produces no row. All pass.
+
+The PGCET college predictor is therefore **restored to the roadmap**, along with the
+predictor engine that tools 19-26 reuse. It was not part of the shipped first release
+because the gate result arrived after that release was already in flight.
 
 ### 6.4 Collection conduct
 
