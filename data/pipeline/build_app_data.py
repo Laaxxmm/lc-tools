@@ -18,8 +18,15 @@ def main():
         # Names drift slightly between years; keep the longest as canonical.
         if len(r["college_name"]) > len(colleges.get(code, "")):
             colleges[code] = r["college_name"]
-        ranks.setdefault(r["course"], {}).setdefault(code, {}) \
-             .setdefault(r["category"], {})[r["year"]] = r["closing_rank"]
+        # A year can publish several rounds (2023 MBA has r1 and r2). Closing ranks
+        # RISE across rounds as stronger candidates take seats elsewhere, so the last
+        # round is the most permissive and is the honest answer to "could I get a
+        # seat". Take the max explicitly -- keying by year alone let file iteration
+        # order silently decide the winner.
+        slot = ranks.setdefault(r["course"], {}).setdefault(code, {}) \
+                    .setdefault(r["category"], {})
+        y = r["year"]
+        slot[y] = max(slot.get(y, 0), r["closing_rank"])
 
     payload = {
         "source": "Karnataka Examinations Authority (KEA), official cutoff PDFs",

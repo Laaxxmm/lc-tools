@@ -49,7 +49,18 @@ def main() -> int:
     if absent:
         bad += 1
 
-    print(f"\n{len(EXPECT)+1} checks, {bad} failed")
+    # Multi-round years must resolve to the LAST round. 2023 MBA published r1 and r2;
+    # B051 GM closed at 28834 in r1 and 42669 in r2. Taking r1 would tell a student
+    # with rank 40000 they had no chance at a seat they would comfortably have got.
+    app = pathlib.Path(__file__).parent.parent.parent / "tools" / "data" / "pgcet-cutoffs.json"
+    if app.exists():
+        got = json.loads(app.read_text())["ranks"]["MBA"]["B051"]["GM"]["2023"]
+        ok = got == 42669
+        print(f"{'PASS' if ok else 'FAIL'}  app data: 2023 MBA B051 GM resolves to last round (42669), got {got}")
+        if not ok:
+            bad += 1
+
+    print(f"\n{bad} failed")
     return 1 if bad else 0
 
 if __name__ == "__main__":
