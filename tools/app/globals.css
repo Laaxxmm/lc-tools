@@ -478,12 +478,13 @@ body {
 .lcp .longform[open] > .prose { padding-bottom: var(--s4); }
 
 
-/* ---- Reading column ----
-   A 578px measure stranded in an 1140px grid reads as a broken layout, not as a
-   text column. Prose sections get their own centred container and the text fills
-   it, so the width is the design rather than an accident of max-width. */
+/* ---- Reading layout ----
+   Two failure modes to avoid: a 578px measure stranded in an 1140px grid (dead
+   right half), and a narrow centred column (dead margins on BOTH sides). The fix
+   is to use the full container and give the spare width a job -- a contents rail
+   beside the prose, two columns for the FAQ. Line length stays readable. */
 .lcp .container-prose {
-  width: 100%; max-width: var(--container-prose);
+  width: 100%; max-width: var(--container);
   margin-inline: auto; padding-inline: var(--s3);
 }
 .lcp .container-prose > * { max-width: none; }
@@ -542,3 +543,37 @@ body {
 }
 .lcp .deadlines-more:hover { text-decoration: underline; text-underline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .lcp .deadlines li { animation: none; } }
+
+/* Prose + contents rail. The rail is the reason the prose can stay at a readable
+   measure without leaving the right side empty. */
+.lcp .prose-layout { display: grid; grid-template-columns: 1fr; gap: var(--s4); align-items: start; }
+@media (min-width: 980px) {
+  .lcp .prose-layout { grid-template-columns: minmax(0, 1fr) 232px; gap: var(--s6); }
+  .lcp .prose-nav { position: sticky; top: 118px; }
+}
+.lcp .prose { max-width: 72ch; }
+
+.lcp .prose-nav { border-left: 2px solid var(--line); padding-left: var(--s3); }
+.lcp .prose-nav-label {
+  margin: 0 0 var(--s2); font-size: var(--t-xs); font-weight: var(--w-bold);
+  letter-spacing: .14em; text-transform: uppercase; color: var(--muted);
+}
+.lcp .prose-nav ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+.lcp .prose-nav a {
+  font-size: var(--t-sm); font-weight: var(--w-med); color: var(--muted);
+  text-decoration: none; line-height: 1.4; display: block;
+  transition: color .15s ease;
+}
+.lcp .prose-nav a:hover { color: var(--forest); }
+.lcp .prose-nav a.is-active { color: var(--forest); font-weight: var(--w-semi); }
+@media (max-width: 979px) { .lcp .prose-nav { display: none; } }
+
+/* FAQ across the full width. Accordion rows are short; two columns fill the page
+   without a single line getting longer. */
+@media (min-width: 900px) {
+  .lcp .faq { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--s5); border-top: 0; }
+  .lcp .faq details { border-top: 1px solid var(--line); }
+}
+.lcp .faq details p { max-width: 60ch; }
+.lcp .sources { max-width: none; }
+@media (prefers-reduced-motion: reduce) { .lcp .prose-nav a { transition: none; } }

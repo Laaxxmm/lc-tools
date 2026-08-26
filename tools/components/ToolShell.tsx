@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { ToolConfig } from '../lib/types';
 import { TOOLS } from '../config';
 import Icon from './Icon';
+import ProseNav from './ProseNav';
 import { formatUpdated, groundClass, relatedTools, resolveCta, serialiseJsonLd, toolJsonLd } from '../lib/shell';
 import ToolCard from './ToolCard';
 
@@ -49,7 +50,10 @@ export default function ToolShell({ tool, children, explainer }: Props) {
                 essay; the people who want the reasoning can open it. */}
             <details className="longform">
               <summary>How this works, and what it will not claim</summary>
-              <div className="prose">{explainer}</div>
+              <div className="prose-layout">
+                <div className="prose">{explainer}</div>
+                <ProseNav />
+              </div>
             </details>
           </div>
         </section>
