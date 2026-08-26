@@ -18,6 +18,9 @@ const config: ToolConfig = {
     'cat registration last date',
     'mba exam registration deadlines',
   ],
+  shortName: "Exam dates & deadlines",
+  icon: 'clock',
+  oneLiner: "Every deadline, soonest first",
   readMinutes: 6,
   faq: [
     {

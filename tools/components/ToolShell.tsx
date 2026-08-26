@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import type { ToolConfig } from '../lib/types';
 import { TOOLS } from '../config';
+import Icon from './Icon';
 import { formatUpdated, groundClass, relatedTools, resolveCta, serialiseJsonLd, toolJsonLd } from '../lib/shell';
 import ToolCard from './ToolCard';
 
@@ -28,11 +29,10 @@ export default function ToolShell({ tool, children, explainer }: Props) {
 
       <header className={`tool-hero ${ground}`}>
         <div className="container">
-          <p className="eyebrow"><span className="dot" />{tool.eyebrow}</p>
+          <p className="eyebrow"><Icon name={tool.icon} size={16} />{tool.eyebrow}</p>
           <h1>{tool.title}</h1>
           <p className="lead">{tool.tagline}</p>
           <p className="meta">
-            <span>{tool.readMinutes} min read</span>
             <span>Updated {formatUpdated(tool.updated)}</span>
           </p>
         </div>
@@ -45,7 +45,12 @@ export default function ToolShell({ tool, children, explainer }: Props) {
       {explainer ? (
         <section className="section">
           <div className="container">
-            <div className="prose">{explainer}</div>
+            {/* Available, not imposed. A calculator page should not open with an
+                essay; the people who want the reasoning can open it. */}
+            <details className="longform">
+              <summary>How this works, and what it will not claim</summary>
+              <div className="prose">{explainer}</div>
+            </details>
           </div>
         </section>
       ) : null}

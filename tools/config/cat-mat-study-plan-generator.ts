@@ -20,6 +20,9 @@ const tool: ToolConfig = {
     'study plan generator mba entrance',
     'cat sectional time split',
   ],
+  shortName: "Study plan generator",
+  icon: 'calendar',
+  oneLiner: "Your weeks to exam day, mapped",
   readMinutes: 6,
   faq: [
     {

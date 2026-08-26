@@ -9,6 +9,7 @@
   /* --font: 'Lexend', system-ui, sans-serif;   <- matches live learncrew.org instead */
 
   --forest: #0E3B2E;   /* PGCET ground, footer, headings */
+  --forest-deep: #0A2C22;  /* footer ground, deeper bands (learncrew.org) */
   --teal:   #0B2A34;   /* MAT ground, secondary panels   */
   --amber:  #E8A33D;   /* CTAs, prices, eyebrows, rules  */
   --burnt:  #C9772C;   /* hover, secondary accent        */
@@ -150,9 +151,14 @@ body {
 .lcp .lc-footer .lc-nav a:hover { color: var(--cream); }
 .lcp .lc-footer small { font-size: 13.5px; }
 
-.lcp .tool-hero { padding: var(--s6) 0 var(--s5); }
+/* A tool page is used, not read. The hero identifies the page and gets out of the
+   way; the first control should be reachable without scrolling on a laptop. */
+.lcp .tool-hero { padding: var(--s5) 0 var(--s4); }
+.lcp .tool-hero + .section { padding-top: var(--s4); }
+.lcp .tool-hero h1 { font-size: clamp(26px, 3.6vw, 38px); }
+.lcp .tool-hero .eyebrow svg { color: var(--amber); flex: none; }
 .lcp .tool-hero h1 { margin-top: 14px; }
-.lcp .tool-hero .lead { margin-top: var(--s2); font-size: 18.5px; max-width: 62ch; }
+.lcp .tool-hero .lead { margin-top: var(--s2); font-size: 17px; max-width: 60ch; }
 .lcp .meta { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s3); font-size: 13.5px; font-weight: 700; }
 .lcp .rule { height: 3px; width: 56px; margin: 0 0 var(--s3); background: var(--amber); border: 0; border-radius: 2px; }
 
@@ -174,10 +180,7 @@ body {
 .lcp .faq details p { margin: 0 0 var(--s3); max-width: 62ch; color: var(--muted); }
 
 .lcp .grid { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-.lcp .tool-card { display: block; text-decoration: none; transition: transform .15s ease, box-shadow .15s ease; }
-.lcp .tool-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
-.lcp .tool-card h3 { margin-top: var(--s2); }
-.lcp .tool-card p { margin-bottom: var(--s2); color: var(--muted); font-size: 15px; }
+/* .tool-card is defined once, in the icon-led block below. */
 
 .lcp .cta-block { padding: var(--s5); border-radius: var(--radius-lg); }
 .lcp .cta-block p { max-width: 52ch; font-size: 17px; }
@@ -227,3 +230,228 @@ body {
    above gives a single button its top margin; the row owns the spacing instead. */
 .lcp .cta-row { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s3); }
 .lcp .cta-row .btn { margin-top: 0; }
+
+/* ---- Icon-led UI. Ported from learncrew.org's own patterns so /tools/ reads as
+   the same site: 46px badge, 13px radius, forest at 7%, icon in currentColor. ---- */
+
+.lcp .icon-badge {
+  width: 46px; height: 46px; border-radius: 13px;
+  background: rgba(14, 59, 46, .07); color: var(--forest);
+  display: grid; place-items: center; margin-bottom: var(--s2);
+}
+.lcp .ground-pgcet .icon-badge,
+.lcp .ground-mat .icon-badge { background: rgba(250, 247, 242, .12); color: var(--amber); }
+
+/* Quick nav: the whole toolset reachable in one glance, above the fold, no reading. */
+.lcp .quicknav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: var(--s3); }
+.lcp .quicknav a {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 15px 9px 11px; border-radius: 999px;
+  background: rgba(250, 247, 242, .10); border: 1.5px solid rgba(250, 247, 242, .18);
+  color: var(--cream); font-size: 14px; font-weight: 600; text-decoration: none;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.lcp .quicknav a:hover { background: rgba(250, 247, 242, .17); border-color: var(--amber); transform: translateY(-1px); }
+.lcp .quicknav a svg { flex: none; color: var(--amber); }
+
+/* Tool cards: icon, name, one line, cost. */
+.lcp .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); gap: 18px; }
+.lcp .tool-card {
+  display: flex; flex-direction: column; align-items: flex-start;
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: var(--s3); box-shadow: var(--shadow-sm); text-decoration: none;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.lcp .tool-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--amber); }
+.lcp .tool-card h3 { font-size: 17px; font-weight: 700; margin: 0 0 6px; }
+.lcp .tool-card p { margin: 0 0 var(--s2); color: var(--muted); font-size: 14.5px; line-height: 1.5; flex: 1; }
+
+.lcp .tag {
+  font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+}
+.lcp .tag-free { background: rgba(14, 59, 46, .09); color: var(--forest); }
+.lcp .tag-gate { background: rgba(201, 119, 44, .13); color: #8A3E12; }
+
+/* Decision path. Numbered because this genuinely IS the order a student needs them:
+   eligible first, then deadline, then plan, then target. */
+.lcp .flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; counter-reset: step; }
+.lcp .flow a {
+  position: relative; display: flex; flex-direction: column; gap: 6px;
+  background: var(--cream-2, #F3EEE4); border: 1px solid var(--line);
+  border-radius: var(--radius-sm); padding: 16px 18px 16px 17px;
+  border-left: 3px solid var(--amber); text-decoration: none;
+  transition: transform .15s ease, background .15s ease;
+}
+.lcp .flow a:hover { transform: translateY(-2px); background: #fff; }
+.lcp .flow .q { font-size: 15.5px; font-weight: 700; color: var(--ink); line-height: 1.35; }
+.lcp .flow .a { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--burnt); }
+.lcp .flow .step {
+  counter-increment: step; font-family: inherit; font-size: 11px; font-weight: 800;
+  letter-spacing: .12em; color: var(--muted);
+}
+.lcp .flow .step::before { content: counter(step) " / 4"; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lcp .tool-card, .lcp .tool-card:hover,
+  .lcp .flow a, .lcp .flow a:hover,
+  .lcp .quicknav a, .lcp .quicknav a:hover { transition: none; transform: none; }
+}
+
+/* ---- Two-pane tool layout ----
+   A generator is a control panel plus its output. The controls stay put while the
+   output scrolls, so you can change an answer at any point without hunting for the
+   form. Below 1000px the pane would eat the screen, so it stacks: controls first. */
+
+.lcp .tool-layout { display: grid; grid-template-columns: 1fr; gap: var(--s4); align-items: start; }
+@media (min-width: 1000px) {
+  .lcp .tool-layout { grid-template-columns: minmax(0, 1fr) 392px; gap: var(--s5); }
+  .lcp .tool-layout > .pane { position: sticky; top: var(--s3); }
+  /* Output comes second in the DOM so mobile gets the controls first, but reads
+     left on desktop. Order, not duplication. */
+  .lcp .tool-layout > .pane { order: 2; }
+  .lcp .tool-layout > .output { order: 1; }
+}
+.lcp .pane {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: var(--s4); box-shadow: var(--shadow-sm);
+}
+.lcp .pane h2 { font-size: 19px; margin-bottom: var(--s3); }
+.lcp .pane .field { margin-bottom: var(--s3); }
+.lcp .pane label { font-size: 13.5px; margin-bottom: 7px; }
+.lcp .pane input, .lcp .pane select { padding: 12px 14px; font-size: 15.5px; }
+.lcp .pane-foot { border-top: 1px solid var(--line); margin-top: var(--s4); padding-top: var(--s4); }
+.lcp .pane-foot h3, .lcp .pane-foot h2 { font-size: 17px; margin-bottom: 8px; }
+
+/* Summary strip: the four numbers that matter, tabular so they line up. */
+.lcp .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: var(--s3); margin-bottom: var(--s4); }
+.lcp .summary .n { font-size: 30px; font-weight: 800; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.lcp .summary .k { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+
+/* The plan as a scannable table instead of fourteen full-height blocks.
+   The narrative for each week lives in the PDF, which is what it is for. */
+.lcp .plan-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; }
+.lcp table.plan { border-collapse: collapse; width: 100%; min-width: 460px; font-size: 14.5px; }
+.lcp table.plan th, .lcp table.plan td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.lcp table.plan th { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.lcp table.plan tr:last-child td { border-bottom: none; }
+.lcp table.plan td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lcp table.plan tbody tr:hover { background: var(--cream); }
+.lcp .phase-pill {
+  display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .07em;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
+  background: rgba(14, 59, 46, .08); color: var(--forest); white-space: nowrap;
+}
+.lcp .phase-taper { background: rgba(201, 119, 44, .14); color: #8A3E12; }
+
+/* Long-form explanation is available, not imposed. */
+.lcp .longform > summary {
+  cursor: pointer; font-weight: 700; font-size: 16px; padding: var(--s2) 0;
+  list-style: none; display: flex; align-items: center; gap: 8px; color: var(--forest);
+}
+.lcp .longform > summary::-webkit-details-marker { display: none; }
+.lcp .longform > summary::after { content: '+'; color: var(--burnt); font-weight: 800; }
+.lcp .longform[open] > summary::after { content: '\2013'; }
+
+/* Persistent tool switcher. Scrolls horizontally on narrow screens rather than
+   wrapping to three rows and pushing the tool itself off the fold. */
+.lcp .tool-switch { background: #fff; border-bottom: 1px solid var(--line); position: relative; z-index: 5; }
+.lcp .tool-switch-inner {
+  display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+  padding-top: 9px; padding-bottom: 9px;
+}
+.lcp .tool-switch-inner::-webkit-scrollbar { display: none; }
+.lcp .tool-switch a {
+  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+  padding: 7px 13px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
+  color: var(--muted); text-decoration: none; border: 1.5px solid transparent;
+  transition: background .15s ease, color .15s ease;
+}
+.lcp .tool-switch a svg { flex: none; color: var(--burnt); }
+.lcp .tool-switch a:hover { background: var(--cream); color: var(--ink); }
+.lcp .tool-switch a.is-active {
+  background: var(--forest); color: var(--cream); border-color: var(--forest);
+}
+.lcp .tool-switch a.is-active svg { color: var(--amber); }
+@media (prefers-reduced-motion: reduce) { .lcp .tool-switch a { transition: none; } }
+
+/* Sticky masthead: the site bar and the tool switcher travel together as one
+   unit, so switching tools never means scrolling back to the top. */
+.lcp .lc-header {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--cream); border-bottom: 1px solid var(--line);
+  backdrop-filter: saturate(140%) blur(6px);
+}
+.lcp .tool-switch { position: sticky; top: 57px; z-index: 19; }
+@media (max-width: 700px) { .lcp .tool-switch { top: 53px; } }
+
+.lcp .lc-header .container {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s3); padding-top: 13px; padding-bottom: 13px;
+}
+.lcp .wordmark {
+  font-weight: 800; font-size: 16px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--forest); text-decoration: none;
+}
+.lcp .lc-nav { display: flex; gap: var(--s3); align-items: center; }
+.lcp .lc-nav a {
+  font-size: 14px; font-weight: 600; color: var(--muted); text-decoration: none;
+  padding: 5px 2px; border-bottom: 2px solid transparent; transition: color .15s ease, border-color .15s ease;
+}
+.lcp .lc-nav a:hover { color: var(--forest); border-bottom-color: var(--amber); }
+@media (max-width: 640px) { .lcp .lc-nav { display: none; } }
+
+/* Gate: no form until the file is asked for. */
+.lcp .gate h3 { font-size: 17px; margin-bottom: 6px; }
+.lcp .gate .gate-blurb { margin: 0 0 var(--s3); font-size: 14px; }
+.lcp .gate .gate-fine { margin-top: 10px; font-size: 12.5px; line-height: 1.5; }
+.lcp .gate .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; font-weight: 600; margin-bottom: var(--s3); }
+.lcp .gate .consent input { width: auto; flex: none; margin-top: 3px; }
+.lcp .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+
+/* A short output column must not leave the sticky pane hanging in a void. */
+.lcp .tool-layout > .output { min-height: 100%; }
+@media (prefers-reduced-motion: reduce) { .lcp .lc-nav a { transition: none; } }
+
+/* Footer, matching learncrew.org. */
+.lcp .lc-footer { background: var(--forest-deep, #0A2C22); color: rgba(250, 247, 242, .85); margin-top: var(--s7); }
+.lcp .lc-footer .container { padding-top: var(--s6); padding-bottom: var(--s4); }
+.lcp .foot-top {
+  display: grid; grid-template-columns: 1.5fr repeat(3, 1fr);
+  gap: var(--s5) var(--s4); padding-bottom: var(--s5);
+}
+@media (max-width: 860px) { .lcp .foot-top { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 520px) { .lcp .foot-top { grid-template-columns: 1fr; gap: var(--s4); } }
+
+.lcp .foot-brand .wordmark { color: var(--cream); display: inline-block; margin-bottom: var(--s2); }
+.lcp .foot-brand p { margin: 0 0 8px; font-size: 14.5px; max-width: 34ch; line-height: 1.6; }
+.lcp .foot-contact a { color: var(--amber); font-weight: 700; text-decoration: none; }
+.lcp .foot-contact a:hover { text-decoration: underline; }
+
+.lcp .foot-col { display: flex; flex-direction: column; gap: 11px; }
+.lcp .foot-col h2 {
+  font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--amber); margin: 0 0 4px;
+}
+.lcp .foot-col a { color: rgba(250, 247, 242, .85); font-size: 14.5px; text-decoration: none; }
+.lcp .foot-col a:hover { color: var(--cream); text-decoration: underline; text-underline-offset: 3px; }
+
+.lcp .foot-legal {
+  border-top: 1px solid rgba(250, 247, 242, .14);
+  padding-top: var(--s3);
+  display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); justify-content: space-between;
+}
+.lcp .foot-legal p { margin: 0; font-size: 13px; color: rgba(250, 247, 242, .62); }
+.lcp .lc-footer :focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
+
+/* Section rhythm. Every .section used to pad 64px top AND bottom, so two adjacent
+   sections put 128px of nothing between them. One gap between neighbours, not two. */
+.lcp .section { padding: var(--s5) 0; }
+.lcp .section + .section { padding-top: 0; }
+.lcp .tool-hero + .section { padding-top: var(--s4); }
+
+/* A collapsed explainer is one line until opened; it does not need a full section. */
+.lcp .section:has(> .container > .longform) { padding-block: var(--s4); }
+.lcp .longform { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.lcp .longform > summary { padding: var(--s3) 0; }
+.lcp .longform[open] > .prose { padding-bottom: var(--s4); }

@@ -18,6 +18,9 @@ const tool: ToolConfig = {
     'cat accuracy calculator',
     'raw score for 99 percentile cat',
   ],
+  shortName: "Percentile target",
+  icon: 'target',
+  oneLiner: "The score your target college needs",
   readMinutes: 6,
   faq: [
     {

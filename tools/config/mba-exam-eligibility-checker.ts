@@ -24,6 +24,9 @@ const tool: ToolConfig = {
     'mah cet mba eligibility',
     'final year mba entrance exam',
   ],
+  shortName: "Eligibility checker",
+  icon: 'check',
+  oneLiner: "Which exams you can actually write",
   readMinutes: 6,
   faq: [
     {

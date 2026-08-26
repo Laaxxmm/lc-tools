@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import ToolCard from '../components/ToolCard';
+import Icon from '../components/Icon';
 import { TOOLS } from '../config';
 import { CTA, type ExamFamily } from '../lib/types';
 import { SITE, formatUpdated, groupByFamily, latestUpdated } from '../lib/shell';
@@ -21,45 +22,29 @@ export const metadata: Metadata = {
 const GROUPS: Record<ExamFamily, { heading: string; blurb: ReactNode }> = {
   cat: {
     heading: 'CAT 2026',
-    blurb: (
-      <>
-        CAT is on <a href="https://iimcat.ac.in/">29 November 2026</a> and registration opened on
-        3 August, so the cycle is already running. These deal with the two questions that come
-        first: the score you actually need, and how the syllabus fits into the weeks you have left.
-      </>
-    ),
+    blurb: <>Exam <a href="https://iimcat.ac.in/">29 November</a>. Registration is already open.</>,
   },
   mat: {
     heading: 'MAT 2026',
-    blurb: (
-      <>
-        AIMA runs the paper-based sitting on <a href="https://mat.aima.in/">13 September 2026</a> and
-        the computer-based one on 20 September. MAT is the quickest entrance to get into, which is
-        why it works as a second door when CAT timing goes against you.
-      </>
-    ),
+    blurb: <>Paper-based <a href="https://mat.aima.in/">13 September</a>, computer-based 20 September. The quickest entrance to get into.</>,
   },
   pgcet: {
     heading: 'Karnataka PGCET',
-    blurb: (
-      <>
-        The 2026 exam has concluded and{' '}
-        <a href="https://cetonline.karnataka.gov.in/kea/">KEA counselling</a> is where the decisions
-        are being made now. Tools in this group handle cutoffs, allotment and choice order rather
-        than preparation.
-      </>
-    ),
+    blurb: <>Exam done. <a href="https://cetonline.karnataka.gov.in/kea/">KEA counselling</a> is where the decisions happen now.</>,
   },
   general: {
     heading: 'Works for any entrance',
-    blurb: (
-      <>
-        Eligibility, deadlines, marks and money. Nothing in this group belongs to one exam board, so
-        reach for these whichever form you are filling in.
-      </>
-    ),
+    blurb: <>Eligibility, deadlines, marks and money. Whichever form you are filling in.</>,
   },
 };
+
+// The order a student actually needs these in, which is why they are numbered.
+const FLOW = [
+  { q: 'Can I even apply?', slug: 'mba-exam-eligibility-checker', to: 'Eligibility checker' },
+  { q: 'When is the deadline?', slug: 'mba-exam-dates-2026', to: 'Dates & deadlines' },
+  { q: 'How do I use the weeks left?', slug: 'cat-mat-study-plan-generator', to: 'Study plan' },
+  { q: 'What score do I need?', slug: 'cat-percentile-target-calculator', to: 'Percentile target' },
+];
 
 const HUB_CTAS = [CTA.coaching, CTA.matMocks, CTA.pgcetMocks];
 
@@ -73,15 +58,17 @@ export default function Page() {
           <p className="eyebrow"><span className="dot" />Learn Crew Tools</p>
           <h1>Free tools for MBA and MCA entrance aspirants</h1>
           <p className="lead">
-            Every tool here works before it asks you for anything. You put your own numbers in, the
-            answer appears on the page, and the only time an email box stands in the way is when
-            there is a file we have to send you.
+            Every tool works before it asks you for anything. Put your numbers in, get the answer
+            on the page.
           </p>
-          <p className="lead">
-            A new tool goes up every week. What is live today sits below, grouped by the exam it
-            belongs to, and the arithmetic behind each one is written out on its own page so you can
-            check it instead of trusting it.
-          </p>
+          <nav className="quicknav" aria-label="Jump to a tool">
+            {TOOLS.map((t) => (
+              <a key={t.slug} href={`/tools/${t.slug}/`}>
+                <Icon name={t.icon} size={17} />
+                {t.shortName ?? t.title}
+              </a>
+            ))}
+          </nav>
           <p className="meta">
             <span>{TOOLS.length} tools live</span>
             <span>New tool every week</span>
@@ -89,6 +76,25 @@ export default function Page() {
           </p>
         </div>
       </header>
+
+      <section className="section">
+        <div className="container">
+          <div className="section-head">
+            <hr className="rule" />
+            <h2>Not sure which one?</h2>
+            <p>Find the question you are actually asking.</p>
+          </div>
+          <div className="flow">
+            {FLOW.map((f) => (
+              <a key={f.slug} href={`/tools/${f.slug}/`}>
+                <span className="step" />
+                <span className="q">{f.q}</span>
+                <span className="a">{f.to} <Icon name="arrow" size={15} /></span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {groups.map((g) => (
         <section className="section" key={g.family}>
@@ -98,7 +104,7 @@ export default function Page() {
               <h2>{GROUPS[g.family].heading}</h2>
               <p>{GROUPS[g.family].blurb}</p>
             </div>
-            <div className="grid">
+            <div className="tool-grid">
               {g.tools.map((t) => <ToolCard key={t.slug} tool={t} />)}
             </div>
           </div>

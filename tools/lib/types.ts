@@ -3,6 +3,8 @@
 
 export type ExamFamily = 'pgcet' | 'mat' | 'cat' | 'general';
 
+import type { IconName } from '../components/Icon';
+
 export interface FaqItem { q: string; a: string; }
 
 export interface ToolConfig {
@@ -18,6 +20,12 @@ export interface ToolConfig {
   alsoServes?: ExamFamily[];
   description: string;          // meta description, <=155 chars
   keywords: string[];
+  // The full title is a search headline; a card needs a name. Falls back to title.
+  shortName?: string;
+  icon: IconName;               // card + quick-nav glyph
+  // Six to nine words, scannable. The card shows this, never the tagline -- a card
+  // you have to read a paragraph of is a card nobody reads.
+  oneLiner: string;
   readMinutes: number;          // brand blog convention shows read time
   faq: FaqItem[];               // rendered + emitted as FAQPage schema
   related: string[];            // slugs of nearest tools

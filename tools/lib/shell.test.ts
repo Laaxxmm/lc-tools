@@ -15,6 +15,8 @@ const tool = (over: Partial<ToolConfig> = {}): ToolConfig => ({
   family: 'general',
   description: 'Convert CGPA to percentage.',
   keywords: ['cgpa'],
+  icon: 'percent',
+  oneLiner: 'CGPA to percentage, by your rule',
   readMinutes: 4,
   faq: [{ q: 'Which formula does VTU use?', a: 'It subtracts 0.75, then multiplies by 10.' }],
   related: [],

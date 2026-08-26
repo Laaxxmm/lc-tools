@@ -3,10 +3,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "test": "node --test \"**/*.test.ts\""
+    "build": "NEXT_DIST_DIR=.next-build next build",
+    "test": "node --test \"**/*.test.ts\"",
+    "verify": "npm test && npm run build"
   },
   "dependencies": {
+    "jspdf": "^4.2.1",
     "next": "^15.5.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"

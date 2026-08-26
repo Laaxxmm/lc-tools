@@ -11,13 +11,20 @@ interface Props {
   children: ReactNode;
   heading?: string;
   blurb?: string;
+  /** Label for the button that reveals the form. Until it is pressed no form is
+      shown at all -- a tall form sitting there before anyone asked for the file
+      makes the pane taller than the content beside it and leaves a void. */
+  trigger?: string;
+  /** Submit label. Say what they get, not "show me the rest". */
+  submitLabel?: string;
 }
 
 const key = (slug: string) => `lc-unlock:${slug}`;
 
-export default function LeadGate({ slug, mode, children, heading, blurb }: Props) {
+export default function LeadGate({ slug, mode, children, heading, blurb, trigger, submitLabel }: Props) {
   const id = useId();
   const [unlocked, setUnlocked] = useState(false);
+  const [asked, setAsked] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -28,6 +35,14 @@ export default function LeadGate({ slug, mode, children, heading, blurb }: Props
   }, [slug]);
 
   if (unlocked) return <>{children}</>;
+
+  if (trigger && !asked) {
+    return (
+      <button className="btn btn-amber btn-block" type="button" onClick={() => setAsked(true)}>
+        {trigger}
+      </button>
+    );
+  }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -51,9 +66,9 @@ export default function LeadGate({ slug, mode, children, heading, blurb }: Props
   }
 
   return (
-    <form className="card gate" onSubmit={onSubmit} noValidate>
+    <form className="gate" onSubmit={onSubmit} noValidate>
       <h3>{heading ?? 'See the full breakdown'}</h3>
-      <p className="muted">{blurb ?? 'Enter your email and the rest opens straight away.'}</p>
+      {blurb ? <p className="muted gate-blurb">{blurb}</p> : null}
 
       <div className="field">
         <label htmlFor={`${id}-email`}>Email address</label>
@@ -85,12 +100,12 @@ export default function LeadGate({ slug, mode, children, heading, blurb }: Props
       {error ? <p className="error" role="alert">{error}</p> : null}
 
       <button className="btn btn-forest btn-block" type="submit" disabled={busy}>
-        {busy ? 'Saving…' : 'Show me the rest'}
+        {busy ? 'Saving…' : submitLabel ?? 'Show me the rest'}
       </button>
 
-      <p className="muted" style={{ marginTop: 12 }}>
-        We store your email to send this result and exam updates. WhatsApp is separate and
-        optional. Ask us to delete your details any time and we will.
+      <p className="muted gate-fine">
+        Used to send this result and exam updates. WhatsApp is separate and optional.
+        Ask us to delete your details any time.
       </p>
     </form>
   );

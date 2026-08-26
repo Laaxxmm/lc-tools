@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
+import ToolNav from '../components/ToolNav';
+import { TOOLS } from '../config';
 import { SITE } from '../lib/shell';
 import './globals.css';
 
@@ -46,23 +48,55 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </nav>
           </div>
         </header>
+        <ToolNav />
 
         <main id="main">{children}</main>
 
+        {/* Mirrors the learncrew.org footer: forest-deep ground, cream at 85%,
+            Programs / Tools / Company columns, legal bar. */}
         <footer className="lc-footer">
           <div className="container">
-            <span className="wordmark">Learn Crew</span>
-            <p>
-              You get the working tool first and the answer for free. Buy something only if
-              you want the practice that goes with it.
-            </p>
-            <nav className="lc-nav" aria-label="Learn Crew sites">
-              {PROPERTIES.map((p) => (
-                <a key={p.href} href={p.href}>{p.label}</a>
-              ))}
-              <Link href="/">All tools</Link>
-            </nav>
-            <p><small>&copy; Learn Crew. Bengaluru.</small></p>
+            <div className="foot-top">
+              <div className="foot-brand">
+                <span className="wordmark">Learn Crew</span>
+                <p>
+                  Learn Crew (Learncrew Talent Pvt Ltd), Bengaluru &mdash; online across India.
+                </p>
+                <p className="foot-contact">
+                  <a href="tel:+919738255304">+91 97382 55304</a>
+                </p>
+              </div>
+
+              <div className="foot-col">
+                <h2>Programs</h2>
+                <a href="https://learncrew.org/">PGCET Coaching</a>
+                <a href="https://learncrew.org/">MAT Coaching</a>
+                <a href="https://learncrew.org/learn-crew-results/">Results</a>
+                <a href="https://learncrew.org/blog/">Blog</a>
+                <a href="https://publications.learncrew.org/">Books &amp; Mocks</a>
+              </div>
+
+              <div className="foot-col">
+                <h2>Free tools</h2>
+                {TOOLS.slice(0, 5).map((t) => (
+                  <Link key={t.slug} href={`/${t.slug}/`}>{t.shortName ?? t.title}</Link>
+                ))}
+                <Link href="/">All tools</Link>
+              </div>
+
+              <div className="foot-col">
+                <h2>Company</h2>
+                <a href="https://learncrew.org/contact/">Contact</a>
+                <a href="https://learncrew.org/privacy-policy/">Privacy</a>
+                <a href="https://learncrew.org/terms/">Terms</a>
+                <a href="https://learncrew.org/refund-policy/">Refunds</a>
+              </div>
+            </div>
+
+            <div className="foot-legal">
+              <p>&copy; 2026 Learncrew Talent Pvt Ltd. All rights reserved.</p>
+              <p>PGCET &middot; MAT online coaching | Books &amp; mocks for PGCET, MAT, CLAT, CAT</p>
+            </div>
           </div>
         </footer>
       </body>

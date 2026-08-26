@@ -22,6 +22,9 @@ const tool: ToolConfig = {
     'anna university cgpa percentage',
     'cgpa for mba application form',
   ],
+  shortName: "CGPA converter",
+  icon: 'percent',
+  oneLiner: "CGPA to percentage, by your university's rule",
   readMinutes: 6,
   faq: [
     {
