@@ -99,7 +99,7 @@ export default function ToolShell({ tool, children, explainer }: Props) {
           <div className="container">
             <hr className="rule" />
             <h2>Tools that pair with this one</h2>
-            <div className="grid">
+            <div className="tool-rail">
               {related.map((r) => <ToolCard key={r.slug} tool={r} />)}
             </div>
           </div>

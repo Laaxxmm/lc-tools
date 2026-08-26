@@ -15,16 +15,19 @@ export const metadata: Metadata = {
 // Page-local styling. Every value is a token from globals.css — the shared sheet
 // stays the source of truth and picks up nothing that only one page uses.
 const css = `
-.el-standfirst { max-width: 62ch; font-size: 17px; }
+.el-standfirst { max-width: none; font-size: var(--t-md); }
+/* Same three-column grid every other tool uses. auto-fit was landing 5+1. */
 .el-form {
   display: grid; gap: var(--s3); margin: var(--s4) 0 var(--s3);
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: 1fr;
 }
+@media (min-width: 620px) { .el-form { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 940px) { .el-form { grid-template-columns: repeat(3, 1fr); } }
 .el-form .field { margin: 0; }
 .el-checks { display: grid; gap: var(--s1); margin-bottom: var(--s4); }
 .el-checks .consent { margin: 0; }
 .el-summary {
-  max-width: 62ch; font-size: 17px; margin: 0;
+  max-width: none; font-size: var(--t-md); margin: 0;
   padding: var(--s3); border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--forest) 6%, transparent);
 }
@@ -35,16 +38,21 @@ const css = `
   justify-content: space-between; gap: var(--s2);
 }
 .el-tag {
-  font-size: 12.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em;
-  padding: 5px 12px; border-radius: 999px; border: 1.5px solid transparent; white-space: nowrap;
+  font-size: var(--t-sm); font-weight: var(--w-bold); text-transform: uppercase;
+  letter-spacing: .1em; padding: 8px 16px; border-radius: 999px;
+  border: 1.5px solid transparent; white-space: nowrap;
 }
-.el-yes { background: var(--forest); color: var(--cream); }
-.el-maybe { background: color-mix(in srgb, var(--amber) 26%, transparent); color: var(--ink); }
-.el-no { border-color: var(--line); color: var(--muted); }
-.el-detail { margin: 10px 0 0; font-size: 16px; max-width: 62ch; }
-.el-rule { margin: 8px 0 0; font-size: 14px; color: var(--muted); max-width: 62ch; }
-.el-k { font-weight: 700; }
-.el-note { margin: var(--s2) 0 0; font-size: 14px; color: var(--muted); max-width: 62ch; }
+.el-yes { background: var(--forest); color: var(--cream); box-shadow: 0 6px 16px -8px rgba(14,59,46,.6); }
+.el-maybe { background: var(--amber); color: var(--ink); box-shadow: 0 6px 16px -8px rgba(232,163,61,.7); }
+.el-no { background: transparent; border-color: var(--line); color: var(--muted); }
+/* A row you clear is worth spotting from a scroll. */
+.el-row { border-left: 4px solid var(--line); }
+.el-row:has(.el-yes) { border-left-color: var(--forest); }
+.el-row:has(.el-maybe) { border-left-color: var(--amber); }
+.el-detail { margin: 10px 0 0; font-size: var(--t-base); max-width: none; }
+.el-rule { margin: 8px 0 0; font-size: var(--t-sm); color: var(--muted); max-width: none; }
+.el-k { font-weight: var(--w-semi); }
+.el-note { margin: var(--s2) 0 0; font-size: var(--t-sm); color: var(--muted); max-width: none; }
 .el-src { color: var(--forest); font-weight: 700; }
 .el-foot { display: grid; gap: var(--s1); margin-top: var(--s4); }
 @media (max-width: 560px) {

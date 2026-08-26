@@ -10,6 +10,7 @@ import {
   type Verdict,
 } from '../../calc/eligibility';
 import { FORMULAS, type FormulaId } from '../../calc/cgpa';
+import KpiRow from '../../components/KpiRow';
 
 // No submit button. The verdicts recompute as you change a field, because the
 // interesting part of this tool is watching one input flip six answers at once.
@@ -193,6 +194,12 @@ export default function Checker() {
         <p className="error" role="alert">{result.error}</p>
       ) : (
         <div className="el-out">
+          {/* The answer, before any scrolling. */}
+          <KpiRow items={[
+            { label: 'Exams checked', value: exams.length },
+            { label: 'You clear outright', value: clear },
+            { label: 'Depends on one more thing', value: conditional },
+          ]} />
           <p className="el-summary" aria-live="polite">
             Working from {result.percent}% aggregate. You clear the published bar outright for{' '}
             {clear} of {exams.length}.{' '}

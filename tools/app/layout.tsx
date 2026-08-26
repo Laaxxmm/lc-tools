@@ -81,7 +81,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <div className="container">
             <div className="foot-top">
               <div className="foot-brand">
-                <span className="wordmark">Learn Crew</span>
+                <img src="/tools/learn-crew-logo.png" width={272} height={92} alt="Learn Crew" />
                 <p>
                   Learn Crew (Learncrew Talent Pvt Ltd), Bengaluru &mdash; online across India.
                 </p>

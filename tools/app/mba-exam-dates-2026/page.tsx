@@ -3,6 +3,7 @@ import ToolShell from '../../components/ToolShell';
 import tool from '../../config/mba-exam-dates-2026';
 import { toolUrl } from '../../lib/shell';
 import Tracker from './Tracker';
+import { OfferRow } from '../../components/OfferCard';
 
 export const metadata: Metadata = {
   title: tool.title,
@@ -68,6 +69,38 @@ export default function Page() {
     <>
       <style>{css}</style>
       <ToolShell tool={tool} explainer={<Explainer />}>
+      {/* Someone counting days to an exam is exactly who wants papers to practise
+          on. PGCET routes to publications because it cannot be priced correctly
+          on the LMS. */}
+      <OfferRow offers={[
+        {
+          eyebrow: 'MAT · 13 September',
+          title: 'Full-length MAT papers',
+          body: 'Sit the paper under real timing before the day itself, then read the analysis.',
+          price: 'Rs.999 / year',
+          href: 'https://learn.learncrew.org/',
+          cta: 'Get the MAT series',
+          icon: 'clock',
+        },
+        {
+          eyebrow: 'Karnataka PGCET',
+          title: 'PGCET mock series',
+          body: 'Previous-year patterns and full mocks for the MBA and MCA papers.',
+          price: 'Rs.399 / year',
+          href: 'https://publications.learncrew.org/?tab=mocks',
+          cta: 'Get PGCET mocks',
+          icon: 'target',
+        },
+        {
+          eyebrow: 'Books & ebooks',
+          title: 'The written material',
+          body: 'Topic books and solved papers for PGCET, MAT, CAT and CLAT.',
+          href: 'https://publications.learncrew.org/',
+          cta: 'Browse the store',
+          icon: 'download',
+        },
+      ]} />
+
         <Tracker builtOn={builtOn} />
       </ToolShell>
     </>
