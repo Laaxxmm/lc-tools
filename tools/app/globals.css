@@ -840,7 +840,7 @@ body {
 .lcp .output .note { max-width: none; }
 
 /* Footer logo, on the dark ground. */
-.lcp .foot-brand img { display: block; height: 40px; width: auto; margin-bottom: var(--s2); }
+.lcp .foot-brand > img { display: block; height: 40px; width: auto; margin-bottom: var(--s2); }
 
 /* Related tools as one scrolling rail. Five cards wrapped to 3+2 left a ragged
    second row; a rail keeps them on one line and reads as "there are more". */
@@ -934,3 +934,17 @@ body {
   color: var(--forest); font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 .lcp .ground-pgcet .price, .lcp .ground-mat .price, .lcp .offer .price { color: var(--amber); }
+
+/* Footer lockup: running-pencil mark, wordmark to its right. The mark is drawn
+   with a black outline, so on the forest ground it sits on a cream badge rather
+   than dissolving into the background. */
+.lcp .foot-lockup { display: inline-flex; align-items: center; gap: 12px; margin-bottom: var(--s3); }
+.lcp .foot-mark {
+  display: grid; place-items: center; flex: none;
+  width: 46px; height: 46px; border-radius: 13px; background: var(--cream);
+}
+.lcp .foot-mark img { display: block; width: 34px; height: 34px; }
+.lcp .foot-name {
+  font-size: var(--t-md); font-weight: var(--w-bold);
+  letter-spacing: -.01em; color: var(--cream); white-space: nowrap;
+}
