@@ -1,0 +1,150 @@
+row_id,confidence,college,city,region,programme,exam,DECISION_yes_no,strength_primary_secondary_vacant,cutoff_if_known,evidence_sentence,source_url
+92,HIGH-exam-body-list,ABBS School of Management,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+55,HIGH-exam-body-list,AIMA – Centre for Management Education,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+97,HIGH-exam-body-list,AIMS IBS Business School Bengaluru,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+98,HIGH-exam-body-list,AIMS Institutes (Acharya Institute of Management and Sciences),Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+33,HIGH-exam-body-list,ATLAS SkillTech University,Mumbai,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+54,HIGH-exam-body-list,Accman Institute of Management,Greater Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+93,HIGH-exam-body-list,Acharya Bangalore B-School,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+94,HIGH-exam-body-list,Acharya Institute of Graduate Studies,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+95,HIGH-exam-body-list,Acharya Institute of Technology,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+1,HIGH-exam-body-list,Adamas University,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+96,HIGH-exam-body-list,Administrative Staff College of India,Hyderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+99,HIGH-exam-body-list,"Alliance School of Business, Alliance University",Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+100,HIGH-exam-body-list,Amrita School of Business,Coimbatore,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+56,HIGH-exam-body-list,Apeejay School of Management,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+57,HIGH-exam-body-list,Asian Business School,Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+101,HIGH-exam-body-list,Badruka School of Management,Hyderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+2,HIGH-exam-body-list,Bharatiya Vidya Bhavan Institute of Management Science,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+3,HIGH-exam-body-list,Bhawanipur Global Campus,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+4,HIGH-exam-body-list,Birla Global University,Bhubaneswar,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+58,HIGH-exam-body-list,Birla Institute of Management Technology,Greater Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+104,HIGH-exam-body-list,"CMR University, School of Management",Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+5,HIGH-exam-body-list,Calcutta Business School,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+102,HIGH-exam-body-list,Chanakya School of Modern Management,Hyderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+6,HIGH-exam-body-list,Chandragupt Institute of Management Patna,Patna,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+59,HIGH-exam-body-list,Chitkara University,Rajpura,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+60,HIGH-exam-body-list,Christ University – School of Business and Management,Ghaziabad,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+103,HIGH-exam-body-list,Christ University – School of Business and Management,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+34,HIGH-exam-body-list,Christ University – School of Business and Management,Pune,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+105,HIGH-exam-body-list,"Crescent School of Business, BS Abdur Rahman Crescent Institute of Science & Technology",Chennai,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+61,HIGH-exam-body-list,Delhi School of Business (VIPS-TC),New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+62,HIGH-exam-body-list,Department of Management- DPG College,Gurugram,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+7,HIGH-exam-body-list,Development Management Institute,Patna,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+106,HIGH-exam-body-list,Dhruva College of Management,Hyderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+8,HIGH-exam-body-list,Dr BC Roy Engineering College,Durgapur,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+63,HIGH-exam-body-list,Dr Gaur Hari Singhania Institute of Management & Research,Kanpur,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+9,HIGH-exam-body-list,Durgapur Institute of Advanced Technology & Management,Durgapur,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+10,HIGH-exam-body-list,EIILM,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+107,HIGH-exam-body-list,East Point College of Higher Education,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+35,HIGH-exam-body-list,Entrepreneurship Development Institute of India,Gandhinagar,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+65,HIGH-exam-body-list,FOSTIIMA Business School,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+108,HIGH-exam-body-list,Firebird Institute of Research in Management,Coimbatore,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+64,HIGH-exam-body-list,Fortune Institute of International Business,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+11,HIGH-exam-body-list,Future Institute of Engineering & Management,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+66,HIGH-exam-body-list,GL Bajaj Institute of Management & Research,Greater Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+67,HIGH-exam-body-list,GNIOT Institute of Management Studies (GIMS),Greater Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+109,HIGH-exam-body-list,Global Institute of Business Studies,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+12,HIGH-exam-body-list,Haldia Institute of Technology,Haldia,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+36,HIGH-exam-body-list,"Hari Shankar Singhania School of Business, JK Lakshmipat University",Jaipur,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+13,HIGH-exam-body-list,Heritage Business School,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+68,HIGH-exam-body-list,I.T.S – School of Management,Ghaziabad,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+110,HIGH-exam-body-list,ICBM School of Business Excellence,Hyderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+37,HIGH-exam-body-list,"IIEBM, Indus Business School",Pune,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+38,HIGH-exam-body-list,IIHMR University,Jaipur,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+69,HIGH-exam-body-list,IILM Academy of Higher Learning,Lucknow,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+39,HIGH-exam-body-list,IILM Academy of Higher Learning,Jaipur,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+70,HIGH-exam-body-list,IILM Institute for Higher Education,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+71,HIGH-exam-body-list,IILM University,Gurgaon,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+72,HIGH-exam-body-list,IILM University Greater Noida,Greater Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+22,HIGH-exam-body-list,IQ City United World School of Business,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+117,HIGH-exam-body-list,ISBR Business School,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+44,HIGH-exam-body-list,ITM Skill University,Mumbai,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+45,HIGH-exam-body-list,ITM University,Raipur,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+43,HIGH-exam-body-list,ITM Vocational University,Vadodara,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+73,HIGH-exam-body-list,Inderprastha Engineering College (IPEC),Ghaziabad,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+111,HIGH-exam-body-list,Indian Institute of Plantation Management,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+14,HIGH-exam-body-list,Indian Institute of Social Welfare and Business Management,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+112,HIGH-exam-body-list,Indus Business Academy,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+15,HIGH-exam-body-list,Institute of Business Management,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+16,HIGH-exam-body-list,Institute of Business Management and Research,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+17,HIGH-exam-body-list,Institute of Engineering & Management,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+113,HIGH-exam-body-list,Institute of Health Management Research,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+116,HIGH-exam-body-list,Institute of Insurance and Risk Management,Hyderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+18,HIGH-exam-body-list,Institute of Management & Information Sciences,Bhubaneswar,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+19,HIGH-exam-body-list,Institute of Management Study,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+74,HIGH-exam-body-list,Institute of Marketing & Management Business School,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+114,HIGH-exam-body-list,Institute of Public Enterprise,Hyderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+41,HIGH-exam-body-list,Institute of Rural Management,Jaipur,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+115,HIGH-exam-body-list,International Institute of Business Studies,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+75,HIGH-exam-body-list,International Institute of Health Management Research,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+40,HIGH-exam-body-list,International Institute of Management Studies,Pune,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+20,HIGH-exam-body-list,International School of Business & Media,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+42,HIGH-exam-body-list,"International School of Business &#038; Media, Pune",Pune,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+21,HIGH-exam-body-list,International School of Management Patna,Patna,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+83,HIGH-exam-body-list,JK Business School,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+76,HIGH-exam-body-list,Jagan Institute of Management Studies,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+77,HIGH-exam-body-list,Jagannath International Management School,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+78,HIGH-exam-body-list,Jagannath University,Bahadurgarh,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+118,HIGH-exam-body-list,Jain University,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+79,HIGH-exam-body-list,Jaipuria Institute of Management,Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+80,HIGH-exam-body-list,Jaipuria Institute of Management,Lucknow,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+46,HIGH-exam-body-list,Jaipuria Institute of Management (Indore),Indore,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+47,HIGH-exam-body-list,Jaipuria Institute of Management (Jaipur),Jaipur,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+81,HIGH-exam-body-list,Jaipuria School of Business,Ghaziabad,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+82,HIGH-exam-body-list,Jaypee Business School,Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+23,HIGH-exam-body-list,KIIT – School of Rural Management,Bhubaneswar,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+24,HIGH-exam-body-list,LN Mishra College of Business Management,Muzaffarpur,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+84,HIGH-exam-body-list,Lloyd Business School,Greater Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+85,HIGH-exam-body-list,Lovely Professional University,Phagwara,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+119,HIGH-exam-body-list,MCC Boyd Tandon School of Business,Chennai,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+25,HIGH-exam-body-list,MCKV Institute of Engineering,Howrah,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+48,HIGH-exam-body-list,MIT World Peace University,Pune,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+120,HIGH-exam-body-list,MS Ramaiah Institute of Management,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+121,HIGH-exam-body-list,Myra School of Business,Mysore,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+26,HIGH-exam-body-list,NERIM Group of Institutions,Guwahati,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+49,HIGH-exam-body-list,NICMAR University,Pune,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+88,HIGH-exam-body-list,NIET Business School,Greater Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+123,HIGH-exam-body-list,NSB Academy,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+122,HIGH-exam-body-list,"National Institute of Technology, Surathkal",Surathkal,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+27,HIGH-exam-body-list,Netaji Subhas University,Jamshedpur,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+86,HIGH-exam-body-list,New Delhi Institute of Management,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+87,HIGH-exam-body-list,Noida International University,Greater Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+124,HIGH-exam-body-list,PES University,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+28,HIGH-exam-body-list,Pailan College of Mgmt &Technology,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+50,HIGH-exam-body-list,Poddar Business Schools,Jaipur,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+128,HIGH-exam-body-list,RL Institute of Management Studies,Madurai,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+129,HIGH-exam-body-list,RV Institute of Management,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+130,HIGH-exam-body-list,RV University,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+125,HIGH-exam-body-list,Rajalakshmi School of Business,Chennai,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+126,HIGH-exam-body-list,Ramaiah Institute of Management Studies,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+127,HIGH-exam-body-list,Ramaiah University of Applied Sciences,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+29,HIGH-exam-body-list,Regional College of Management,Bhubaneswar,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+131,HIGH-exam-body-list,SCMS Cochin School of Business,Kochi,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+132,HIGH-exam-body-list,SCMS School of Technology & Management,Kochi,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+89,HIGH-exam-body-list,SPARSH Global Business School,Greater Noida,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+133,HIGH-exam-body-list,Sardar Vallabhbhai Patel International School of Textiles & Management,Coimbatore,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+136,HIGH-exam-body-list,"School of Management, Shiv Nadar University Chennai",Chennai,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+134,HIGH-exam-body-list,Siddaganga Institute of Technology,Tumakuru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+30,HIGH-exam-body-list,Siksha ‘O’ Anusandhan University,Bhubaneswar,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+31,HIGH-exam-body-list,Sister Nivedita University,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+135,HIGH-exam-body-list,Siva Sivani Institute of Management,Secunderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+90,HIGH-exam-body-list,Sri Sharda Institute of Indian Management Research,New Delhi,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+137,HIGH-exam-body-list,St Joseph’s Institute of Management,Bengaluru,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+51,HIGH-exam-body-list,St Kabir Institute of Professional Studies,Ahmedabad,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+52,HIGH-exam-body-list,Suryadatta Institute of Management,Pune,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+53,HIGH-exam-body-list,Suryadatta Institute of Management & Mass Communication,Pune,West,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+32,HIGH-exam-body-list,Techno India Group,Kolkata,East,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+91,HIGH-exam-body-list,Uttaranchal University,Dehradun,North,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+138,HIGH-exam-body-list,Vignana Jyothi Institute of Management,Hyderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+139,HIGH-exam-body-list,Vishwa Vishwani Institute of Systems & Management,Secunderabad,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+140,HIGH-exam-body-list,"Xavier Institute of Management & Entrepreneurship, Chennai",Chennai,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+141,HIGH-exam-body-list,"Xavier Institute of Management & Entrepreneurship, Kochi",Kochi,South,MBA/PGDM,MAT,,,,Listed by AIMA as a MAT participating institute.,https://aima.in/mat/participating-b-schools/
+644,HIGH-names-this-college,AIMS IBS Business School Bengaluru,Bengaluru,South,MBA/PGDM,CAT,,,,"They must also have appeared for any national-level management entrance test such as CAT, MAT, XAT, CMAT, KMAT, PGCET, or equivalent.",https://www.aimsibs.com/mba-bangalore-university/
+642,HIGH-names-this-college,AIMS IBS Business School Bengaluru,Bengaluru,South,MBA/PGDM,CMAT,,,,"They must also have appeared for any national-level management entrance test such as CAT, MAT, XAT, CMAT, KMAT, PGCET, or equivalent.",https://www.aimsibs.com/mba-bangalore-university/
+647,HIGH-names-this-college,AIMS IBS Business School Bengaluru,Bengaluru,South,MBA/PGDM,KMAT Karnataka,,,,"They must also have appeared for any national-level management entrance test such as CAT, MAT, XAT, CMAT, KMAT, PGCET, or equivalent.",https://www.aimsibs.com/mba-bangalore-university/
+646,HIGH-names-this-college,AIMS IBS Business School Bengaluru,Bengaluru,South,MBA/PGDM,Karnataka PGCET,,,,"They must also have appeared for any national-level management entrance test such as CAT, MAT, XAT, CMAT, KMAT, PGCET, or equivalent.",https://www.aimsibs.com/mba-bangalore-university/
+643,HIGH-names-this-college,AIMS IBS Business School Bengaluru,Bengaluru,South,MBA/PGDM,XAT,,,,"They must also have appeared for any national-level management entrance test such as CAT, MAT, XAT, CMAT, KMAT, PGCET, or equivalent.",https://www.aimsibs.com/mba-bangalore-university/
+640,LOW-generic-sentence,ABBS School of Management,Bengaluru,South,MBA/PGDM,CAT,,,,"Additionally, most institutions require scores from entrance exams such as CAT, MAT, XAT, or GMAT.",https://www.abbssm.edu.in/pgdm-colleges-in-india/
+638,LOW-generic-sentence,ABBS School of Management,Bengaluru,South,MBA/PGDM,GMAT,,,,"Additionally, most institutions require scores from entrance exams such as CAT, MAT, XAT, or GMAT.",https://www.abbssm.edu.in/pgdm-colleges-in-india/
+639,LOW-generic-sentence,ABBS School of Management,Bengaluru,South,MBA/PGDM,XAT,,,,"Additionally, most institutions require scores from entrance exams such as CAT, MAT, XAT, or GMAT.",https://www.abbssm.edu.in/pgdm-colleges-in-india/
