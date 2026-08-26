@@ -135,7 +135,7 @@ export default function Calculator() {
             <div style={{ marginTop: 'var(--s5)' }}>
               <p className="eyebrow"><span className="dot" />What the MBA actually costs you</p>
               <p className="price">{rupees(out.totalCost)}</p>
-              <p className="muted" style={{ maxWidth: '58ch' }}>
+              <p className="muted">
                 Fees, living, the salary you give up while you study, and the interest on the
                 loan. The loan principal is not added again, because your fees are already in
                 this total once.
@@ -173,7 +173,7 @@ export default function Calculator() {
               />
             </div>
 
-            <div className="card" style={{ marginTop: 'var(--s4)', maxWidth: '52ch' }}>
+            <div className="card" style={{ marginTop: 'var(--s4)' }}>
               <h3>Where the money goes</h3>
               <div style={{ marginTop: 'var(--s2)' }}>
                 <Row label="Course fees" value={rupees(input.totalFees)} />
@@ -192,7 +192,7 @@ export default function Calculator() {
                 blurb="Your total is above and stays there. This opens what each year of the EMI is really buying, which is mostly interest at the start."
               >
                 <h2>Year by year, what your EMI buys</h2>
-                <p className="muted" style={{ maxWidth: '62ch' }}>
+                <p className="muted">
                   An EMI is a fixed amount split two ways, and the split moves. Early on most of
                   it clears interest and very little touches the balance, which is why paying a
                   lump sum into the loan in year one saves far more than the same sum in year six.
@@ -248,7 +248,7 @@ export default function Calculator() {
                     </table>
                   </div>
                 )}
-                <p className="muted" style={{ maxWidth: '62ch' }}>
+                <p className="muted">
                   Interest here is the price of the loan, not of the MBA. It is the one loan
                   figure inside your total cost above.
                 </p>

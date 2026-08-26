@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react';
 import LeadGate from '../../components/LeadGate';
+import KpiRow from '../../components/KpiRow';
 import {
   LADDER_ACCURACIES,
   MAX_SCORE,
@@ -123,20 +124,11 @@ export default function Calculator() {
         <>
           <div className="card">
             <p className="eyebrow"><span className="dot" />Estimated target</p>
-            <div style={figures}>
-              <div>
-                <span className="price">{result.percentile}</span>
-                <p className="muted">percentile, overall</p>
-              </div>
-              <div>
-                <span className="price">{result.scoreLow}&ndash;{result.scoreHigh}</span>
-                <p className="muted">raw marks, out of {MAX_SCORE}</p>
-              </div>
-              <div>
-                <span className="price">{result.totalAttempts}</span>
-                <p className="muted">questions to attempt, of {TOTAL_QUESTIONS}</p>
-              </div>
-            </div>
+            <KpiRow items={[
+              { label: 'Percentile, overall', value: result.percentile },
+              { label: `Raw marks, out of ${MAX_SCORE}`, value: `${result.scoreLow}\u2013${result.scoreHigh}` },
+              { label: `Questions to attempt, of ${TOTAL_QUESTIONS}`, value: result.totalAttempts },
+            ]} />
 
             <p style={{ marginTop: 'var(--s3)' }}>
               This is an estimate, not a cutoff. The IIMs publish your score and your percentile on

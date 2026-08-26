@@ -288,8 +288,10 @@ body {
 .lcp .tool-card p { margin: 0 0 var(--s2); color: var(--muted); font-size: var(--t-sm); line-height: 1.5; flex: 1; }
 
 .lcp .tag {
-  font-size: var(--t-xs); font-weight: var(--w-semi); letter-spacing: .05em; text-transform: uppercase;
-  padding: 4px 10px; border-radius: 999px; white-space: nowrap;
+  font-size: var(--t-xs); font-weight: var(--w-semi); letter-spacing: .04em; text-transform: uppercase;
+  padding: 5px 11px; border-radius: 999px;
+  /* Was nowrap, which pushed "free · email for the full breakdown" past its card. */
+  white-space: normal; max-width: 100%; line-height: 1.35;
 }
 .lcp .tag-free { background: rgba(14, 59, 46, .09); color: var(--forest); }
 .lcp .tag-gate { background: rgba(201, 119, 44, .13); color: #8A3E12; }
@@ -630,11 +632,20 @@ body {
 .lcp .btn-ghost { background: transparent; color: var(--forest); border-color: rgba(14, 59, 46, .28); }
 .lcp .btn-ghost:hover { border-color: var(--forest); background: rgba(14, 59, 46, .05); transform: translateY(-2px); }
 
+/* Third rank is still a button. A bare text link beside two buttons reads as an
+   afterthought rather than as a lower-priority action. Rank comes from fill
+   weight: solid amber, outlined, then subtly filled. */
 .lcp .btn-link {
-  background: none; border: 0; padding: 14px 4px; color: var(--burnt);
-  box-shadow: none; text-decoration: none;
+  background: rgba(14, 59, 46, .07); color: var(--forest);
+  border-color: transparent; box-shadow: none;
 }
-.lcp .btn-link:hover { text-decoration: underline; text-underline-offset: 4px; transform: none; }
+.lcp .btn-link:hover { background: rgba(14, 59, 46, .13); transform: translateY(-2px); }
+.lcp .cta-block .btn-link, .lcp .ground-pgcet .btn-link, .lcp .ground-mat .btn-link {
+  background: rgba(250, 247, 242, .10); color: var(--cream); border-color: transparent;
+}
+.lcp .cta-block .btn-link:hover, .lcp .ground-pgcet .btn-link:hover, .lcp .ground-mat .btn-link:hover {
+  background: rgba(250, 247, 242, .18); color: var(--cream);
+}
 
 /* On a dark ground the secondary inverts so it stays legible without competing. */
 .lcp .ground-pgcet .btn-secondary, .lcp .ground-mat .btn-secondary,
@@ -762,7 +773,12 @@ body {
 
 /* KPI row. One row, always — the figures exist to be compared. */
 .lcp .kpi-row {
-  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 0;
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0;
+  /* Three named bands — label, figure, note — so every cell's figure sits on the
+     same line no matter how many lines its label runs to. A reserved min-height
+     cannot do this: "VTU (Visvesvaraya Technological University)" is three lines
+     and its neighbour is one. */
+  grid-template-rows: auto auto auto;
   background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
   overflow: hidden; margin-bottom: var(--s4);
 }
@@ -771,22 +787,25 @@ body {
   .lcp .kpi-row[data-count="3"], .lcp .kpi-row[data-count="5"] { grid-template-columns: 1fr; }
 }
 .lcp .kpi {
-  display: flex; flex-direction: column; min-width: 0;
-  padding: var(--s3); border-right: 1px solid var(--line);
+  display: grid; grid-row: span 3; grid-template-rows: subgrid; gap: 8px;
+  min-width: 0; padding: var(--s3); border-right: 1px solid var(--line);
+}
+/* Browsers without subgrid keep a sane stacked cell rather than collapsing. */
+@supports not (grid-template-rows: subgrid) {
+  .lcp .kpi { display: flex; flex-direction: column; }
+  .lcp .kpi .k { min-height: calc(var(--t-xs) * 3.9); }
 }
 .lcp .kpi:last-child { border-right: 0; }
 .lcp .kpi .k {
-  margin: 0 0 8px; font-size: var(--t-xs); font-weight: var(--w-bold); letter-spacing: .1em;
-  text-transform: uppercase; color: var(--muted);
-  /* Two-line labels must not push their figure down a line relative to a
-     neighbour — that was the CGPA page's misalignment. */
-  min-height: calc(var(--t-xs) * 2.6);
+  margin: 0; font-size: var(--t-xs); font-weight: var(--w-bold); letter-spacing: .1em;
+  text-transform: uppercase; color: var(--muted); align-self: start;
 }
 .lcp .kpi .n {
   margin: 0; font-size: var(--t-fig); font-weight: var(--w-bold); line-height: 1.05;
   color: var(--forest); font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
+  align-self: end;
 }
-.lcp .kpi .kpi-note { margin: 10px 0 0; font-size: var(--t-sm); color: var(--muted); }
+.lcp .kpi .kpi-note { margin: 0; font-size: var(--t-sm); color: var(--muted); align-self: start; }
 @media (max-width: 760px) {
   .lcp .kpi { border-right: 0; border-bottom: 1px solid var(--line); }
   .lcp .kpi:last-child { border-bottom: 0; }
@@ -855,3 +874,55 @@ body {
   color: var(--amber); white-space: nowrap; margin-bottom: var(--s3);
 }
 .lcp .offer .btn { margin-top: auto; }
+
+/* ============ Floating surfaces ============
+   Two of these must never appear at once, so the popup outranks the rail. */
+
+.lcp .buy-rail {
+  position: fixed; right: var(--s3); bottom: var(--s3); z-index: 40;
+  width: min(292px, calc(100vw - var(--s4)));
+  background: var(--forest); color: var(--on-dark);
+  border-radius: var(--radius); padding: var(--s3);
+  box-shadow: 0 24px 48px -20px rgba(10, 44, 34, .55);
+  animation: rail-in .32s cubic-bezier(.22,.61,.36,1) both;
+}
+@keyframes rail-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.lcp .buy-rail .eyebrow { color: var(--amber); margin-bottom: 6px; }
+.lcp .buy-rail h3 { color: var(--cream); font-size: var(--t-base); margin-bottom: 6px; }
+.lcp .buy-rail-price {
+  margin: 0 0 var(--s2); font-size: var(--t-md);
+  font-weight: var(--w-bold); color: var(--amber); white-space: nowrap;
+}
+.lcp .buy-rail-close, .lcp .updates-close {
+  position: absolute; top: 8px; right: 10px; background: none; border: 0;
+  color: var(--on-dark); font-size: 22px; line-height: 1; cursor: pointer; padding: 4px;
+}
+.lcp .buy-rail-close:hover, .lcp .updates-close:hover { color: var(--cream); }
+.lcp .buy-rail-dots { display: flex; gap: 6px; justify-content: center; margin-top: var(--s2); }
+.lcp .buy-rail-dots button {
+  width: 7px; height: 7px; padding: 0; border: 0; border-radius: 50%;
+  background: rgba(250, 247, 242, .32); cursor: pointer;
+}
+.lcp .buy-rail-dots button.is-on { background: var(--amber); }
+
+.lcp .updates-pop {
+  position: fixed; right: var(--s3); bottom: var(--s3); z-index: 50;
+  width: min(340px, calc(100vw - var(--s4)));
+  background: #fff; color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--radius); padding: var(--s4);
+  box-shadow: 0 28px 56px -22px rgba(14, 59, 46, .45);
+  animation: rail-in .32s cubic-bezier(.22,.61,.36,1) both;
+}
+.lcp .updates-pop .updates-close { color: var(--muted); }
+.lcp .updates-pop h3 { font-size: var(--t-md); margin-bottom: 6px; }
+.lcp .updates-pop > form > p, .lcp .updates-pop > p { font-size: var(--t-sm); color: var(--muted); margin: 0 0 var(--s3); }
+.lcp .updates-pop .field { margin-bottom: var(--s2); }
+.lcp .updates-pop .gate-fine { margin-top: 10px; }
+/* When the popup is up, the rail steps aside. */
+.lcp:has(.updates-pop) .buy-rail { display: none; }
+@media (max-width: 560px) {
+  .lcp .buy-rail, .lcp .updates-pop { right: var(--s2); left: var(--s2); bottom: var(--s2); width: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lcp .buy-rail, .lcp .updates-pop { animation: none; }
+}

@@ -65,7 +65,7 @@ export default function StudyPlanTool() {
       {/* Set-once controls, laid out across the width. */}
       <section className="tool-inputs" aria-label="Your details">
         <h2>Your details</h2>
-        <div className="fields">
+        <div className="field-grid">
 
         <div className="field">
           <label htmlFor={`${id}-exam`}>Which exam</label>

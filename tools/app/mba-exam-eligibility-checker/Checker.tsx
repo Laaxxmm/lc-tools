@@ -73,7 +73,9 @@ export default function Checker() {
         percentage bar, you get told that instead of a number we made up.
       </p>
 
-      <div className="el-form">
+      {/* Same card + three-column grid as every other tool. */}
+      <div className="tool-inputs">
+        <div className="field-grid">
         <div className="field">
           <label htmlFor={`${id}-stream`}>Your degree</label>
           <select
@@ -166,9 +168,9 @@ export default function Checker() {
             onChange={(e) => setWork(e.target.value)}
           />
         </div>
-      </div>
+        </div>
 
-      <div className="el-checks">
+        <div className="el-checks">
         <label className="consent" htmlFor={`${id}-final`}>
           <input
             id={`${id}-final`}
@@ -188,6 +190,7 @@ export default function Checker() {
           />
           <span>I studied Mathematics or Statistics at 10+2 or in my degree</span>
         </label>
+        </div>
       </div>
 
       {!result.ok ? (

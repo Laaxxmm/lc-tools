@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 // Page-local styling. Every value is a token from globals.css — the shared sheet
 // stays the source of truth and picks up nothing that only one page uses.
 const css = `
-.xd-standfirst { max-width: 62ch; font-size: 17px; }
+.xd-standfirst { max-width: none; font-size: var(--t-md); }
 .xd-controls {
   display: flex; flex-wrap: wrap; align-items: flex-end;
   gap: var(--s3); margin: var(--s4) 0;
@@ -42,7 +42,7 @@ const css = `
   margin: 0 0 4px; font-size: 12.5px; font-weight: 700;
   text-transform: uppercase; letter-spacing: .1em; color: var(--muted);
 }
-.xd-line { margin: 8px 0 0; font-size: 15.5px; max-width: 60ch; }
+.xd-line { margin: 8px 0 0; font-size: var(--t-base); max-width: none; }
 .xd-k { color: var(--muted); }
 .xd-tag {
   display: inline-block; margin-left: 8px; padding: 1px 10px; border-radius: 999px;
@@ -51,9 +51,9 @@ const css = `
 }
 .xd-yes { background: var(--forest); color: var(--cream); }
 .xd-no { background: color-mix(in srgb, var(--amber) 26%, transparent); color: var(--ink); }
-.xd-note { margin: 10px 0 0; font-size: 14px; color: var(--muted); max-width: 60ch; }
+.xd-note { margin: 10px 0 0; font-size: var(--t-sm); color: var(--muted); max-width: none; }
 .xd-src { color: var(--forest); font-weight: 700; }
-.xd-foot { margin-top: var(--s3); max-width: 62ch; }
+.xd-foot { margin-top: var(--s3); max-width: none; }
 @media (max-width: 560px) {
   .xd-row { grid-template-columns: 92px 1fr; padding: var(--s2); }
   .xd-n { font-size: 33px; }

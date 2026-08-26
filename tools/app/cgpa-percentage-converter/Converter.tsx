@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react';
 import { FORMULAS, MAX_CGPA, cgpaToPercent, percentToCgpa, type FormulaId } from '../../calc/cgpa';
+import KpiRow from '../../components/KpiRow';
 
 // Two boxes, no submit button and no direction toggle. Whichever box you type in
 // is the source; the other one is derived. The maths lives in calc/cgpa.ts.
@@ -109,22 +110,20 @@ export default function Converter() {
           <h2 style={{ marginTop: 'var(--s6)' }}>
             A CGPA of {cgpaForCompare} under each formula
           </h2>
-          <p className="muted" style={{ maxWidth: '62ch' }}>
+          <p className="muted">
             Same grade point, five different percentages. This spread is the reason picking
             the wrong formula quietly costs or gains you marks on an application form.
           </p>
-          <div className="grid" style={{ marginTop: 'var(--s3)' }}>
-            {ORDER.map((k) => {
+          <KpiRow
+            items={ORDER.map((k) => {
               const r = cgpaToPercent(cgpaForCompare, k, f);
-              return (
-                <div className="card" key={k}>
-                  <h3>{FORMULAS[k].label}</h3>
-                  <p className="price">{r.ok ? `${r.value}%` : '—'}</p>
-                  <p className="muted">{FORMULAS[k].note}</p>
-                </div>
-              );
+              return {
+                label: FORMULAS[k].label,
+                value: r.ok ? `${r.value}%` : '\u2014',
+                note: FORMULAS[k].note,
+              };
             })}
-          </div>
+          />
         </>
       ) : null}
     </>
