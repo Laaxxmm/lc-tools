@@ -104,7 +104,6 @@ body {
 .lcp .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
 
 /* Price figure — brand spec: 800, amber, never wraps. Large enough for amber. */
-.lcp .price { font-size: 52px; font-weight: var(--w-bold); color: var(--burnt); white-space: nowrap; }
 .lcp .ground-pgcet .price, .lcp .ground-mat .price { color: var(--amber); }
 
 .lcp .btn {
@@ -926,3 +925,12 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .lcp .buy-rail, .lcp .updates-pop { animation: none; }
 }
+
+/* A lone headline figure gets the same treatment as a figure inside a KPI row,
+   so a number looks like a number wherever it appears. */
+.lcp .price {
+  display: block; margin: 6px 0 var(--s2);
+  font-size: var(--t-fig); font-weight: var(--w-bold); line-height: 1.05;
+  color: var(--forest); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.lcp .ground-pgcet .price, .lcp .ground-mat .price, .lcp .offer .price { color: var(--amber); }
