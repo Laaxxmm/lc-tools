@@ -34,14 +34,13 @@ function years(n: number): string {
   return m === 0 ? `${y} year${y === 1 ? '' : 's'}` : `${y} yr ${m} mo`;
 }
 
-const NUMBER_STYLE = { fontSize: 28, fontWeight: 800, margin: '6px 0 0', lineHeight: 1.15 } as const;
-
+// Uses the shared KPI cell so a figure looks like a figure on every page.
 function Stat({ label, value, note }: { label: string; value: string; note: string }) {
   return (
-    <div className="card">
-      <h3>{label}</h3>
-      <p style={NUMBER_STYLE}>{value}</p>
-      <p className="muted" style={{ marginBottom: 0 }}>{note}</p>
+    <div className="kpi">
+      <p className="k">{label}</p>
+      <p className="n">{value}</p>
+      <p className="kpi-note">{note}</p>
     </div>
   );
 }
@@ -143,7 +142,7 @@ export default function Calculator() {
               </p>
             </div>
 
-            <div className="grid" style={{ marginTop: 'var(--s4)' }}>
+            <div className="kpi-row" style={{ marginTop: 'var(--s4)' }}>
               <Stat
                 label="Monthly EMI"
                 value={out.emi > 0 ? rupees(out.emi) : 'No loan'}

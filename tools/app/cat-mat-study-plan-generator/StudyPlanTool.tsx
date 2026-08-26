@@ -118,7 +118,7 @@ export default function StudyPlanTool() {
             heading="Where should we send it?"
             submitLabel="Get my plan"
           >
-            <button className="btn btn-amber btn-block" type="button" onClick={getPdf} disabled={!plan || busy}>
+            <button className="btn btn-primary btn-block" type="button" onClick={getPdf} disabled={!plan || busy}>
               <Icon name="download" size={17} />
               {busy ? 'Building your PDF…' : 'Download the plan'}
             </button>

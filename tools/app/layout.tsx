@@ -17,6 +17,13 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  icons: {
+    icon: [
+      { url: '/tools/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/tools/favicon-192x192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: '/tools/apple-touch-icon.png',
+  },
   metadataBase: new URL(SITE),
   title: {
     default: 'Free tools for MBA and MCA entrance aspirants | Learn Crew Tools',
@@ -38,16 +45,32 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={`lcp ${poppins.variable}`}>
         <a className="skip" href="#main">Skip to content</a>
 
+        {/* Announcement ribbon, matching learncrew.org's .lcp-announce. */}
+        <div className="lc-announce">
+          <a href="https://learncrew.org/">
+            <strong>MAT Sep 2026</strong> — paper-based test 13 Sept · coaching batches enrolling{' '}
+            <span className="lc-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </div>
+
         <header className="lc-header">
-          <div className="container">
-            <Link className="wordmark" href="/">Learn Crew</Link>
+          <div className="container lc-header-inner">
+            <Link className="lc-brand" href="/" aria-label="Learn Crew Tools home">
+              {/* The wordmark already carries "Your journey to success" — never
+                  repeat the tagline beside it. */}
+              <img src="/tools/learn-crew-logo.png" width={272} height={92} alt="Learn Crew" />
+            </Link>
             <nav className="lc-nav" aria-label="Learn Crew sites">
               {PROPERTIES.map((p) => (
                 <a key={p.href} href={p.href}>{p.label}</a>
               ))}
             </nav>
+            <a className="btn btn-primary lc-header-cta" href="https://learncrew.org/">
+              Book a free demo
+            </a>
           </div>
         </header>
+
         <ToolNav />
 
         <main id="main">{children}</main>

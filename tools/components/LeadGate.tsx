@@ -38,7 +38,7 @@ export default function LeadGate({ slug, mode, children, heading, blurb, trigger
 
   if (trigger && !asked) {
     return (
-      <button className="btn btn-amber btn-block" type="button" onClick={() => setAsked(true)}>
+      <button className="btn btn-primary btn-block" type="button" onClick={() => setAsked(true)}>
         {trigger}
       </button>
     );
@@ -99,7 +99,7 @@ export default function LeadGate({ slug, mode, children, heading, blurb, trigger
 
       {error ? <p className="error" role="alert">{error}</p> : null}
 
-      <button className="btn btn-forest btn-block" type="submit" disabled={busy}>
+      <button className="btn btn-primary btn-block" type="submit" disabled={busy}>
         {busy ? 'Saving…' : submitLabel ?? 'Show me the rest'}
       </button>
 

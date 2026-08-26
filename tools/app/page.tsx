@@ -47,7 +47,14 @@ const FLOW = [
   { q: 'What score do I need?', slug: 'cat-percentile-target-calculator', to: 'Percentile target' },
 ];
 
-const HUB_CTAS = [CTA.coaching, CTA.matMocks, CTA.pgcetMocks];
+// Ranked, not equal. PGCET mocks are the lowest-friction paid step and the only
+// place PGCET can be bought at the right price, so they lead. Coaching is the
+// bigger ask; the MAT series is a sideways move for most readers.
+const HUB_CTAS = [
+  { ...CTA.pgcetMocks, variant: 'btn-primary' },
+  { ...CTA.coaching, variant: 'btn-secondary' },
+  { ...CTA.matMocks, variant: 'btn-link' },
+];
 
 export default function Page() {
   const groups = groupByFamily(TOOLS);
@@ -123,7 +130,7 @@ export default function Page() {
             </p>
             <div className="cta-row">
               {HUB_CTAS.map((c) => (
-                <a className="btn btn-amber" key={c.href} href={c.href}>{c.label}</a>
+                <a className={`btn ${c.variant}`} key={c.href} href={c.href}>{c.label}</a>
               ))}
             </div>
           </div>

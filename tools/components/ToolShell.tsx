@@ -104,7 +104,7 @@ export default function ToolShell({ tool, children, explainer }: Props) {
           <div className={`cta-block ${ground}`}>
             <p className="eyebrow"><span className="dot" />Next step</p>
             <p>{cta.note ?? 'Practise the same syllabus on full-length papers.'}</p>
-            <a className="btn btn-amber" href={cta.href}>{cta.label}</a>
+            <a className="btn btn-primary" href={cta.href}>{cta.label}</a>
           </div>
         </div>
       </section>

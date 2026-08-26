@@ -14,7 +14,7 @@ export default function NotFound() {
             the full list is one click away, so you will find what you came for in a few seconds.
           </p>
           <div className="cta-row">
-            <Link className="btn btn-amber" href="/">See every tool</Link>
+            <Link className="btn btn-primary" href="/">See every tool</Link>
           </div>
         </div>
       </header>
