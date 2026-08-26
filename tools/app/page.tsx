@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import ToolCard from '../components/ToolCard';
 import Icon from '../components/Icon';
+import DeadlineStrip from '../components/DeadlineStrip';
 import { TOOLS } from '../config';
 import { CTA, type ExamFamily } from '../lib/types';
 import { SITE, formatUpdated, groupByFamily, latestUpdated } from '../lib/shell';
@@ -69,6 +70,7 @@ export default function Page() {
               </a>
             ))}
           </nav>
+          <DeadlineStrip />
           <p className="meta">
             <span>{TOOLS.length} tools live</span>
             <span>New tool every week</span>

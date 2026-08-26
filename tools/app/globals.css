@@ -21,6 +21,26 @@
   /* Body copy on dark grounds. Brand rule — do not use flat cream. */
   --on-dark: rgba(250, 247, 242, .80);
 
+  /* Type scale. Seven steps, nothing in between. 14 / 14.5 / 15 / 15.5 read as
+     the same size to a human but as inconsistency to the eye across a page. */
+  --t-xs:   12px;                      /* micro labels, legal */
+  --t-sm:   13.5px;                    /* meta, captions, table headers */
+  --t-base: 16px;                      /* body */
+  --t-md:   18px;                      /* lead, standfirst */
+  --t-lg:   22px;                      /* h3 */
+  --t-xl:   clamp(26px, 3vw, 32px);    /* h2 */
+  --t-2xl:  clamp(30px, 4.4vw, 44px);  /* h1 */
+  --t-fig:  clamp(30px, 3.4vw, 38px);  /* summary figures */
+
+  /* Weights. The brand's "600 body" is a poster spec for 16.5-26px display type;
+     at 16px web body it reads semi-bold on every line. Body is 400 here. */
+  --w-body: 400; --w-med: 600; --w-semi: 700; --w-bold: 800;
+
+  /* Measure. Prose lives in its own narrower centred column so a text section
+     fills its container instead of dying at 60% of a 1140px grid. */
+  --measure: 68ch;
+  --container-prose: 680px;
+
   --radius-sm: 12px; --radius: 18px; --radius-lg: 26px;
   --shadow-sm: 0 1px 2px rgba(14,59,46,.05), 0 2px 6px rgba(14,59,46,.05);
   --shadow: 0 10px 30px -12px rgba(14,59,46,.18);
@@ -45,22 +65,23 @@ body {
   background: var(--cream);
   color: var(--ink);
   font-family: var(--font);
-  font-weight: 600;              /* brand: body/sub-copy is 600 */
+  font-weight: var(--w-body);
+  font-size: var(--t-base);
   line-height: 1.62;
   -webkit-font-smoothing: antialiased;
 }
 
-.lcp h1, .lcp h2, .lcp h3, .lcp h4 { margin: 0; font-weight: 800; color: var(--ink); }
-.lcp h1 { font-size: clamp(30px, 4.6vw, 46px); line-height: 1.08; letter-spacing: -.02em; }
-.lcp h2 { font-size: clamp(24px, 3.4vw, 34px); line-height: 1.12; letter-spacing: -.015em; }
-.lcp h3 { font-size: 18px; font-weight: 700; }
+.lcp h1, .lcp h2, .lcp h3, .lcp h4 { margin: 0; font-weight: var(--w-bold); color: var(--ink); }
+.lcp h1 { font-size: var(--t-2xl); line-height: 1.08; letter-spacing: -.022em; }
+.lcp h2 { font-size: var(--t-xl); line-height: 1.14; letter-spacing: -.018em; }
+.lcp h3 { font-size: var(--t-lg); font-weight: var(--w-semi); letter-spacing: -.01em; }
 .lcp p { margin: 12px 0; }
 .lcp a { color: inherit; }
 
 .lcp .container { width: 100%; max-width: var(--container); margin: 0 auto; padding: 0 var(--s3); }
 .lcp .section { padding: var(--s6) 0; }
 .lcp .section-head { max-width: 70ch; margin-bottom: var(--s5); }
-.lcp .section-head p { margin-top: 14px; color: var(--muted); font-size: 17.5px; }
+.lcp .section-head p { margin-top: 14px; color: var(--muted); font-size: var(--t-md); }
 
 /* Eyebrow: uppercase, wide tracking, 700 per brand spec for eyebrows and labels.
    Amber never appears as text on cream. Plain --burnt does not either: measured
@@ -70,19 +91,19 @@ body {
    override below stands. */
 .lcp .eyebrow {
   display: inline-flex; align-items: center; gap: var(--s1);
-  font-size: 14.5px; font-weight: 700; text-transform: uppercase;
+  font-size: var(--t-sm); font-weight: var(--w-semi); text-transform: uppercase;
   letter-spacing: .2em; color: color-mix(in srgb, var(--burnt) 75%, var(--ink));
 }
 .lcp .ground-pgcet .eyebrow, .lcp .ground-mat .eyebrow { color: var(--amber); }
 .lcp .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
 
 /* Price figure — brand spec: 800, amber, never wraps. Large enough for amber. */
-.lcp .price { font-size: 52px; font-weight: 800; color: var(--burnt); white-space: nowrap; }
+.lcp .price { font-size: 52px; font-weight: var(--w-bold); color: var(--burnt); white-space: nowrap; }
 .lcp .ground-pgcet .price, .lcp .ground-mat .price { color: var(--amber); }
 
 .lcp .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 9px;
-  font-family: inherit; font-weight: 700; font-size: 15px; cursor: pointer;
+  font-family: inherit; font-weight: var(--w-semi); font-size: var(--t-base); cursor: pointer;
   padding: 14px 22px; border: 1.5px solid transparent; border-radius: 999px;
   text-decoration: none; transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
 }
@@ -108,15 +129,15 @@ body {
   background: #fff; border: 1px solid var(--line);
   border-radius: var(--radius); padding: var(--s4); box-shadow: var(--shadow-sm);
 }
-.lcp label { display: block; font-size: 14px; font-weight: 700; color: var(--muted); margin-bottom: 6px; }
+.lcp label { display: block; font-size: var(--t-sm); font-weight: var(--w-semi); color: var(--muted); margin-bottom: 6px; }
 .lcp input, .lcp select {
-  width: 100%; font-family: inherit; font-weight: 600; font-size: 16px; color: var(--ink);
+  width: 100%; font-family: inherit; font-weight: var(--w-med); font-size: var(--t-base); color: var(--ink);
   padding: 12px 14px; border: 1.5px solid var(--line);
   border-radius: var(--radius-sm); background: #fff;
 }
 .lcp .field { margin-bottom: var(--s3); }
-.lcp .error { color: #8A3E12; font-size: 14px; font-weight: 600; margin-top: 6px; }
-.lcp .muted { color: var(--muted); font-size: 14px; }
+.lcp .error { color: #8A3E12; font-size: var(--t-sm); font-weight: var(--w-med); margin-top: 6px; }
+.lcp .muted { color: var(--muted); font-size: var(--t-sm); }
 
 /* ── Shell ────────────────────────────────────────────────────────────────────
    Header, footer and tool-page furniture. Tokens only — no colour is defined
@@ -131,25 +152,25 @@ body {
   gap: var(--s3); min-height: 68px; flex-wrap: wrap;
 }
 .lcp .lc-nav { display: flex; align-items: center; gap: var(--s3); }
-.lcp .lc-nav a { font-size: 14px; font-weight: 700; color: var(--muted); text-decoration: none; }
+.lcp .lc-nav a { font-size: var(--t-sm); font-weight: var(--w-semi); color: var(--muted); text-decoration: none; }
 .lcp .lc-nav a:hover { color: var(--forest); }
 
 /* Wordmark: 800, uppercase, 0.2em tracking. */
 .lcp .wordmark {
-  font-weight: 800; text-transform: uppercase; letter-spacing: .2em;
-  font-size: 15px; text-decoration: none; color: var(--forest);
+  font-weight: var(--w-bold); text-transform: uppercase; letter-spacing: .2em;
+  font-size: var(--t-base); text-decoration: none; color: var(--forest);
 }
 
 .lcp .lc-footer { background: var(--forest); color: var(--on-dark); padding: var(--s6) 0 var(--s5); }
 .lcp .lc-footer .wordmark {
-  display: block; font-size: 32px; line-height: 1.1;
+  display: block; font-size: var(--t-xl); line-height: 1.1;
   color: color-mix(in srgb, var(--cream) 42%, transparent);
 }
 .lcp .lc-footer p { max-width: 56ch; }
 .lcp .lc-footer .lc-nav { margin-top: var(--s3); flex-wrap: wrap; }
 .lcp .lc-footer .lc-nav a { color: var(--on-dark); }
 .lcp .lc-footer .lc-nav a:hover { color: var(--cream); }
-.lcp .lc-footer small { font-size: 13.5px; }
+.lcp .lc-footer small { font-size: var(--t-sm); }
 
 /* A tool page is used, not read. The hero identifies the page and gets out of the
    way; the first control should be reachable without scrolling on a laptop. */
@@ -158,12 +179,12 @@ body {
 .lcp .tool-hero h1 { font-size: clamp(26px, 3.6vw, 38px); }
 .lcp .tool-hero .eyebrow svg { color: var(--amber); flex: none; }
 .lcp .tool-hero h1 { margin-top: 14px; }
-.lcp .tool-hero .lead { margin-top: var(--s2); font-size: 17px; max-width: 60ch; }
-.lcp .meta { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s3); font-size: 13.5px; font-weight: 700; }
+.lcp .tool-hero .lead { margin-top: var(--s2); font-size: var(--t-md); max-width: 60ch; }
+.lcp .meta { display: flex; flex-wrap: wrap; gap: var(--s3); margin-top: var(--s3); font-size: var(--t-sm); font-weight: var(--w-semi); }
 .lcp .rule { height: 3px; width: 56px; margin: 0 0 var(--s3); background: var(--amber); border: 0; border-radius: 2px; }
 
 .lcp .prose { max-width: 68ch; }
-.lcp .prose p { font-size: 17px; }
+.lcp .prose p { font-size: var(--t-md); }
 .lcp .prose h2 { margin-top: var(--s5); }
 .lcp .prose h3 { margin-top: var(--s4); }
 
@@ -172,10 +193,10 @@ body {
 .lcp .faq summary {
   display: flex; justify-content: space-between; gap: var(--s2);
   padding: var(--s3) 0; cursor: pointer; list-style: none;
-  font-size: 17px; font-weight: 700;
+  font-size: var(--t-md); font-weight: var(--w-semi);
 }
 .lcp .faq summary::-webkit-details-marker { display: none; }
-.lcp .faq summary::after { content: '+'; color: var(--burnt); font-weight: 800; }
+.lcp .faq summary::after { content: '+'; color: var(--burnt); font-weight: var(--w-bold); }
 .lcp .faq details[open] summary::after { content: '\2013'; }
 .lcp .faq details p { margin: 0 0 var(--s3); max-width: 62ch; color: var(--muted); }
 
@@ -183,10 +204,10 @@ body {
 /* .tool-card is defined once, in the icon-led block below. */
 
 .lcp .cta-block { padding: var(--s5); border-radius: var(--radius-lg); }
-.lcp .cta-block p { max-width: 52ch; font-size: 17px; }
+.lcp .cta-block p { max-width: 52ch; font-size: var(--t-md); }
 .lcp .cta-block .btn { margin-top: var(--s2); }
 
-.lcp .sources { max-width: 68ch; font-size: 14px; color: var(--muted); }
+.lcp .sources { max-width: 68ch; font-size: var(--t-sm); color: var(--muted); }
 .lcp .sources a { color: var(--forest); }
 
 /* Explainer furniture: the worked-example callout and the estimate disclaimer.
@@ -206,18 +227,18 @@ body {
   max-width: 68ch; margin: var(--s3) 0;
   padding: var(--s3); border: 1px solid var(--line);
   border-radius: var(--radius-sm);
-  font-size: 14.5px; color: var(--muted);
+  font-size: var(--t-sm); color: var(--muted);
 }
 .lcp .disclaimer p { margin: 0 0 var(--s1); }
 .lcp .disclaimer p:last-child { margin-bottom: 0; }
-.lcp .disclaimer strong { color: var(--ink); font-weight: 800; }
+.lcp .disclaimer strong { color: var(--ink); font-weight: var(--w-bold); }
 .lcp .disclaimer a { color: var(--forest); }
 
 /* Lead gate. The consent row overrides the block-label and full-width-input defaults. */
 .lcp .gate { max-width: 480px; }
 .lcp .consent {
   display: flex; align-items: flex-start; gap: 10px; margin-bottom: var(--s3);
-  font-size: 15px; font-weight: 600; color: var(--ink);
+  font-size: var(--t-base); font-weight: var(--w-med); color: var(--ink);
 }
 .lcp .consent input { flex: none; width: 18px; height: 18px; margin: 3px 0 0; }
 .lcp .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
@@ -248,7 +269,7 @@ body {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 9px 15px 9px 11px; border-radius: 999px;
   background: rgba(250, 247, 242, .10); border: 1.5px solid rgba(250, 247, 242, .18);
-  color: var(--cream); font-size: 14px; font-weight: 600; text-decoration: none;
+  color: var(--cream); font-size: var(--t-sm); font-weight: var(--w-med); text-decoration: none;
   transition: background .15s ease, border-color .15s ease, transform .15s ease;
 }
 .lcp .quicknav a:hover { background: rgba(250, 247, 242, .17); border-color: var(--amber); transform: translateY(-1px); }
@@ -263,11 +284,11 @@ body {
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 .lcp .tool-card:hover { transform: translateY(-3px); box-shadow: var(--shadow); border-color: var(--amber); }
-.lcp .tool-card h3 { font-size: 17px; font-weight: 700; margin: 0 0 6px; }
-.lcp .tool-card p { margin: 0 0 var(--s2); color: var(--muted); font-size: 14.5px; line-height: 1.5; flex: 1; }
+.lcp .tool-card h3 { font-size: var(--t-md); font-weight: var(--w-semi); margin: 0 0 6px; }
+.lcp .tool-card p { margin: 0 0 var(--s2); color: var(--muted); font-size: var(--t-sm); line-height: 1.5; flex: 1; }
 
 .lcp .tag {
-  font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  font-size: var(--t-xs); font-weight: var(--w-semi); letter-spacing: .05em; text-transform: uppercase;
   padding: 4px 10px; border-radius: 999px; white-space: nowrap;
 }
 .lcp .tag-free { background: rgba(14, 59, 46, .09); color: var(--forest); }
@@ -284,10 +305,10 @@ body {
   transition: transform .15s ease, background .15s ease;
 }
 .lcp .flow a:hover { transform: translateY(-2px); background: #fff; }
-.lcp .flow .q { font-size: 15.5px; font-weight: 700; color: var(--ink); line-height: 1.35; }
-.lcp .flow .a { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--burnt); }
+.lcp .flow .q { font-size: var(--t-base); font-weight: var(--w-semi); color: var(--ink); line-height: 1.35; }
+.lcp .flow .a { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-sm); font-weight: var(--w-med); color: var(--burnt); }
 .lcp .flow .step {
-  counter-increment: step; font-family: inherit; font-size: 11px; font-weight: 800;
+  counter-increment: step; font-family: inherit; font-size: var(--t-xs); font-weight: var(--w-bold);
   letter-spacing: .12em; color: var(--muted);
 }
 .lcp .flow .step::before { content: counter(step) " / 4"; }
@@ -316,29 +337,29 @@ body {
   background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
   padding: var(--s4); box-shadow: var(--shadow-sm);
 }
-.lcp .pane h2 { font-size: 19px; margin-bottom: var(--s3); }
+.lcp .pane h2 { font-size: var(--t-lg); margin-bottom: var(--s3); }
 .lcp .pane .field { margin-bottom: var(--s3); }
-.lcp .pane label { font-size: 13.5px; margin-bottom: 7px; }
-.lcp .pane input, .lcp .pane select { padding: 12px 14px; font-size: 15.5px; }
+.lcp .pane label { font-size: var(--t-sm); margin-bottom: 7px; }
+.lcp .pane input, .lcp .pane select { padding: 12px 14px; font-size: var(--t-base); }
 .lcp .pane-foot { border-top: 1px solid var(--line); margin-top: var(--s4); padding-top: var(--s4); }
-.lcp .pane-foot h3, .lcp .pane-foot h2 { font-size: 17px; margin-bottom: 8px; }
+.lcp .pane-foot h3, .lcp .pane-foot h2 { font-size: var(--t-md); margin-bottom: 8px; }
 
 /* Summary strip: the four numbers that matter, tabular so they line up. */
 .lcp .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(104px, 1fr)); gap: var(--s3); margin-bottom: var(--s4); }
-.lcp .summary .n { font-size: 30px; font-weight: 800; line-height: 1.05; font-variant-numeric: tabular-nums; }
-.lcp .summary .k { font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.lcp .summary .n { font-size: var(--t-fig); font-weight: var(--w-bold); line-height: 1.05; font-variant-numeric: tabular-nums; }
+.lcp .summary .k { font-size: var(--t-xs); color: var(--muted); font-weight: var(--w-med); }
 
 /* The plan as a scannable table instead of fourteen full-height blocks.
    The narrative for each week lives in the PDF, which is what it is for. */
 .lcp .plan-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); background: #fff; }
-.lcp table.plan { border-collapse: collapse; width: 100%; min-width: 460px; font-size: 14.5px; }
+.lcp table.plan { border-collapse: collapse; width: 100%; min-width: 460px; font-size: var(--t-sm); }
 .lcp table.plan th, .lcp table.plan td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line); }
-.lcp table.plan th { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.lcp table.plan th { font-size: var(--t-xs); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: var(--w-semi); }
 .lcp table.plan tr:last-child td { border-bottom: none; }
 .lcp table.plan td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .lcp table.plan tbody tr:hover { background: var(--cream); }
 .lcp .phase-pill {
-  display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: .07em;
+  display: inline-block; font-size: var(--t-xs); font-weight: var(--w-bold); letter-spacing: .07em;
   text-transform: uppercase; padding: 3px 8px; border-radius: 999px;
   background: rgba(14, 59, 46, .08); color: var(--forest); white-space: nowrap;
 }
@@ -346,11 +367,11 @@ body {
 
 /* Long-form explanation is available, not imposed. */
 .lcp .longform > summary {
-  cursor: pointer; font-weight: 700; font-size: 16px; padding: var(--s2) 0;
+  cursor: pointer; font-weight: var(--w-semi); font-size: var(--t-base); padding: var(--s2) 0;
   list-style: none; display: flex; align-items: center; gap: 8px; color: var(--forest);
 }
 .lcp .longform > summary::-webkit-details-marker { display: none; }
-.lcp .longform > summary::after { content: '+'; color: var(--burnt); font-weight: 800; }
+.lcp .longform > summary::after { content: '+'; color: var(--burnt); font-weight: var(--w-bold); }
 .lcp .longform[open] > summary::after { content: '\2013'; }
 
 /* Persistent tool switcher. Scrolls horizontally on narrow screens rather than
@@ -363,7 +384,7 @@ body {
 .lcp .tool-switch-inner::-webkit-scrollbar { display: none; }
 .lcp .tool-switch a {
   display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
-  padding: 7px 13px; border-radius: 999px; font-size: 13.5px; font-weight: 600;
+  padding: 7px 13px; border-radius: 999px; font-size: var(--t-sm); font-weight: var(--w-med);
   color: var(--muted); text-decoration: none; border: 1.5px solid transparent;
   transition: background .15s ease, color .15s ease;
 }
@@ -390,22 +411,22 @@ body {
   gap: var(--s3); padding-top: 13px; padding-bottom: 13px;
 }
 .lcp .wordmark {
-  font-weight: 800; font-size: 16px; letter-spacing: .16em;
+  font-weight: var(--w-bold); font-size: var(--t-base); letter-spacing: .16em;
   text-transform: uppercase; color: var(--forest); text-decoration: none;
 }
 .lcp .lc-nav { display: flex; gap: var(--s3); align-items: center; }
 .lcp .lc-nav a {
-  font-size: 14px; font-weight: 600; color: var(--muted); text-decoration: none;
+  font-size: var(--t-sm); font-weight: var(--w-med); color: var(--muted); text-decoration: none;
   padding: 5px 2px; border-bottom: 2px solid transparent; transition: color .15s ease, border-color .15s ease;
 }
 .lcp .lc-nav a:hover { color: var(--forest); border-bottom-color: var(--amber); }
 @media (max-width: 640px) { .lcp .lc-nav { display: none; } }
 
 /* Gate: no form until the file is asked for. */
-.lcp .gate h3 { font-size: 17px; margin-bottom: 6px; }
-.lcp .gate .gate-blurb { margin: 0 0 var(--s3); font-size: 14px; }
-.lcp .gate .gate-fine { margin-top: 10px; font-size: 12.5px; line-height: 1.5; }
-.lcp .gate .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; font-weight: 600; margin-bottom: var(--s3); }
+.lcp .gate h3 { font-size: var(--t-md); margin-bottom: 6px; }
+.lcp .gate .gate-blurb { margin: 0 0 var(--s3); font-size: var(--t-sm); }
+.lcp .gate .gate-fine { margin-top: 10px; font-size: var(--t-xs); line-height: 1.5; }
+.lcp .gate .consent { display: flex; gap: 10px; align-items: flex-start; font-size: var(--t-sm); font-weight: var(--w-med); margin-bottom: var(--s3); }
 .lcp .gate .consent input { width: auto; flex: none; margin-top: 3px; }
 .lcp .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 
@@ -424,16 +445,16 @@ body {
 @media (max-width: 520px) { .lcp .foot-top { grid-template-columns: 1fr; gap: var(--s4); } }
 
 .lcp .foot-brand .wordmark { color: var(--cream); display: inline-block; margin-bottom: var(--s2); }
-.lcp .foot-brand p { margin: 0 0 8px; font-size: 14.5px; max-width: 34ch; line-height: 1.6; }
-.lcp .foot-contact a { color: var(--amber); font-weight: 700; text-decoration: none; }
+.lcp .foot-brand p { margin: 0 0 8px; font-size: var(--t-sm); max-width: 34ch; line-height: 1.6; }
+.lcp .foot-contact a { color: var(--amber); font-weight: var(--w-semi); text-decoration: none; }
 .lcp .foot-contact a:hover { text-decoration: underline; }
 
 .lcp .foot-col { display: flex; flex-direction: column; gap: 11px; }
 .lcp .foot-col h2 {
-  font-size: 12px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase;
+  font-size: var(--t-xs); font-weight: var(--w-bold); letter-spacing: .16em; text-transform: uppercase;
   color: var(--amber); margin: 0 0 4px;
 }
-.lcp .foot-col a { color: rgba(250, 247, 242, .85); font-size: 14.5px; text-decoration: none; }
+.lcp .foot-col a { color: rgba(250, 247, 242, .85); font-size: var(--t-sm); text-decoration: none; }
 .lcp .foot-col a:hover { color: var(--cream); text-decoration: underline; text-underline-offset: 3px; }
 
 .lcp .foot-legal {
@@ -441,7 +462,7 @@ body {
   padding-top: var(--s3);
   display: flex; flex-wrap: wrap; gap: var(--s2) var(--s4); justify-content: space-between;
 }
-.lcp .foot-legal p { margin: 0; font-size: 13px; color: rgba(250, 247, 242, .62); }
+.lcp .foot-legal p { margin: 0; font-size: var(--t-sm); color: rgba(250, 247, 242, .62); }
 .lcp .lc-footer :focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; }
 
 /* Section rhythm. Every .section used to pad 64px top AND bottom, so two adjacent
@@ -455,3 +476,69 @@ body {
 .lcp .longform { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .lcp .longform > summary { padding: var(--s3) 0; }
 .lcp .longform[open] > .prose { padding-bottom: var(--s4); }
+
+
+/* ---- Reading column ----
+   A 578px measure stranded in an 1140px grid reads as a broken layout, not as a
+   text column. Prose sections get their own centred container and the text fills
+   it, so the width is the design rather than an accident of max-width. */
+.lcp .container-prose {
+  width: 100%; max-width: var(--container-prose);
+  margin-inline: auto; padding-inline: var(--s3);
+}
+.lcp .container-prose > * { max-width: none; }
+.lcp .prose, .lcp .faq, .lcp .sources { max-width: none; }
+.lcp .prose p { font-size: var(--t-md); line-height: 1.68; color: var(--ink); }
+.lcp .prose h2 { margin-top: var(--s5); margin-bottom: var(--s2); }
+.lcp .prose h2:first-child { margin-top: 0; }
+.lcp .prose > p + p { margin-top: var(--s3); }
+.lcp .faq details p { max-width: none; }
+.lcp .worked-example, .lcp .disclaimer { max-width: none; }
+
+/* One rule for every body-copy surface, so nothing drifts to semi-bold. */
+.lcp p, .lcp li, .lcp td { font-weight: var(--w-body); }
+.lcp .muted { font-weight: var(--w-body); color: var(--muted); }
+.lcp strong, .lcp b { font-weight: var(--w-semi); }
+.lcp label, .lcp .meta, .lcp .tag, .lcp .eyebrow { font-weight: var(--w-med); }
+.lcp .eyebrow { font-weight: var(--w-semi); }
+
+/* ---- Live deadline strip ----
+   The homepage's one moving part. Real countdowns from the verified date table,
+   so it is useful rather than decorative and differs every morning. */
+.lcp .deadlines {
+  margin-top: var(--s4);
+  padding: var(--s3) var(--s4);
+  background: rgba(250, 247, 242, .07);
+  border: 1px solid rgba(250, 247, 242, .16);
+  border-radius: var(--radius);
+}
+.lcp .deadlines-label {
+  display: flex; align-items: center; gap: 7px; margin: 0 0 var(--s2);
+  font-size: var(--t-xs); font-weight: var(--w-bold); letter-spacing: .16em;
+  text-transform: uppercase; color: var(--amber);
+}
+.lcp .deadlines ul {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: var(--s3);
+}
+.lcp .deadlines li {
+  display: grid; grid-template-columns: auto auto; align-items: baseline;
+  column-gap: 6px; row-gap: 2px;
+  animation: dl-in .45s cubic-bezier(.22,.61,.36,1) both;
+}
+@keyframes dl-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.lcp .deadlines .d-days {
+  font-size: var(--t-fig); font-weight: var(--w-bold); color: var(--cream);
+  line-height: 1; font-variant-numeric: tabular-nums;
+}
+.lcp .deadlines .d-unit { font-size: var(--t-sm); color: var(--on-dark); }
+.lcp .deadlines .d-exam {
+  grid-column: 1 / -1; font-size: var(--t-base); font-weight: var(--w-semi); color: var(--cream);
+}
+.lcp .deadlines .d-what { grid-column: 1 / -1; font-size: var(--t-sm); color: var(--on-dark); }
+.lcp .deadlines-more {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: var(--s3);
+  font-size: var(--t-sm); font-weight: var(--w-semi); color: var(--amber); text-decoration: none;
+}
+.lcp .deadlines-more:hover { text-decoration: underline; text-underline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .lcp .deadlines li { animation: none; } }

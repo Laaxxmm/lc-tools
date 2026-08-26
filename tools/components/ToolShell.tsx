@@ -44,7 +44,7 @@ export default function ToolShell({ tool, children, explainer }: Props) {
 
       {explainer ? (
         <section className="section">
-          <div className="container">
+          <div className="container-prose">
             {/* Available, not imposed. A calculator page should not open with an
                 essay; the people who want the reasoning can open it. */}
             <details className="longform">
@@ -56,7 +56,7 @@ export default function ToolShell({ tool, children, explainer }: Props) {
       ) : null}
 
       {tool.sources?.length ? (
-        <section className="container">
+        <section className="container-prose">
           <p className="sources">
             Checked against:{' '}
             {tool.sources.map((s, i) => (
@@ -68,7 +68,7 @@ export default function ToolShell({ tool, children, explainer }: Props) {
 
       {tool.faq.length > 0 ? (
         <section className="section">
-          <div className="container">
+          <div className="container-prose">
             <hr className="rule" />
             <h2>Questions you might have</h2>
             <div className="faq">
