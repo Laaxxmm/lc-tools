@@ -41,5 +41,12 @@
   },
   "_dead": {
     "2019": "KEA links pgcet_2019/R1_cutoff_*.pdf but the files 404. Verified 2026-08-26."
+  },
+  "mat_colleges": {
+    "url": "https://aima.in/mat/participating-b-schools/",
+    "what": "AIMA's own list of institutes accepting MAT, in four regions.",
+    "gives": "acceptance only \u2014 AIMA publishes no per-institute cutoff and no route strength",
+    "script": "fetch_mat_colleges.py",
+    "verified": "2026-08-26"
   }
 }
