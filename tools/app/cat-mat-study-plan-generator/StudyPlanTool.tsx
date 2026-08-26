@@ -61,11 +61,11 @@ export default function StudyPlanTool() {
   }
 
   return (
-    <div className="tool-layout">
-      {/* Controls. Sticky on desktop so you can change an answer from anywhere in
-          the plan; first in the DOM so mobile meets them before the output. */}
-      <aside className="pane">
+    <>
+      {/* Set-once controls, laid out across the width. */}
+      <section className="tool-inputs" aria-label="Your details">
         <h2>Your details</h2>
+        <div className="fields">
 
         <div className="field">
           <label htmlFor={`${id}-exam`}>Which exam</label>
@@ -79,7 +79,7 @@ export default function StudyPlanTool() {
           <label htmlFor={`${id}-date`}>Exam date</label>
           <input id={`${id}-date`} type="date" value={examDate} min={start || undefined}
                  onChange={(e) => setExamDate(e.target.value)} />
-          <span className="muted" style={{ fontSize: 12 }}>
+          <span className="field-note">
             {official ? 'Confirmed by the exam body' : 'Expected date — check the official site'}
           </span>
         </div>
@@ -110,7 +110,11 @@ export default function StudyPlanTool() {
                  onChange={(e) => setStart(e.target.value)} />
         </div>
 
-        <div className="pane-foot">
+        </div>
+      </section>
+
+      <div className="tool-layout">
+        <aside className="pane">
           <LeadGate
             slug={SLUG}
             mode="email+phone"
@@ -123,20 +127,19 @@ export default function StudyPlanTool() {
               {busy ? 'Building your PDF…' : 'Download the plan'}
             </button>
           </LeadGate>
-        </div>
-      </aside>
+        </aside>
 
-      {/* Output. Summary only — the week-by-week narrative lives in the PDF. */}
-      <div className="output">
+        {/* Output. Summary only — the week-by-week narrative lives in the PDF. */}
+        <div className="output">
         {error ? <p className="error" role="alert">{error}</p> : null}
 
         {plan ? (
           <>
-            <div className="summary">
-              <div><div className="n">{plan.daysLeft}</div><div className="k">days left</div></div>
-              <div><div className="n">{plan.weeks.length}</div><div className="k">{plan.weeks.length === 1 ? 'week' : 'weeks'}</div></div>
-              <div><div className="n">{plan.totalHours}h</div><div className="k">study hours</div></div>
-              <div><div className="n">{plan.totalMocks}</div><div className="k">full mocks</div></div>
+            <div className="kpi-row">
+              <div className="kpi"><p className="k">Days left</p><p className="n">{plan.daysLeft}</p></div>
+              <div className="kpi"><p className="k">{plan.weeks.length === 1 ? 'Week' : 'Weeks'}</p><p className="n">{plan.weeks.length}</p></div>
+              <div className="kpi"><p className="k">Study hours</p><p className="n">{plan.totalHours}h</p></div>
+              <div className="kpi"><p className="k">Full mocks</p><p className="n">{plan.totalMocks}</p></div>
             </div>
 
             <p className="muted" style={{ marginTop: 0 }}>{plan.shapeNote}</p>
@@ -188,8 +191,9 @@ export default function StudyPlanTool() {
           </>
         ) : (
           <p className="muted">Building your plan…</p>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

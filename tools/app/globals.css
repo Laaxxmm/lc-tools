@@ -30,7 +30,7 @@
   --t-lg:   22px;                      /* h3 */
   --t-xl:   clamp(26px, 3vw, 32px);    /* h2 */
   --t-2xl:  clamp(30px, 4.4vw, 44px);  /* h1 */
-  --t-fig:  clamp(30px, 3.4vw, 38px);  /* summary figures */
+  --t-fig:  clamp(26px, 2.5vw, 31px);  /* KPI figures — sized to fit its cell */
 
   /* Weights. The brand's "600 body" is a poster spec for 16.5-26px display type;
      at 16px web body it reads semi-bold on every line. Body is 400 here. */
@@ -570,13 +570,7 @@ body {
 .lcp .prose-nav a.is-active { color: var(--forest); font-weight: var(--w-semi); }
 @media (max-width: 979px) { .lcp .prose-nav { display: none; } }
 
-/* FAQ across the full width. Accordion rows are short; two columns fill the page
-   without a single line getting longer. */
-@media (min-width: 900px) {
-  .lcp .faq { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--s5); border-top: 0; }
-  .lcp .faq details { border-top: 1px solid var(--line); }
-}
-.lcp .faq details p { max-width: 60ch; }
+
 .lcp .sources { max-width: none; }
 @media (prefers-reduced-motion: reduce) { .lcp .prose-nav a { transition: none; } }
 
@@ -645,23 +639,6 @@ body {
 .lcp .cta-block .btn-secondary:hover { background: rgba(250, 247, 242, .12); border-color: var(--cream); }
 .lcp .cta-block .btn-link, .lcp .ground-pgcet .btn-link, .lcp .ground-mat .btn-link { color: var(--amber); }
 
-/* ============ KPI figures ============
-   Bare numbers on a page do not read as findings. Ruled cells give them weight. */
-.lcp .summary {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(136px, 1fr));
-  gap: 0; margin-bottom: var(--s4);
-  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
-  overflow: hidden;
-}
-.lcp .summary > div {
-  padding: var(--s3) var(--s3);
-  border-right: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-}
-.lcp .summary > div:last-child { border-right: 0; }
-.lcp .summary .n { font-size: var(--t-fig); font-weight: var(--w-bold); line-height: 1.05; color: var(--forest); font-variant-numeric: tabular-nums; }
-.lcp .summary .k { font-size: var(--t-sm); color: var(--muted); font-weight: var(--w-med); margin-top: 4px; }
-@media (min-width: 620px) { .lcp .summary > div { border-bottom: 0; } }
 
 /* ============ Fixes ============ */
 
@@ -698,3 +675,67 @@ body {
 }
 .lcp .kpi .kpi-note { margin: 8px 0 0; font-size: var(--t-sm); color: var(--muted); }
 @media (min-width: 700px) { .lcp .kpi { border-bottom: 0; } }
+
+/* ============ FAQ ============
+   One column, so the reading order is obvious and opening a row does not reflow a
+   neighbour. Question type steps down to body size — these are questions, not
+   headings. The help card beside it uses the width the list does not need. */
+.lcp .faq-layout { display: grid; grid-template-columns: 1fr; gap: var(--s4); align-items: start; }
+@media (min-width: 980px) {
+  .lcp .faq-layout { grid-template-columns: minmax(0, 1fr) 280px; gap: var(--s6); }
+  .lcp .faq-aside { position: sticky; top: 132px; }
+}
+
+.lcp .faq { max-width: none; border-top: 1px solid var(--line); }
+.lcp .faq details { border-bottom: 1px solid var(--line); }
+.lcp .faq summary {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s3);
+  padding: 15px 0; cursor: pointer; list-style: none;
+  font-size: var(--t-base); font-weight: var(--w-med); color: var(--ink); line-height: 1.45;
+}
+.lcp .faq summary:hover { color: var(--forest); }
+.lcp .faq summary::-webkit-details-marker { display: none; }
+.lcp .faq summary::after {
+  content: '+'; flex: none; color: var(--burnt); font-weight: var(--w-bold);
+  font-size: var(--t-md); line-height: 1.2;
+}
+.lcp .faq details[open] summary { color: var(--forest); font-weight: var(--w-semi); }
+.lcp .faq details[open] summary::after { content: '\2013'; }
+.lcp .faq details p {
+  margin: 0 0 15px; max-width: 70ch;
+  font-size: var(--t-sm); line-height: 1.62; color: var(--muted);
+}
+
+.lcp .faq-aside {
+  background: var(--cream-2, #F3EEE4); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: var(--s3);
+}
+.lcp .faq-aside h3 { font-size: var(--t-md); margin: 0 0 8px; }
+.lcp .faq-aside p { font-size: var(--t-sm); color: var(--muted); margin: 0 0 var(--s3); }
+
+/* Legacy .summary maps onto the shared KPI cell so figures read identically
+   everywhere. Label first, figure second — the label tells you what you are
+   about to read. */
+.lcp .summary { display: contents; }
+.lcp .kpi-row { align-items: stretch; }
+.lcp .kpi { display: flex; flex-direction: column; justify-content: flex-start; min-width: 0; }
+.lcp .kpi .n { white-space: nowrap; overflow-wrap: normal; }
+@media (max-width: 480px) { .lcp .kpi .n { white-space: normal; overflow-wrap: anywhere; } }
+
+/* ============ Tool input bar ============
+   Inputs are set once, then you read the result. Stacking six of them down a
+   narrow rail makes a short task feel long and pushes the answer off the fold.
+   They run horizontally across the full width instead; only the lead form —
+   the thing you reach for at any point — stays sticky. */
+.lcp .tool-inputs {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: var(--s3) var(--s4) var(--s4); box-shadow: var(--shadow-sm);
+  margin-bottom: var(--s4);
+}
+.lcp .tool-inputs > h2 { font-size: var(--t-md); margin-bottom: var(--s3); }
+.lcp .tool-inputs .fields {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  gap: var(--s3) var(--s3); align-items: start;
+}
+.lcp .tool-inputs .field { margin-bottom: 0; }
+.lcp .tool-inputs .field-note { display: block; margin-top: 5px; font-size: var(--t-xs); color: var(--muted); }

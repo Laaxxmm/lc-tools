@@ -75,13 +75,20 @@ export default function ToolShell({ tool, children, explainer }: Props) {
           <div className="container-prose">
             <hr className="rule" />
             <h2>Questions you might have</h2>
-            <div className="faq">
+            <div className="faq-layout">
+              <div className="faq">
               {tool.faq.map((f) => (
                 <details key={f.q}>
                   <summary>{f.q}</summary>
                   <p>{f.a}</p>
                 </details>
               ))}
+              </div>
+              <aside className="faq-aside">
+                <h3>Still not sure?</h3>
+                <p>A mentor answers the ones a page cannot — your marks, your college list, your shot.</p>
+                <a className="btn btn-secondary btn-block" href="https://learncrew.org/">Talk to a mentor</a>
+              </aside>
             </div>
           </div>
         </section>
