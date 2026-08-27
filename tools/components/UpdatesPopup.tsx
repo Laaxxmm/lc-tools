@@ -45,6 +45,7 @@ export default function UpdatesPopup({ tool, exam }: { tool: string; exam: strin
     setError(null);
     const data = new FormData(e.currentTarget);
     const payload = {
+      name: String(data.get('name') ?? ''),
       email: String(data.get('email') ?? ''),
       phone: String(data.get('phone') ?? ''),
       whatsappConsent: true,
@@ -79,6 +80,10 @@ export default function UpdatesPopup({ tool, exam }: { tool: string; exam: strin
           {/* A concrete promise, not "exam updates". */}
           <h3>WhatsApp me when {exam} dates or forms change</h3>
           <p>Registration opening and closing, admit cards, results. Nothing else.</p>
+          <div className="field">
+            <label htmlFor={`${id}-n`}>Your name</label>
+            <input id={`${id}-n`} name="name" type="text" required placeholder="First and last name" />
+          </div>
           <div className="field">
             <label htmlFor={`${id}-e`}>Email address</label>
             <input id={`${id}-e`} name="email" type="email" required placeholder="you@example.com" />

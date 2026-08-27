@@ -53,6 +53,7 @@ export default function LeadGate({ slug, mode, children, heading, blurb, trigger
       email: String(f.get('email') ?? '').trim(),
       phone: String(f.get('phone') ?? '').trim(),
       whatsappConsent: f.get('whatsapp') === 'on',
+      name: String(f.get('name') ?? '').trim(),
       tool: slug,
       website: String(f.get('website') ?? ''),
     });
@@ -69,6 +70,14 @@ export default function LeadGate({ slug, mode, children, heading, blurb, trigger
     <form className="gate" onSubmit={onSubmit} noValidate>
       <h3>{heading ?? 'See the full breakdown'}</h3>
       {blurb ? <p className="muted gate-blurb">{blurb}</p> : null}
+
+      <div className="field">
+        <label htmlFor={`${id}-name`}>Your name</label>
+        <input
+          id={`${id}-name`} name="name" type="text" required
+          autoComplete="name" placeholder="First and last name"
+        />
+      </div>
 
       <div className="field">
         <label htmlFor={`${id}-email`}>Email address</label>

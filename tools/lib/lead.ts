@@ -2,6 +2,8 @@
 // so there is no CORS setup and no third-party service holding student data.
 
 export interface LeadPayload {
+  /** The team works from a leads sheet whose rows all carry a name. */
+  name?: string;
   email: string;
   phone?: string;
   whatsappConsent: boolean;

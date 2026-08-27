@@ -148,6 +148,7 @@ function lc_leads_handle( WP_REST_Request $request ) {
 	// DPDP wants provable consent, and the WhatsApp Business API bans senders who
 	// message without prior opt-in. Boolean alone is not evidence, so the timestamp
 	// and the IP are stored with it and the timestamp stays NULL when consent is not given.
+	$name    = sanitize_text_field( (string) $request->get_param( 'name' ) );
 	$consent = rest_sanitize_boolean( $request->get_param( 'whatsappConsent' ) );
 	$now     = current_time( 'mysql', true );
 
@@ -171,7 +172,88 @@ function lc_leads_handle( WP_REST_Request $request ) {
 		return new WP_Error( 'lc_store_failed', 'Could not save right now. Please try again.', array( 'status' => 500 ) );
 	}
 
+	// The database is the record. The sheet is where the team works, so push a copy
+	// there — but only after the row is safely stored, and never let a webhook
+	// failure turn into a lost lead or a visible error.
+	lc_leads_push_to_sheet(
+		array(
+			'name'    => $name,
+			'email'   => $email,
+			'phone'   => $phone,
+			'tool'    => $tool,
+			'payload' => $payload_json,
+			'consent' => $consent,
+		)
+	);
+
 	return new WP_REST_Response( array( 'ok' => true ), 201 );
+}
+
+/**
+ * Append the lead to the All Leads sheet via the Apps Script webhook.
+ *
+ * Fire-and-forget: a five second timeout, failures logged and swallowed. The
+ * lead is already in the database by this point, so the worst case is a row
+ * missing from the sheet, never a lost lead or a form that appears broken.
+ */
+function lc_leads_push_to_sheet( array $lead ) {
+	if ( ! defined( 'LC_SHEET_WEBHOOK_URL' ) || ! defined( 'LC_SHEET_SECRET' ) ) {
+		return; // Not configured yet — the database write already succeeded.
+	}
+
+	// The sheet's Course column, inferred from which tool captured the lead.
+	$course = 'MBA entrance';
+	if ( false !== strpos( $lead['tool'], 'pgcet' ) ) {
+		$course = 'PGCET';
+	} elseif ( false !== strpos( $lead['tool'], 'mat' ) && false === strpos( $lead['tool'], 'cat-mat' ) ) {
+		$course = 'MAT';
+	} elseif ( false !== strpos( $lead['tool'], 'cat' ) ) {
+		$course = 'CAT / MAT';
+	}
+
+	// Email now has its own column on the mailing-list tab, so Remarks carries the
+	// context a caller needs instead.
+	$remarks = $lead['tool'];
+	if ( $lead['consent'] ) {
+		$remarks .= ' | WhatsApp opt-in';
+	}
+	$inputs = json_decode( (string) $lead['payload'], true );
+	if ( is_array( $inputs ) && $inputs ) {
+		$bits = array();
+		foreach ( array_slice( $inputs, 0, 4, true ) as $k => $v ) {
+			if ( is_scalar( $v ) ) {
+				$bits[] = $k . '=' . $v;
+			}
+		}
+		if ( $bits ) {
+			$remarks .= ' | ' . implode( ', ', $bits );
+		}
+	}
+
+	$res = wp_remote_post(
+		LC_SHEET_WEBHOOK_URL,
+		array(
+			'timeout'  => 5,
+			'blocking' => true,
+			'headers'  => array( 'Content-Type' => 'application/json' ),
+			'body'     => wp_json_encode(
+				array(
+					'secret'  => LC_SHEET_SECRET,
+					'source'  => 'tools',
+					'course'  => $course,
+					'name'    => $lead['name'],
+					'phone'   => $lead['phone'],
+					'email'   => $lead['email'],
+					'consent' => $lead['consent'] ? true : false,
+					'remarks' => $remarks,
+				)
+			),
+		)
+	);
+
+	if ( is_wp_error( $res ) ) {
+		error_log( '[lc-leads] sheet push failed: ' . $res->get_error_message() );
+	}
 }
 
 /* -------------------------------------------------------------------------
