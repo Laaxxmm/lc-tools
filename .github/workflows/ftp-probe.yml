@@ -1,0 +1,28 @@
+name: FTP probe
+
+# One-off diagnostic. Lists what the FTP account actually sees, so the deploy
+# path can be set from fact instead of guesswork. Prints directory names only —
+# never credentials, which stay in the runner.
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: List FTP root and likely web roots
+        env:
+          H: ${{ secrets.HOSTINGER_HOST }}
+          U: ${{ secrets.HOSTINGER_USER }}
+          P: ${{ secrets.HOSTINGER_PASS }}
+        run: |
+          set +e
+          for path in "/" "/public_html/" "/domains/" "/domains/learncrew.org/" \
+                      "/domains/learncrew.org/public_html/" "/tools/" "/public_html/tools/"; do
+            echo "=============================================="
+            echo "LISTING: $path"
+            curl -s --max-time 45 --ftp-ssl --insecure \
+                 --user "$U:$P" "ftp://$H$path" \
+                 | awk '{ printf "  %s  %s\n", substr($1,1,10), $NF }' | head -30
+            echo "  (curl exit: $?)"
+          done
