@@ -5,10 +5,11 @@ import Icon from '../components/Icon';
 import DeadlineStrip from '../components/DeadlineStrip';
 import { TOOLS } from '../config';
 import { CTA, type ExamFamily } from '../lib/types';
-import { SITE, formatUpdated, groupByFamily, latestUpdated } from '../lib/shell';
+import { SITE, formatUpdated, groupByFamily, latestUpdated, serialiseJsonLd } from '../lib/shell';
 
 export const metadata: Metadata = {
   alternates: { canonical: `${SITE}/tools/` },
+  openGraph: { url: `${SITE}/tools/` },
   keywords: [
     'free mba entrance tools',
     'cat 2026 calculator',
@@ -50,6 +51,8 @@ const FLOW = [
 // Ranked, not equal. PGCET mocks are the lowest-friction paid step and the only
 // place PGCET can be bought at the right price, so they lead. Coaching is the
 // bigger ask; the MAT series is a sideways move for most readers.
+// Prices deliberately absent from anchor labels: store prices change and a stale
+// price in an anchor is a liability. The destination shows the current one.
 const HUB_CTAS = [
   { ...CTA.pgcetMocks, variant: 'btn-primary' },
   { ...CTA.coaching, variant: 'btn-secondary' },
@@ -59,8 +62,42 @@ const HUB_CTAS = [
 export default function Page() {
   const groups = groupByFamily(TOOLS);
 
+  // The hub is the parent of six tools and carried no schema of its own. An
+  // ItemList is what lets it compete for "free MBA entrance tools" style
+  // listings rather than only its children ranking individually.
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      '@id': `${SITE}/tools/#page`,
+      name: 'Free tools for MBA and MCA entrance aspirants',
+      url: `${SITE}/tools/`,
+      isPartOf: { '@id': `${SITE}/#website` },
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListOrder: 'https://schema.org/ItemListUnordered',
+        numberOfItems: TOOLS.length,
+        itemListElement: TOOLS.map((t, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          url: `${SITE}/tools/${t.slug}/`,
+          name: t.shortName ?? t.title,
+        })),
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE}/` },
+        { '@type': 'ListItem', position: 2, name: 'Free Tools' },
+      ],
+    },
+  ];
+
   return (
     <article>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serialiseJsonLd(jsonLd) }} />
       <header className="tool-hero ground-pgcet">
         <div className="container">
           <p className="eyebrow"><span className="dot" />Learn Crew Tools</p>

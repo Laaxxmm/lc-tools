@@ -2,7 +2,7 @@ import { CTA, type ToolConfig } from '../lib/types.ts';
 
 const tool: ToolConfig = {
   slug: 'cat-percentile-target-calculator',
-  title: 'CAT percentile target calculator: work backwards from the school you want',
+  title: 'CAT Percentile Target Calculator: the score you need',
   tagline:
     'Pick a target tier. Get the percentile it usually takes, the raw score band behind it, and how many questions each section needs at your own accuracy.',
   eyebrow: 'CAT 2026',

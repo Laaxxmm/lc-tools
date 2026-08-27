@@ -39,17 +39,46 @@ export interface ToolConfig {
 // the Management ladder at Rs.999). Every PGCET CTA points at publications instead.
 export const CTA = {
   pgcetMocks: {
-    label: 'Get PGCET mocks — Rs.399/year',
+    label: 'Get the PGCET mock series',
     href: 'https://publications.learncrew.org/?tab=mocks',
-    note: 'PGCET mock series, one year access.',
+    note: 'PGCET mock series, one year of access.',
   },
   matMocks: {
-    label: 'Get MAT test series — Rs.999/year',
-    href: 'https://learn.learncrew.org/',
-    note: 'MAT and MBA entrance mocks.',
+    // Deep link, not the LMS root: a student who lands on the root has to find
+    // the paper again themselves.
+    label: 'Get the MAT test series',
+    href: 'https://learn.learncrew.org/tests/1279/management-aptitude-test-mat',
+    note: 'Full-length MAT papers with analysis.',
   },
+  pgcetCoaching: {
+    label: 'PGCET coaching',
+    href: 'https://learncrew.org/pgcet-online-coaching-mba-mca/',
+  },
+  matCoaching: {
+    label: 'MAT coaching',
+    href: 'https://learncrew.org/mat-online-coaching-600plus/',
+  },
+  // Anchor text is a ranking signal. Pointing "PGCET coaching" at the homepage
+  // spends that signal on a page that should not rank for it, and drops the
+  // student on something generic.
   coaching: {
     label: 'See PGCET & MAT coaching',
-    href: 'https://learncrew.org/',
+    href: 'https://learncrew.org/pgcet-online-coaching-mba-mca/',
+  },
+  contact: {
+    label: 'Talk to a mentor',
+    href: 'https://learncrew.org/contact/',
+  },
+  demo: {
+    label: 'Book a free demo',
+    href: 'https://learncrew.org/contact/',
+  },
+  books: {
+    label: 'Books & mocks',
+    href: 'https://publications.learncrew.org/',
+  },
+  results: {
+    label: 'Student results',
+    href: 'https://learncrew.org/learn-crew-results/',
   },
 } as const;

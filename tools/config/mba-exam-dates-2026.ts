@@ -2,7 +2,7 @@ import { CTA, type ToolConfig } from '../lib/types.ts';
 
 const config: ToolConfig = {
   slug: 'mba-exam-dates-2026',
-  title: 'MBA and MCA exam dates 2026-27: what is confirmed and what is not',
+  title: 'MBA & MCA Exam Dates 2026-27: confirmed vs expected',
   tagline:
     'Every MBA and MCA entrance with its exam date, registration window and days left, sorted by whatever closes first.',
   eyebrow: 'Deadline tracker',

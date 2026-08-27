@@ -2,7 +2,7 @@ import { CTA, type ToolConfig } from '../lib/types.ts';
 
 const tool: ToolConfig = {
   slug: 'mba-cost-and-roi-calculator',
-  title: 'MBA Cost and ROI Calculator: What It Really Costs and When You Break Even',
+  title: 'MBA Cost & ROI Calculator: true cost and break-even',
   tagline:
     'Fees are the smallest part of the bill. Add living costs, the salary you give up and the interest on the loan, and you get the number worth deciding on.',
   eyebrow: 'Cost and ROI',

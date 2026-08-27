@@ -2,7 +2,7 @@ import { CTA, type ToolConfig } from '../lib/types.ts';
 
 const tool: ToolConfig = {
   slug: 'cat-mat-study-plan-generator',
-  title: 'CAT & MAT Study Plan Generator: your weeks mapped to exam day',
+  title: 'CAT & MAT Study Plan Generator: weeks to exam day',
   tagline:
     'Give it your exam date, the hours you actually have, and your weakest section. It returns a week-by-week plan with the sectional split and the mock checkpoints already placed.',
   eyebrow: 'CAT & MAT · Study planner',

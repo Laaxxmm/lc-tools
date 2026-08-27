@@ -3,6 +3,7 @@ import type { ToolConfig } from '../lib/types';
 import { TOOLS } from '../config';
 import Icon from './Icon';
 import ProseNav from './ProseNav';
+import Breadcrumbs from './Breadcrumbs';
 import BuyRail, { type RailOffer } from './BuyRail';
 import UpdatesPopup from './UpdatesPopup';
 import { formatUpdated, groundClass, relatedTools, resolveCta, serialiseJsonLd, toolJsonLd } from '../lib/shell';
@@ -21,26 +22,28 @@ interface Props {
 // the LMS, where it inherits the Management ladder at Rs.999.
 const RAIL: Record<string, RailOffer[]> = {
   mat: [
-    { eyebrow: 'MAT · 13 September', title: 'Full-length MAT papers', price: 'Rs.999 / year',
-      href: 'https://learn.learncrew.org/', cta: 'Get the MAT series', icon: 'clock' },
+    { eyebrow: 'MAT · 13 September', title: 'Full-length MAT papers',
+      href: 'https://learn.learncrew.org/tests/1279/management-aptitude-test-mat',
+      cta: 'Get the MAT series', icon: 'clock' },
     { eyebrow: 'Books & ebooks', title: 'Solved papers and topic books',
       href: 'https://publications.learncrew.org/', cta: 'Browse the store', icon: 'download' },
   ],
   pgcet: [
-    { eyebrow: 'Karnataka PGCET', title: 'PGCET mock series', price: 'Rs.399 / year',
+    { eyebrow: 'Karnataka PGCET', title: 'PGCET mock series',
       href: 'https://publications.learncrew.org/?tab=mocks', cta: 'Get PGCET mocks', icon: 'target' },
   ],
   cat: [
-    { eyebrow: 'CAT · 29 November', title: 'MBA entrance mocks', price: 'Rs.999 / year',
-      href: 'https://learn.learncrew.org/', cta: 'Get the test series', icon: 'target' },
-    { eyebrow: 'Coaching', title: 'PGCET & MAT batches',
-      href: 'https://learncrew.org/', cta: 'Book a free demo', icon: 'spark' },
+    { eyebrow: 'CAT · 29 November', title: 'MBA entrance mocks',
+      href: 'https://learn.learncrew.org/tests/1279/management-aptitude-test-mat',
+      cta: 'Get the test series', icon: 'target' },
+    { eyebrow: 'Coaching', title: 'PGCET & MAT coaching batches',
+      href: 'https://learncrew.org/contact/', cta: 'Book a free demo', icon: 'spark' },
   ],
   general: [
     { eyebrow: 'Books & ebooks', title: 'Solved papers and topic books',
       href: 'https://publications.learncrew.org/', cta: 'Browse the store', icon: 'download' },
-    { eyebrow: 'Coaching', title: 'PGCET & MAT batches',
-      href: 'https://learncrew.org/', cta: 'Book a free demo', icon: 'spark' },
+    { eyebrow: 'Coaching', title: 'PGCET & MAT coaching batches',
+      href: 'https://learncrew.org/contact/', cta: 'Book a free demo', icon: 'spark' },
   ],
 };
 
@@ -64,6 +67,7 @@ export default function ToolShell({ tool, children, explainer }: Props) {
 
       <header className={`tool-hero ${ground}`}>
         <div className="container">
+          <Breadcrumbs name={tool.shortName ?? tool.title} slug={tool.slug} />
           <p className="eyebrow"><Icon name={tool.icon} size={16} />{tool.eyebrow}</p>
           <h1>{tool.title}</h1>
           <p className="lead">{tool.tagline}</p>
@@ -121,7 +125,7 @@ export default function ToolShell({ tool, children, explainer }: Props) {
               <aside className="faq-aside">
                 <h3>Still not sure?</h3>
                 <p>A mentor answers the ones a page cannot — your marks, your college list, your shot.</p>
-                <a className="btn btn-secondary btn-block" href="https://learncrew.org/">Talk to a mentor</a>
+                <a className="btn btn-secondary btn-block" href="https://learncrew.org/contact/">Talk to a mentor</a>
               </aside>
             </div>
           </div>

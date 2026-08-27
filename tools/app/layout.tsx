@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 };
 
 const PROPERTIES = [
-  { label: 'Coaching', href: 'https://learncrew.org/' },
+  { label: 'Coaching', href: 'https://learncrew.org/pgcet-online-coaching-mba-mca/' },
   { label: 'Mocks', href: 'https://learn.learncrew.org/' },
   { label: 'Books', href: 'https://publications.learncrew.org/' },
 ];
@@ -75,7 +75,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <a key={p.href} href={p.href}>{p.label}</a>
               ))}
             </nav>
-            <a className="btn btn-primary lc-header-cta" href="https://learncrew.org/">
+            <a className="btn btn-primary lc-header-cta" href="https://learncrew.org/contact/">
               Book a free demo
             </a>
           </div>
@@ -96,7 +96,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     forest ground. */}
                 <span className="foot-lockup">
                   <span className="foot-mark">
-                    <img src="/tools/learn-crew-mark.png" width={192} height={192} alt="" />
+                    <img src="/tools/learn-crew-mark.png" width={192} height={192} alt="" aria-hidden="true" />
                   </span>
                   <span className="foot-name">Learn Crew</span>
                 </span>
@@ -110,8 +110,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
               <div className="foot-col">
                 <h2>Programs</h2>
-                <a href="https://learncrew.org/">PGCET Coaching</a>
-                <a href="https://learncrew.org/">MAT Coaching</a>
+                <a href="https://learncrew.org/pgcet-online-coaching-mba-mca/">PGCET Coaching</a>
+                <a href="https://learncrew.org/mat-online-coaching-600plus/">MAT Coaching</a>
                 <a href="https://learncrew.org/learn-crew-results/">Results</a>
                 <a href="https://learncrew.org/blog/">Blog</a>
                 <a href="https://publications.learncrew.org/">Books &amp; Mocks</a>
@@ -129,8 +129,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <h2>Company</h2>
                 <a href="https://learncrew.org/contact/">Contact</a>
                 <a href="https://learncrew.org/privacy-policy/">Privacy</a>
-                <a href="https://learncrew.org/terms/">Terms</a>
-                <a href="https://learncrew.org/refund-policy/">Refunds</a>
+                <a href="https://learncrew.org/terms-conditions/">Terms</a>
+                <a href="https://learncrew.org/return-refund-policy/">Refunds</a>
               </div>
             </div>
 
