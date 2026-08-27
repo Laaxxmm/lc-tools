@@ -2,6 +2,10 @@
 
 Leads land in three places, on purpose:
 
+The All Leads sheet has **nine** columns, not eight: `Page` sits at position 4 and
+is collapsed in the normal view. Rows are written by column index rather than by
+position, so a hidden or reordered column cannot shift the data.
+
 | Where | Why |
 |---|---|
 | WordPress database | the record. Written first, so a webhook outage never loses a lead |
@@ -11,10 +15,25 @@ Leads land in three places, on purpose:
 Email gets its own tab so it can be exported straight into a mail tool without
 dragging phone numbers and call notes along.
 
+## 0. Check for an existing doPost first
+
+**A project can hold only one `doPost`.** This sheet already has an Apps Script
+(the dashboard builder). Before pasting anything:
+
+- Open **Extensions → Apps Script**
+- Press **Ctrl/Cmd + F** and search the project for `doPost`
+
+If nothing is found — the dashboard script has none — add `lead-to-sheet.gs` as a
+**new file** in that same project (Files → **+** → Script). It must live in the
+same project because both need to be bound to this sheet.
+
+If a `doPost` already exists and is receiving WordPress leads, do not paste this
+over it. Tell me what it does and I will merge the two rather than replace one.
+
 ## 1. Add the script
 
-In the sheet: **Extensions → Apps Script**. Delete anything there, paste
-`lead-to-sheet.gs`, and change one line:
+Add `lead-to-sheet.gs` as a **new file** in the existing project — do not delete
+the dashboard script. Then change one line:
 
 ```js
 var SHARED_SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';

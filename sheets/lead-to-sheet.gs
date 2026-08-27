@@ -1,6 +1,11 @@
 /**
  * Learn Crew — tool leads into the All Leads sheet.
  *
+ * IMPORTANT: an Apps Script project can hold only ONE doPost. If this project
+ * already has one receiving WordPress leads, adding this file will break it —
+ * search the project for "doPost" before pasting. The dashboard script is safe;
+ * it has no doPost.
+ *
  * Deploy: Extensions → Apps Script → paste this → Deploy → New deployment →
  * type "Web app" → Execute as: Me → Who has access: Anyone → Deploy.
  * Copy the /exec URL it gives you; that is what WordPress posts to.
@@ -10,8 +15,18 @@
  * SHARED_SECRET below is a second check in case the URL ever leaks.
  */
 
-var LEADS_SHEET = 'All Leads';   // the calling list — name, phone, course
+var LEADS_SHEET = 'All Leads';   // the calling list
 var EMAIL_SHEET = 'Email List';  // the mailing list — created automatically
+
+/**
+ * Column order of the All Leads sheet, 1-indexed, matching the CONFIG already in
+ * this project's dashboard script. Note PAGE at 4 — it is collapsed in the normal
+ * view, so an 8-value append silently shifts every column after Source.
+ */
+var COL = {
+  DATE: 1, TIME: 2, SOURCE: 3, PAGE: 4, COURSE: 5,
+  NAME: 6, MOBILE: 7, REMARKS: 8, STATUS: 9
+};
 var SHARED_SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';
 
 function doPost(e) {
@@ -32,15 +47,22 @@ function doPost(e) {
     //    blank on purpose — that column belongs to your team, not to this script.
     var leads = ss.getSheetByName(LEADS_SHEET);
     if (!leads) return json({ ok: false, error: 'sheet not found: ' + LEADS_SHEET });
-    leads.appendRow([
-      date, time,
-      body.source || 'tools',
-      body.course || '',
-      body.name || '',
-      body.phone || '',
-      body.remarks || '',
-      ''
-    ]);
+    // Build by column index rather than by position, so a hidden or reordered
+    // column can never shift the data.
+    var row = [];
+    row[COL.DATE - 1]    = date;
+    row[COL.TIME - 1]    = time;
+    row[COL.SOURCE - 1]  = body.source || 'tools';
+    row[COL.PAGE - 1]    = body.page || body.tool || '';
+    row[COL.COURSE - 1]  = body.course || '';
+    row[COL.NAME - 1]    = body.name || '';
+    row[COL.MOBILE - 1]  = body.phone || '';
+    row[COL.REMARKS - 1] = body.remarks || '';
+    row[COL.STATUS - 1]  = '';                    // yours to fill, never ours
+    for (var c = 0; c < row.length; c++) {
+      if (row[c] === undefined) row[c] = '';
+    }
+    leads.appendRow(row);
 
     // 2. The mailing list, kept separate so it can be exported straight into an
     //    email tool without dragging call notes and phone numbers along.
@@ -91,6 +113,7 @@ function testAppend() {
   var res = doPost({ postData: { contents: JSON.stringify({
     secret: SHARED_SECRET,
     source: 'tools',
+    page: 'cat-mat-study-plan-generator',
     course: 'PGCET MBA',
     name: 'Test Row',
     phone: '9999999999',

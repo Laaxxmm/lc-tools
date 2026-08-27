@@ -240,6 +240,8 @@ function lc_leads_push_to_sheet( array $lead ) {
 				array(
 					'secret'  => LC_SHEET_SECRET,
 					'source'  => 'tools',
+					// The sheet's Page column — which tool produced the lead.
+					'page'    => $lead['tool'],
 					'course'  => $course,
 					'name'    => $lead['name'],
 					'phone'   => $lead['phone'],
