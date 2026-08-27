@@ -57,7 +57,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         {/* Announcement ribbon, matching learncrew.org's .lcp-announce. */}
         <div className="lc-announce">
-          <a href="https://learncrew.org/">
+          {/* The ribbon promises MAT coaching, so it lands on the MAT coaching
+              page — not the homepage the reader then has to search from. */}
+          <a href="https://learncrew.org/mat-online-coaching-600plus/">
             <strong>MAT Sep 2026</strong> — paper-based test 13 Sept · coaching batches enrolling{' '}
             <span className="lc-arrow" aria-hidden="true">&rarr;</span>
           </a>
