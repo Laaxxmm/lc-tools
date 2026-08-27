@@ -33,7 +33,10 @@ function gtag(): ((...args: unknown[]) => void) | null {
   document.head.appendChild(s);
 
   queue('js', new Date());
-  queue('config', id);
+  // send_page_view: false because the GTM container already fires the GA4
+  // page_view. This branch only runs if a tool event beats GTM to defining
+  // window.gtag; without the flag that race would double-count the page view.
+  queue('config', id, { send_page_view: false });
   return queue;
 }
 

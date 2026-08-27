@@ -41,7 +41,9 @@ test('with a GA4 id: loads gtag.js once and queues the event', () => {
   assert.deepEqual(loaded, ['https://www.googletagmanager.com/gtag/js?id=G-ABC123']);
   const queue = win.dataLayer ?? [];
   assert.equal(args(queue[0])[0], 'js');
-  assert.deepEqual(args(queue[1]), ['config', 'G-ABC123']);
+  // send_page_view: false — the GTM container owns the page_view. If this
+  // branch ever wins the race with GTM, it must not fire a second one.
+  assert.deepEqual(args(queue[1]), ['config', 'G-ABC123', { send_page_view: false }]);
   assert.deepEqual(args(queue[2]), [
     'event', 'tool_use', { tool_slug: 'mba-cost-and-roi-calculator' },
   ]);

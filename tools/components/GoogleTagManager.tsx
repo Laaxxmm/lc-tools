@@ -1,8 +1,14 @@
 import Script from 'next/script';
 
-// Google Tag Manager container GTM-NWH7PFJ8 — the same container learncrew.org
-// runs, so the tools site reports into the same GA4 property (G-S9TPBWTJRS) and
-// there is one place to change tagging for both.
+// Google Tag Manager container GTM-NWH7PFJ8 — the container learn.learncrew.org
+// (the EduGorilla LMS) runs, so the tools site reports into the same GA4 property
+// and there is one place to change tagging for both.
+//
+// Checked on the live sites 27 Aug 2026: learncrew.org and
+// publications.learncrew.org load NO analytics at all — no GTM, no gtag, no
+// dataLayer. So the blog -> tool -> purchase journey does NOT yet stitch
+// together; only the LMS and this site report. Tagging the WordPress site and
+// the store with this same container is what completes it.
 //
 // The ID is hard-coded on purpose. A container ID is public — it is visible in
 // the page source of every site that runs it, exactly like the measurement ID in
