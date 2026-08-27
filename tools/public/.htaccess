@@ -1,1 +1,9 @@
+# Static export: every route is a directory containing index.html. Hostinger's
+# server-level DirectoryIndex leads with index.php, so a folder with only an
+# index.html returns 403 rather than serving it. Declare it explicitly.
+DirectoryIndex index.html
+
+# Never expose a bare file listing if an index is ever missing.
+Options -Indexes
+
 ErrorDocument 404 /tools/404.html
