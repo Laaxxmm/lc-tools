@@ -52,7 +52,8 @@ jobs:
           username: ${{ secrets.HOSTINGER_USER }}
           password: ${{ secrets.HOSTINGER_PASS }}
           local-dir: ./tools/out/
-          # The FTP account is rooted AT public_html — hPanel's FTP Accounts page
-          # states "Folder to upload files: public_html". So the path is /tools/,
-          # not /public_html/tools/, which would nest a second public_html.
-          server-dir: /tools/
+          # The FTP account lands in the HOME directory, not the web root. Hostinger
+          # keeps sites under domains/<domain>/public_html, so that is the only
+          # correct target. An FTP listing of / confirmed it: home holds domains/,
+          # and domains/learncrew.org/public_html/ is where wp-config.php lives.
+          server-dir: /domains/learncrew.org/public_html/tools/
