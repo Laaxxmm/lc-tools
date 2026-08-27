@@ -40,8 +40,10 @@ jobs:
         working-directory: tools
         env:
           # Public measurement ID, not a secret — it ends up in the page source
-          # either way. Unset means lib/analytics.ts stays inert and loads nothing.
-          NEXT_PUBLIC_GA4_ID: ${{ vars.NEXT_PUBLIC_GA4_ID }}
+          # either way. The literal is the fallback so a missing repository
+          # Variable can no longer ship the site untagged, which is the state it
+          # was in until 27 Aug 2026. Set vars.NEXT_PUBLIC_GA4_ID to override.
+          NEXT_PUBLIC_GA4_ID: ${{ vars.NEXT_PUBLIC_GA4_ID || 'G-S9TPBWTJRS' }}
         run: npm run build
 
       - name: Upload to Hostinger
