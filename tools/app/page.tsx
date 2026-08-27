@@ -9,7 +9,16 @@ import { SITE, formatUpdated, groupByFamily, latestUpdated, serialiseJsonLd } fr
 
 export const metadata: Metadata = {
   alternates: { canonical: `${SITE}/tools/` },
-  openGraph: { url: `${SITE}/tools/` },
+  // Next REPLACES a parent's openGraph rather than merging it, so adding url
+  // alone silently drops the inherited image. Every field has to be restated.
+  openGraph: {
+    type: 'website',
+    url: `${SITE}/tools/`,
+    siteName: 'Learn Crew',
+    locale: 'en_IN',
+    images: [{ url: '/tools/og-default.png', width: 1200, height: 630, alt: 'Learn Crew free tools' }],
+  },
+  twitter: { card: 'summary_large_image', images: ['/tools/og-default.png'] },
   keywords: [
     'free mba entrance tools',
     'cat 2026 calculator',
