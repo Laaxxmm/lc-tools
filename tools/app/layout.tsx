@@ -25,6 +25,16 @@ export const metadata: Metadata = {
     apple: '/tools/apple-touch-icon.png',
   },
   metadataBase: new URL(SITE),
+  // Without these, every share into a WhatsApp or Telegram exam group renders as
+  // a bare URL — no title, no description, no image. That is the main way these
+  // tools travel, so it is not cosmetic.
+  openGraph: {
+    type: 'website',
+    siteName: 'Learn Crew',
+    locale: 'en_IN',
+    images: [{ url: '/tools/og-default.png', width: 1200, height: 630, alt: 'Learn Crew free tools' }],
+  },
+  twitter: { card: 'summary_large_image', images: ['/tools/og-default.png'] },
   title: {
     default: 'Free tools for MBA and MCA entrance aspirants | Learn Crew Tools',
     template: '%s | Learn Crew Tools',

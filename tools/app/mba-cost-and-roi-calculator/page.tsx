@@ -7,6 +7,17 @@ import Calculator from './Calculator';
 // The h1 carries the long descriptive title. The SERP title is trimmed, because
 // the layout appends "| Learn Crew Tools" and Google truncates past ~60 characters.
 export const metadata: Metadata = {
+  openGraph: {
+    title: tool.title,
+    description: tool.description,
+    url: `/tools/${tool.slug}/`,
+    type: 'article',
+    siteName: 'Learn Crew',
+    locale: 'en_IN',
+    images: [{ url: '/tools/og-default.png', width: 1200, height: 630, alt: tool.title }],
+  },
+  twitter: { card: 'summary_large_image', title: tool.title,
+    description: tool.description, images: ['/tools/og-default.png'] },
   title: 'MBA Cost and ROI Calculator',
   description: tool.description,
   keywords: tool.keywords,
