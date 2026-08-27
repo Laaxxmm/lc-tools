@@ -21,8 +21,9 @@ jobs:
                       "/domains/learncrew.org/public_html/" "/tools/" "/public_html/tools/"; do
             echo "=============================================="
             echo "LISTING: $path"
-            curl -s --max-time 45 --ftp-ssl --insecure \
-                 --user "$U:$P" "ftp://$H$path" \
-                 | awk '{ printf "  %s  %s\n", substr($1,1,10), $NF }' | head -30
-            echo "  (curl exit: $?)"
+            curl -s --max-time 45 --ftp-ssl --insecure --list-only \
+                 --user "$U:$P" "ftp://$H$path" > /tmp/ls.txt 2>/tmp/err.txt
+            echo "  exit=$? lines=$(wc -l < /tmp/ls.txt)"
+            sed 's/^/  ENTRY: /' /tmp/ls.txt | head -40
+            [ -s /tmp/err.txt ] && sed 's/^/  ERR: /' /tmp/err.txt | head -3
           done
