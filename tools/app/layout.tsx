@@ -121,7 +121,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
               <div className="foot-col">
                 <h2>Free tools</h2>
-                {TOOLS.slice(0, 5).map((t) => (
+                {TOOLS.map((t) => (
                   <Link key={t.slug} href={`/${t.slug}/`}>{t.shortName ?? t.title}</Link>
                 ))}
                 <Link href="/">All tools</Link>

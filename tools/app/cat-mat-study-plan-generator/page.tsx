@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     url: toolUrl(tool.slug),
     siteName: 'Learn Crew',
     locale: 'en_IN',
-    images: [{ url: '/tools/og-default.png', width: 1200, height: 630, alt: tool.title }],
+    images: [{ url: `/tools/og/cat-mat-study-plan-generator.png`, width: 1200, height: 630, alt: tool.title }],
   },
   twitter: {
     card: 'summary_large_image',
     title: tool.title,
     description: tool.description,
-    images: ['/tools/og-default.png'],
+    images: [`/tools/og/cat-mat-study-plan-generator.png`],
   },
 };
 

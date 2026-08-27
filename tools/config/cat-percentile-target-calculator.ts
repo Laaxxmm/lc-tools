@@ -8,7 +8,7 @@ const tool: ToolConfig = {
   eyebrow: 'CAT 2026',
   family: 'cat',
   description:
-    'Pick your target B-school tier and see the CAT percentile, raw score band and attempts per section it needs at your own accuracy. Free, no signup.',
+    'Pick your target B-school tier and see the CAT percentile, raw score band and attempts per section it needs at your own accuracy. The answer is free.',
   keywords: [
     'cat percentile calculator',
     'cat score vs percentile',

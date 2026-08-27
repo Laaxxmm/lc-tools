@@ -6,7 +6,7 @@ import { CTA, type ToolConfig } from '../lib/types.ts';
 // and points at coaching rather than either mock ladder.
 const tool: ToolConfig = {
   slug: 'cgpa-percentage-converter',
-  title: 'CGPA to Percentage Converter: Your University’s Own Formula',
+  title: 'CGPA to Percentage Converter: your university’s rule',
   tagline:
     'Convert both ways with the rule your university actually applies, because VTU, the 9.5 rule and a plain 10x give three different answers from one CGPA.',
   eyebrow: 'Marks and grades',

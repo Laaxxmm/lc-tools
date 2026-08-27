@@ -109,7 +109,7 @@ export default function LeadGate({ slug, mode, children, heading, blurb, trigger
       {error ? <p className="error" role="alert">{error}</p> : null}
 
       <button className="btn btn-primary btn-block" type="submit" disabled={busy}>
-        {busy ? 'Saving…' : submitLabel ?? 'Show me the rest'}
+        {busy ? 'Saving…' : submitLabel ?? 'Send it to me'}
       </button>
 
       <p className="muted gate-fine">

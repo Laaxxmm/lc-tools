@@ -5,7 +5,7 @@ import { CTA, type ToolConfig } from '../lib/types.ts';
 // ladder, because the people who land here are three months from writing something.
 const tool: ToolConfig = {
   slug: 'mba-exam-eligibility-checker',
-  title: 'MBA Exam Eligibility Checker: CAT, MAT, XAT and Seven More',
+  title: 'MBA Exam Eligibility Checker: ten exams, one answer',
   tagline:
     'Enter your degree, your marks and your category. You get a straight answer for ten entrance exams, each with the rule that decided it and the official page it came from.',
   eyebrow: 'Eligibility',

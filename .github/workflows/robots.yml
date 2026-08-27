@@ -1,0 +1,58 @@
+name: Publish root robots.txt
+
+# The tools sitemap exists at /tools/sitemap.xml and is correct, but nothing points
+# at it: the root robots.txt carries a single Sitemap line for the WordPress index,
+# which lists only post/page/category sitemaps. Crawlers only read the ORIGIN root
+# robots.txt, and that file belongs to WordPress, not to the tools app.
+#
+# This uploads one file and touches nothing else. It deliberately does NOT use
+# FTP-Deploy-Action: that syncs a directory and can delete server files absent
+# locally, and pointed at the web root it would take WordPress with it.
+#
+# Note: a physical robots.txt takes precedence over the virtual one WordPress and
+# AIOSEO generate. Once this runs, THIS FILE is the source of truth — edit
+# wp/webroot/robots.txt here, not the AIOSEO editor.
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-tools      # never race the tools deploy
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Refuse to ship a robots.txt missing the tools sitemap
+        run: |
+          set -euo pipefail
+          grep -qx 'Sitemap: https://learncrew.org/sitemap.xml'       wp/webroot/robots.txt
+          grep -qx 'Sitemap: https://learncrew.org/tools/sitemap.xml' wp/webroot/robots.txt
+          grep -q  'Disallow: /wp-admin/'                            wp/webroot/robots.txt
+          echo "robots.txt looks sane:"
+          cat wp/webroot/robots.txt
+
+      - name: Upload single file over FTPS
+        env:
+          H: ${{ secrets.HOSTINGER_HOST }}
+          U: ${{ secrets.HOSTINGER_USER }}
+          P: ${{ secrets.HOSTINGER_PASS }}
+        run: |
+          set -euo pipefail
+          curl -sS --fail --max-time 60 --ftp-ssl --insecure \
+               --user "$U:$P" \
+               -T wp/webroot/robots.txt \
+               "ftp://$H/domains/learncrew.org/public_html/robots.txt"
+          echo "uploaded"
+
+      - name: Verify it is live and serving both sitemap lines
+        run: |
+          set -euo pipefail
+          sleep 5
+          curl -sS --fail https://learncrew.org/robots.txt -o /tmp/live.txt
+          cat /tmp/live.txt
+          grep -qx 'Sitemap: https://learncrew.org/tools/sitemap.xml' /tmp/live.txt
+          echo "VERIFIED: the tools sitemap is now announced at the origin root."

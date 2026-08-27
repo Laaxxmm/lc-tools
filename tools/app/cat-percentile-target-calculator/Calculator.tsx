@@ -204,6 +204,7 @@ export default function Calculator() {
             mode="email"
             heading="See what a change in accuracy does to this plan"
             blurb="Same target, eight accuracy levels, so you can see whether you are short on accuracy or short on speed. Enter your email and it opens straight away."
+            submitLabel="Show me the accuracy table"
           >
             <div className="card">
               <h3>The same {result.percentile} percentile target at other accuracies</h3>

@@ -190,6 +190,7 @@ export default function Calculator() {
                 mode="email"
                 heading="See the year-by-year loan breakdown"
                 blurb="Your total is above and stays there. This opens what each year of the EMI is really buying, which is mostly interest at the start."
+                submitLabel="Show me the year-by-year breakdown"
               >
                 <h2>Year by year, what your EMI buys</h2>
                 <p className="muted">
