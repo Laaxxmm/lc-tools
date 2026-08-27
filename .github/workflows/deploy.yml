@@ -52,4 +52,7 @@ jobs:
           username: ${{ secrets.HOSTINGER_USER }}
           password: ${{ secrets.HOSTINGER_PASS }}
           local-dir: ./tools/out/
-          server-dir: /public_html/tools/
+          # The FTP account is rooted AT public_html — hPanel's FTP Accounts page
+          # states "Folder to upload files: public_html". So the path is /tools/,
+          # not /public_html/tools/, which would nest a second public_html.
+          server-dir: /tools/
