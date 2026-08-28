@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Poppins } from 'next/font/google';
 import Link from 'next/link';
+import AttributionCapture from '../components/AttributionCapture';
 import GoogleTagManager from '../components/GoogleTagManager';
 import ToolNav from '../components/ToolNav';
 import { TOOLS } from '../config';
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en-IN">
       <body className={`lcp ${poppins.variable}`}>
         <GoogleTagManager />
+        <AttributionCapture />
         <a className="skip" href="#main">Skip to content</a>
 
         {/* Announcement ribbon, matching learncrew.org's .lcp-announce. */}

@@ -152,6 +152,39 @@ function lc_leads_handle( WP_REST_Request $request ) {
 	$consent = rest_sanitize_boolean( $request->get_param( 'whatsappConsent' ) );
 	$now     = current_time( 'mysql', true );
 
+	// Where the visitor came from. The tools app attaches this to every lead; a
+	// direct API caller may omit it, so every field is optional and sanitised.
+	$attr_in = $request->get_param( 'attribution' );
+	$attr    = array();
+	if ( is_array( $attr_in ) ) {
+		foreach ( array( 'channel', 'gclid', 'gbraid', 'wbraid', 'utmSource', 'utmMedium', 'utmCampaign', 'utmTerm', 'firstSeen', 'firstReferrer', 'landingPage' ) as $k ) {
+			if ( isset( $attr_in[ $k ] ) && is_scalar( $attr_in[ $k ] ) ) {
+				$attr[ $k ] = substr( sanitize_text_field( (string) $attr_in[ $k ] ), 0, 300 );
+			}
+		}
+	}
+
+	// Keep attribution with the lead in the database too, so the CSV export and
+	// any later re-push to the sheet still carry it.
+	if ( $attr ) {
+		$merged       = is_string( $payload_json ) ? json_decode( $payload_json, true ) : array();
+		$merged       = is_array( $merged ) ? $merged : array();
+		$merged['_attribution'] = $attr;
+		$encoded_attr = wp_json_encode( $merged, 0, 8 );
+
+		// Never substr() encoded JSON — a cut lands mid-string and what gets
+		// stored will not parse, which defeats keeping it for the export. If both
+		// halves will not fit, attribution is the smaller and more useful one.
+		if ( is_string( $encoded_attr ) && strlen( $encoded_attr ) <= LC_LEADS_PAYLOAD_MAX ) {
+			$payload_json = $encoded_attr;
+		} else {
+			$attr_only = wp_json_encode( array( '_attribution' => $attr ), 0, 8 );
+			if ( is_string( $attr_only ) && strlen( $attr_only ) <= LC_LEADS_PAYLOAD_MAX ) {
+				$payload_json = $attr_only;
+			}
+		}
+	}
+
 	global $wpdb;
 	$inserted = $wpdb->insert(
 		lc_leads_table(),
@@ -183,6 +216,7 @@ function lc_leads_handle( WP_REST_Request $request ) {
 			'tool'    => $tool,
 			'payload' => $payload_json,
 			'consent' => $consent,
+			'attr'    => $attr,
 		)
 	);
 
@@ -240,6 +274,14 @@ function lc_leads_push_to_sheet( array $lead ) {
 				array(
 					'secret'  => LC_SHEET_SECRET,
 					'source'  => 'tools',
+					// The paid-vs-organic answer. 'unknown' only when the visitor
+					// arrived before this shipped, or with storage blocked.
+					'channel' => isset( $lead['attr']['channel'] ) ? $lead['attr']['channel'] : 'unknown',
+					'gclid'   => isset( $lead['attr']['gclid'] ) ? $lead['attr']['gclid'] : '',
+					'utm_source'   => isset( $lead['attr']['utmSource'] ) ? $lead['attr']['utmSource'] : '',
+					'utm_medium'   => isset( $lead['attr']['utmMedium'] ) ? $lead['attr']['utmMedium'] : '',
+					'utm_campaign' => isset( $lead['attr']['utmCampaign'] ) ? $lead['attr']['utmCampaign'] : '',
+					'landing_page' => isset( $lead['attr']['landingPage'] ) ? $lead['attr']['landingPage'] : '',
 					// The sheet's Page column — which tool produced the lead.
 					'page'    => $lead['tool'],
 					'course'  => $course,
