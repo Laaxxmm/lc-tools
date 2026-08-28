@@ -2,9 +2,30 @@
 
 Leads land in three places, on purpose:
 
-The All Leads sheet has **nine** columns, not eight: `Page` sits at position 4 and
-is collapsed in the normal view. Rows are written by column index rather than by
-position, so a hidden or reordered column cannot shift the data.
+The All Leads sheet has **fifteen** columns. The first nine are yours and keep
+their positions: `Page` sits at 4 and is collapsed in the normal view. Rows are
+written by column index rather than by position, so a hidden or reordered column
+cannot shift the data.
+
+Columns 10-15 are attribution, appended after `Status` so nothing above them
+moves and the dashboard script's CONFIG keeps working untouched:
+
+| # | Column | What it holds |
+|---|---|---|
+| 10 | Channel | `google-ads`, `campaign-<source>`, `google-organic`, `referral`, `direct`, `unknown` |
+| 11 | GCLID | Google's own click id, when the visit came from an ad |
+| 12-14 | UTM Source / Medium / Campaign | whatever the link carried |
+| 15 | Landing Page | the first tools page they opened |
+
+**Channel is the paid-vs-organic answer.** Filter All Leads on it to see which
+leads your ad spend actually produced. `unknown` means the visitor arrived
+before attribution shipped, or with browser storage blocked — never blank, so
+filtering never silently hides rows.
+
+The script labels columns 10-15 for you on the first lead, but only when row 1
+is a frozen header row and those cells are empty. If your sheet has no frozen
+header row it leaves them unlabelled rather than risk overwriting a data row —
+the leads still land either way.
 
 | Where | Why |
 |---|---|
@@ -47,6 +68,32 @@ is the second lock in case that URL ever leaks.
 In the Apps Script editor pick `testAppend` and press Run. Grant permission when
 asked. A test row should appear in **All Leads**, and an **Email List** tab should
 be created. Delete the test row afterwards.
+
+## Checking the column mapping
+
+`Page` sits at column 4 and is collapsed, so an append that is one value short
+writes Course into Page without any error. That has happened once already. To
+check the mapping after editing the script:
+
+```bash
+node sheets/lead-to-sheet.test.js
+```
+
+It runs `doPost` against stubbed Google APIs and fails if any column moves.
+
+## Updating the script later
+
+Pasting new code into the editor does **not** change what the `/exec` URL
+serves. That URL is pinned to a deployed version, so without this step the
+webhook keeps running the old code and nothing appears to change:
+
+**Deploy → Manage deployments → (pencil icon) → Version: New version → Deploy**
+
+Keep the same deployment rather than creating a new one — a new deployment
+gives a different `/exec` URL, which would mean editing `wp-config.php` too.
+
+Run `testAppend` from the editor afterwards. A row should appear in All Leads
+with `google-ads` in Channel and `TEST_GCLID` in GCLID. Delete that row.
 
 ## 3. Deploy it
 

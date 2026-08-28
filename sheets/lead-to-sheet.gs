@@ -25,8 +25,14 @@ var EMAIL_SHEET = 'Email List';  // the mailing list — created automatically
  */
 var COL = {
   DATE: 1, TIME: 2, SOURCE: 3, PAGE: 4, COURSE: 5,
-  NAME: 6, MOBILE: 7, REMARKS: 8, STATUS: 9
+  NAME: 6, MOBILE: 7, REMARKS: 8, STATUS: 9,
+  // Attribution, appended AFTER Status on purpose. Columns 1-9 keep their
+  // positions, so the dashboard script's CONFIG keeps working untouched.
+  CHANNEL: 10, GCLID: 11, UTM_SOURCE: 12, UTM_MEDIUM: 13,
+  UTM_CAMPAIGN: 14, LANDING_PAGE: 15
 };
+
+var ATTR_HEADERS = ['Channel', 'GCLID', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'Landing Page'];
 var SHARED_SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';
 
 function doPost(e) {
@@ -59,9 +65,21 @@ function doPost(e) {
     row[COL.MOBILE - 1]  = body.phone || '';
     row[COL.REMARKS - 1] = body.remarks || '';
     row[COL.STATUS - 1]  = '';                    // yours to fill, never ours
+
+    // Where this lead came from. 'unknown' when the visitor arrived before
+    // attribution shipped, or with storage blocked — never blank, so a filter
+    // on Channel never silently hides rows.
+    row[COL.CHANNEL - 1]      = body.channel || 'unknown';
+    row[COL.GCLID - 1]        = body.gclid || '';
+    row[COL.UTM_SOURCE - 1]   = body.utm_source || '';
+    row[COL.UTM_MEDIUM - 1]   = body.utm_medium || '';
+    row[COL.UTM_CAMPAIGN - 1] = body.utm_campaign || '';
+    row[COL.LANDING_PAGE - 1] = body.landing_page || '';
+
     for (var c = 0; c < row.length; c++) {
       if (row[c] === undefined) row[c] = '';
     }
+    prepareAttributionColumns(leads);
     leads.appendRow(row);
 
     // 2. The mailing list, kept separate so it can be exported straight into an
@@ -102,6 +120,31 @@ function doPost(e) {
   }
 }
 
+/**
+ * Make the Attribution columns safe to write to.
+ *
+ * Two jobs. appendRow() throws outright if the row is wider than the sheet, so
+ * the sheet is widened first. Then the six new columns get labelled — but only
+ * when row 1 is provably a header row (frozen) and the cells are still empty.
+ * If either test fails the labels are skipped and the data still lands; the
+ * columns just stay unlabelled. Never overwrite something already there: a
+ * sheet whose row 1 holds data would otherwise lose that row to headers.
+ */
+function prepareAttributionColumns(sheet) {
+  var needed = COL.LANDING_PAGE;
+  if (sheet.getMaxColumns() < needed) {
+    sheet.insertColumnsAfter(sheet.getMaxColumns(), needed - sheet.getMaxColumns());
+  }
+
+  if (sheet.getFrozenRows() < 1) return;   // cannot prove row 1 is a header
+  var range = sheet.getRange(1, COL.CHANNEL, 1, ATTR_HEADERS.length);
+  var current = range.getValues()[0];
+  for (var i = 0; i < current.length; i++) {
+    if (String(current[i]).trim() !== '') return;   // already labelled, leave it
+  }
+  range.setValues([ATTR_HEADERS]);
+}
+
 function json(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
@@ -119,7 +162,13 @@ function testAppend() {
     phone: '9999999999',
     email: 'test@example.com',
     consent: true,
-    remarks: 'study plan | delete this row'
+    remarks: 'study plan | delete this row',
+    channel: 'google-ads',
+    gclid: 'TEST_GCLID',
+    utm_source: 'google',
+    utm_medium: 'cpc',
+    utm_campaign: 'pgcet-aug',
+    landing_page: '/tools/'
   })}});
   Logger.log(res.getContent());
 }
