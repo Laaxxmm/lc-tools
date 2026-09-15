@@ -29,7 +29,21 @@ const css = `
 .pc-hint { margin-top: var(--s4); font-size: var(--t-md); }
 .pc-empty { margin-top: var(--s4); }
 .pc-empty p { max-width: none; }
-.pc-h { margin: var(--s5) 0 var(--s1); }
+.pc-h { margin: 0 0 var(--s1); }
+/* Heading left, download right; they stack under the form on a narrow screen. */
+.pc-bar {
+  display: flex; flex-wrap: wrap; align-items: flex-end;
+  justify-content: space-between; gap: var(--s3); margin: var(--s5) 0 var(--s3);
+}
+.pc-bar > div:first-child { flex: 1 1 22rem; min-width: 0; }
+.pc-dl { flex: 0 0 auto; text-align: right; }
+.pc-dl .btn { white-space: nowrap; }
+.pc-dl-note { margin: 8px 0 0; font-size: var(--t-sm); max-width: 22rem; }
+@media (max-width: 620px) {
+  .pc-dl { text-align: left; flex: 1 1 100%; }
+  .pc-dl .btn { width: 100%; }
+  .pc-dl-note { max-width: none; }
+}
 .pc-lede { margin: 0 0 var(--s3); font-size: var(--t-base); }
 .pc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
 .pc-row { padding: var(--s3); border-left: 4px solid var(--line); }
@@ -62,10 +76,13 @@ const css = `
   margin: 6px 0 0; font-size: var(--t-base); color: var(--muted);
   display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: none;
 }
-.pc-code, .pc-college-code {
+.pc-code, .pc-college-code, .pc-city {
   font-size: var(--t-sm); font-weight: var(--w-semi); letter-spacing: .06em;
   padding: 2px 8px; border-radius: var(--radius-sm);
   background: color-mix(in srgb, var(--forest) 8%, transparent); color: var(--forest);
+}
+.pc-city {
+  background: color-mix(in srgb, var(--amber) 16%, transparent); color: var(--ink);
 }
 .pc-years {
   margin: 10px 0 0; font-size: var(--t-sm); color: var(--muted);
@@ -77,7 +94,10 @@ const css = `
 .pc-cross { margin: var(--s5) 0 0; font-size: var(--t-base); }
 @media (max-width: 560px) {
   .pc-row { padding: var(--s2); }
-  .pc-years { gap: var(--s2); }
+  .pc-city {
+  background: color-mix(in srgb, var(--amber) 16%, transparent); color: var(--ink);
+}
+.pc-years { gap: var(--s2); }
 }
 `;
 
@@ -105,7 +125,7 @@ function Explainer() {
         seats with its own closing rank.
       </p>
       <p>
-        Those ranks are not near each other. In KEA&rsquo;s own 2024 tables there is a college
+        Those ranks are not near each other. In KEA&rsquo;s own tables there is a college
         where the general MBA closed at 3,683 while another programme in the same building
         closed at 35,266. That is a gap of thirty-one thousand ranks inside one campus. Roll
         them into a single row labelled with the college name and you have built a tool that
@@ -114,52 +134,60 @@ function Explainer() {
       </p>
       <p>
         So every row here is a programme, not a college, and you will see the same college
-        more than once when it runs more than one course. The two-letter code next to each
-        row is KEA&rsquo;s own programme code, which is what you will be selecting against
-        during option entry.
+        more than once when it runs more than one course.
       </p>
 
-      <h2>Which years this uses, and why not the newest one</h2>
+      <h2>Which cut-offs this uses</h2>
       <p>
-        The lists are built from KEA&rsquo;s published seat allotment tables for PGCET 2023 and
-        2024. Both years are printed against every programme rather than averaged into one
-        figure, because the distance between them is the honest signal. A programme that
-        closed at 5,100 one year and 8,366 the next is telling you its boundary swings by
-        three thousand ranks, and a single blended number hides exactly that.
+        KEA&rsquo;s published seat allotment table for PGCET 2025, second round, for MBA and
+        MCA. Second round is the right one to shortlist against. Closing ranks move outward
+        between rounds as stronger candidates take seats elsewhere and their places pass down
+        the list, so the later round is the most permissive published boundary &mdash; the
+        honest answer to the question you are actually asking, which is whether a seat could
+        have reached you at all.
       </p>
       <p>
-        The obvious question is why 2025 is missing when it is more recent. KEA changed the
-        format that year, and in the new tables the programme name is cut off at the edge of
-        its column. The practical effect is that two different courses at one college can
-        arrive carrying an identical label. One university in our extract reports four
-        separate General Merit closing ranks &mdash; 1,018, 2,599, 7,160 and 15,801 &mdash;
-        under what reads as a single programme, and nothing in the published file says which
-        number belongs to which course.
-      </p>
-      <p>
-        We could have picked one of those four and shipped it. Taking the highest would
-        flatter every result and quietly overstate what your rank reaches; taking the lowest
-        would scare people off colleges they would have got. Both are guesses wearing the
-        authority of an official number, so the tool stays on the two years that resolve
-        cleanly and says so.
+        Every row prints the exact rank that programme closed at, rather than a score or a
+        percentage we invented on top of it. If a number looks wrong to you, you can take it
+        straight to KEA&rsquo;s own PDF and check it.
       </p>
 
       <h2>Reading Safe, Moderate and Reach</h2>
       <p>
-        <strong>Safe</strong> means your rank is ahead of that programme&rsquo;s closing rank
-        in both years. It stayed open past you even in the tighter of the two, which is as
-        much reassurance as historical data can honestly give.
+        <strong>Safe</strong> means your rank is comfortably inside where that programme
+        closed, ahead of it by fifteen per cent or more. An ordinary year-to-year swing should
+        not put it out of range.
       </p>
       <p>
-        <strong>Moderate</strong> means you are inside the more generous year but not the
-        tighter one. Whether it comes to you depends on which way this cycle moves, so these
-        are worth listing and not worth relying on.
+        <strong>Moderate</strong> means you are inside the closing rank but near it. Realistic,
+        and not something to build a whole option list around.
       </p>
       <p>
-        <strong>Reach</strong> means you are past even the easier year, but by less than
-        fifteen per cent. Boundaries do drift outward in a year with more seats or a harder
-        paper, so these are real possibilities rather than wishes. Anything further out is
-        left off the list rather than padded in to make the result look generous.
+        <strong>Reach</strong> means you are just past it, within about fifteen per cent.
+        Boundaries do drift outward in a year with more seats or a harder paper, so these are
+        real possibilities rather than wishes. Anything further out is left off the list
+        rather than padded in to make the result look generous.
+      </p>
+
+      <h2>Filtering by city, and why some colleges say &ldquo;Not stated&rdquo;</h2>
+      <p>
+        Location is a real constraint, not a detail &mdash; you are choosing somewhere to live
+        for two years, and a seat in a city you will not move to is not a seat you will take.
+        So the list filters by city, across about twenty-five of them from Bengaluru and
+        Mysuru through Hubballi, Belagavi, Mangaluru and Kalaburagi.
+      </p>
+      <p>
+        There is an honest limit to it. KEA publishes no district column, and the field it
+        does publish runs the college name and its postal address together with no separator.
+        The city has to be recovered from that text, which works for roughly three quarters of
+        colleges &mdash; either because the city is named outright, or because the address
+        gives a locality that only belongs to one.
+      </p>
+      <p>
+        The remaining quarter carry no city we can establish, and they are grouped under
+        &ldquo;Not stated&rdquo; rather than assigned a guess. They are never hidden from you:
+        leave the filter on All cities and they appear like everything else. A wrong city on a
+        two-year decision is worse than an admitted blank.
       </p>
 
       <h2>Category and seat type are one decision, not two</h2>
@@ -193,7 +221,13 @@ function Explainer() {
         real thing.
       </p>
 
-      <h2>What to do with the list you get</h2>
+      <h2>Take the whole list into option entry</h2>
+      <p>
+        The page shows the first forty rows, because a strong rank can reach three hundred
+        programmes and nobody reads three hundred rows on a phone. The PDF is the complete
+        list &mdash; every match, in columns, ordered safest first. Download it and work from
+        it offline while you build your preference order.
+      </p>
       <p>
         Order your options by what you genuinely want, not by how likely each one is. KEA
         reads your list from the top and gives you the first option your rank reaches, so

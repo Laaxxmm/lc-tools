@@ -16,6 +16,10 @@ Two layouts exist and both are handled:
 Both need extraction_mode="layout"; the default mode reads 2023/24 column-wise and
 silently shreds every row. Categories are read from each block's header because the
 set genuinely differs between years -- never hardcode them.
+
+College codes are case-insensitive: KEA's 2025 files print some in lower case, and
+an uppercase-only pattern files those rows under the previous college rather than
+failing loudly. See the COLLEGE_2025 comment.
 """
 import csv, json, pathlib, re, sys
 from pypdf import PdfReader
@@ -23,10 +27,25 @@ from pypdf import PdfReader
 HERE = pathlib.Path(__file__).resolve().parent
 RAW, OUT = HERE.parent / "raw", HERE.parent / "normalised"
 
-COLLEGE_2025 = re.compile(r"^College:\s*([A-Z]\d{3,4})\b\s*(.*)$")
-COLLEGE_2324 = re.compile(r"^\s*\d+\s+([A-Z]\d{3,4})\s+(.+)$")
+# College codes are matched case-insensitively and upper-cased on the way in.
+# KEA's 2025 files print 86 of them in lower case ("College: c481", and 40 per
+# MBA file). An [A-Z]-only pattern skips those lines, which does not drop the
+# rows -- it silently files them under the PREVIOUS college, because `code` is
+# still holding it. That is how C480 came to report four different GM closing
+# ranks: three of them belonged to c481, c482 and c484.
+COLLEGE_2025 = re.compile(r"^College:\s*([A-Za-z]\d{3,4})\b\s*(.*)$")
+COLLEGE_2324 = re.compile(r"^\s*\d+\s+([A-Za-z]\d{3,4})\s+(.+)$")
 HEADER_2025 = re.compile(r"^\s*Course\s+Name\s+(.*)$")
-ROUND_RE = re.compile(r"(ROUND\s*-?\s*\w+|FINAL\s+ROUND)", re.I)
+# Name the round properly. The 2025 banner reads "PGCET-2025 SECOND ROUND
+# CUT-OFF RANKS FOR MCA", and a bare ROUND\s+\w+ match takes "ROUND CUT" from it.
+ROUND_RE = re.compile(
+    r"((?:FIRST|SECOND|THIRD|FOURTH|FINAL|EXTENDED|\d(?:ST|ND|RD|TH))\s+ROUND"
+    r"|ROUND\s*-\s*\w+)", re.I)
+
+# Page furniture. A line that is none of these, carries no rank columns, and
+# follows a programme row is the tail of a wrapped programme name.
+FURNITURE = re.compile(
+    r"Generated on|KARNATAKA EXAMINATIONS|Non-Interactive|PGCET-|Seat Type|Page\s+\d", re.I)
 CAT_TOKEN = re.compile(r"^(?:[123][ABC]?[GH]|GM|GMH|NKN|PH|SC[GH]|ST[GH]|XD|[123]H)$")
 NA = {"--", "-", "—"}
 
@@ -40,6 +59,7 @@ def is_category_header(toks):
 def parse_pdf(path: pathlib.Path, year: str, course: str):
     reader = PdfReader(str(path))
     rows, code, name, cats, rnd = [], None, None, [], "unknown"
+    pending: list[dict] = []   # rows of the last programme line, for name wraps
 
     for page in reader.pages:
         for raw_line in (page.extract_text(extraction_mode="layout") or "").splitlines():
@@ -53,22 +73,37 @@ def parse_pdf(path: pathlib.Path, year: str, course: str):
             # 2025 prefixes its category header with "Course Name"; 2023/24 does not.
             if m := HEADER_2025.match(line):
                 cats = m.group(1).split()
+                pending = []
                 continue
             if is_category_header(toks):
                 cats = toks
+                pending = []
                 continue
             if m := (COLLEGE_2025.match(line.strip()) or COLLEGE_2324.match(line)):
-                code, name = m.group(1), re.sub(r"\s{2,}", " ", m.group(2)).strip()
+                code = m.group(1).upper()
+                name = re.sub(r"\s{2,}", " ", m.group(2)).strip()
+                pending = []
                 continue
-            if not (code and cats) or len(toks) <= len(cats):
+            if not (code and cats):
                 continue
 
-            vals = toks[-len(cats):]
-            if not all(v in NA or v.isdigit() for v in vals):
+            vals = toks[-len(cats):] if len(toks) > len(cats) else None
+            if vals is None or not all(v in NA or v.isdigit() for v in vals):
+                # Carries no rank columns. If a programme row came immediately
+                # before, this is the rest of its name: KEA wraps a long one onto
+                # its own line, and dropping that tail is what made two distinct
+                # programmes at GM University (B086) collide under "MASTER OF
+                # BUSINESS". 71 such lines in the 2025 files.
+                if pending and not FURNITURE.search(line):
+                    tail = re.sub(r"\s{2,}", " ", line.strip())
+                    for r in pending:
+                        r["programme"] = f'{r["programme"]} {tail}'.strip()
+                    pending = []      # a name wraps once; do not keep absorbing
                 continue
             prog = re.sub(r"\s{2,}", " ", " ".join(toks[: -len(cats)])).strip(" -")
             if not prog:
                 continue
+            pending = []
             for cat, v in zip(cats, vals):
                 if v in NA:
                     continue
@@ -77,6 +112,7 @@ def parse_pdf(path: pathlib.Path, year: str, course: str):
                     "college_code": code, "college_name": name, "programme": prog,
                     "category": cat, "closing_rank": int(v), "source_pdf": path.name,
                 })
+                pending.append(rows[-1])
     return rows
 
 

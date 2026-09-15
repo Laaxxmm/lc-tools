@@ -1,46 +1,48 @@
-// Karnataka PGCET college predictor: a rank goes in, the colleges that closed
-// near it come out.
+// Karnataka PGCET college predictor: a rank goes in, the reachable programmes
+// come out.
 //
-// Built on KEA's own published closing ranks for 2023 and 2024. A lower rank
-// number is better: if your rank is at or below a programme's closing rank for
-// your category in a year, you would have been allotted that seat that year.
+// Built on KEA's published closing ranks for PGCET 2025, second round. A lower
+// rank number is better: if your rank is at or below a programme's closing rank
+// for your category, you would have been allotted that seat.
 //
-// Keyed by programme, never by college. 391 of 496 colleges run more than one
-// programme and the spread between them reaches 31,583 ranks, so a college-level
+// Keyed by programme, never by college. Most colleges run more than one and the
+// spread between them reaches tens of thousands of ranks, so a college-level
 // number would be a different programme's answer wearing this one's name.
 //
-// Everything here is pure: the data is passed in, so this is testable without a
-// network or a DOM, and the page can render the same result on any input.
+// Pure: the data is passed in, so this is testable without a network or a DOM.
 
 export type Course = 'MBA' | 'MCA';
 export type Chance = 'safe' | 'moderate' | 'reach';
 export type Seat = 'rok' | 'kk';
 
+export interface College { name: string; city: string }
+
 export interface CutoffData {
   source: string;
-  years: string[];
-  colleges: Record<string, string>;
-  programmes: Record<string, { code: string; name: string }>;
-  // course -> college code -> programme key -> category -> year -> closing rank
-  ranks: Record<string, Record<string, Record<string, Record<string, Record<string, number>>>>>;
+  year: string;
+  round: string;
+  cities: string[];
+  colleges: Record<string, College>;
+  // course -> college code -> programme -> category -> closing rank
+  ranks: Record<string, Record<string, Record<string, Record<string, number>>>>;
 }
 
 export interface Prediction {
   collegeCode: string;
   collegeName: string;
-  programmeCode: string;
-  programmeName: string;
+  city: string;
+  programme: string;
   chance: Chance;
-  closingByYear: Record<string, number>;
-  strictest: number;   // hardest year — the lowest closing rank
-  easiest: number;     // most permissive year — the highest closing rank
+  closingRank: number;
 }
 
 export interface PredictInput {
   rank: number;
-  category: string;     // UI category, e.g. 'GM' or '2A'
+  category: string;
   seat: Seat;
   course: Course;
+  /** '' means every city, including colleges whose city we could not resolve. */
+  city?: string;
   data: CutoffData;
 }
 
@@ -50,18 +52,22 @@ export const CHANCE_LABEL: Record<Chance, string> = {
   reach: 'Reach',
 };
 
-/** How far past the easiest year we still bother showing a programme. */
+/** Comfortably inside last year's boundary. */
+export const SAFE_MARGIN = 0.85;
+/** How far past the closing rank is still worth listing. */
 export const REACH_MARGIN = 1.15;
+
+/** Shown for a college whose city KEA's text never stated. */
+export const NO_CITY = 'Not stated';
 
 const ORDER: Chance[] = ['safe', 'moderate', 'reach'];
 
 /**
- * The categories a student picks from, in KEA's own order.
+ * Categories in KEA's own order.
  *
- * KEA does not print a seat type column. It encodes it in the category itself:
- * a G suffix (or bare GM) is the Rest-of-Karnataka pool and an H suffix is the
- * 371(j) Kalyana Karnataka pool. So the pair the student chooses resolves to one
- * published category code.
+ * KEA publishes no seat type column: it encodes the seat type in the category.
+ * A G suffix (or bare GM) is the Rest-of-Karnataka pool, an H suffix the 371(j)
+ * Kalyana Karnataka pool. So the pair a student picks resolves to one code.
  */
 export const CATEGORIES = [
   { id: 'GM', label: 'General Merit (GM)', rok: 'GM', kk: 'GMH' },
@@ -85,18 +91,29 @@ export function categoryCode(category: string, seat: Seat): string | null {
   return row ? row[seat] : null;
 }
 
-function bandOf(rank: number, strictest: number, easiest: number): Chance | null {
-  // Ahead of even the hardest year: you cleared this in every year we hold.
-  if (rank <= strictest) return 'safe';
-  // Inside the most permissive year: it went this far at least once.
-  if (rank <= easiest) return 'moderate';
-  // Just outside. Cut-offs drift outward some years, so it is worth listing.
-  if (rank <= easiest * REACH_MARGIN) return 'reach';
+function bandOf(rank: number, closing: number): Chance | null {
+  if (rank <= closing * SAFE_MARGIN) return 'safe';
+  if (rank <= closing) return 'moderate';
+  if (rank <= closing * REACH_MARGIN) return 'reach';
   return null;
 }
 
+/** Cities that actually have a programme for this course, for the filter. */
+export function citiesFor(data: CutoffData, course: Course): string[] {
+  const seen = new Set<string>();
+  let missing = false;
+  for (const code of Object.keys(data.ranks[course] ?? {})) {
+    const city = data.colleges[code]?.city;
+    if (city) seen.add(city);
+    else missing = true;
+  }
+  const out = [...seen].sort((a, b) => a.localeCompare(b));
+  if (missing) out.push(NO_CITY);
+  return out;
+}
+
 export function predict(input: PredictInput): { results: Prediction[]; error?: string } {
-  const { rank, category, seat, course, data } = input;
+  const { rank, category, seat, course, city = '', data } = input;
 
   if (!Number.isFinite(rank) || rank < 1) {
     return { results: [], error: 'Enter your PGCET rank.' };
@@ -112,28 +129,28 @@ export function predict(input: PredictInput): { results: Prediction[]; error?: s
 
   const out: Prediction[] = [];
   for (const [collegeCode, byProgramme] of Object.entries(byCollege)) {
-    for (const [progKey, byCat] of Object.entries(byProgramme)) {
-      const closingByYear = byCat[code];
-      if (!closingByYear) continue;            // never allotted this category
+    const college = data.colleges[collegeCode] ?? { name: collegeCode, city: '' };
+    if (city) {
+      // NO_CITY is a real filter value: it selects exactly the colleges whose
+      // city could not be resolved, so they stay reachable instead of hidden.
+      const matches = city === NO_CITY ? college.city === '' : college.city === city;
+      if (!matches) continue;
+    }
 
-      const values = Object.values(closingByYear);
-      if (values.length === 0) continue;
+    for (const [programme, byCat] of Object.entries(byProgramme)) {
+      const closing = byCat[code];
+      if (closing == null) continue;            // never allotted this category
 
-      const strictest = Math.min(...values);
-      const easiest = Math.max(...values);
-      const chance = bandOf(rank, strictest, easiest);
-      if (!chance) continue;                   // out of reach; do not pad the list
+      const chance = bandOf(rank, closing);
+      if (!chance) continue;                    // out of reach; do not pad the list
 
-      const prog = data.programmes[progKey] ?? { code: '', name: progKey };
       out.push({
         collegeCode,
-        collegeName: data.colleges[collegeCode] ?? collegeCode,
-        programmeCode: prog.code,
-        programmeName: prog.name,
+        collegeName: college.name,
+        city: college.city,
+        programme,
         chance,
-        closingByYear,
-        strictest,
-        easiest,
+        closingRank: closing,
       });
     }
   }
@@ -143,7 +160,7 @@ export function predict(input: PredictInput): { results: Prediction[]; error?: s
   out.sort((a, b) => {
     const d = ORDER.indexOf(a.chance) - ORDER.indexOf(b.chance);
     if (d !== 0) return d;
-    if (a.strictest !== b.strictest) return a.strictest - b.strictest;
+    if (a.closingRank !== b.closingRank) return a.closingRank - b.closingRank;
     return a.collegeName.localeCompare(b.collegeName);
   });
   return { results: out };
