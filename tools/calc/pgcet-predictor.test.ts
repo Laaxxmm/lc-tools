@@ -1,81 +1,128 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { predict, summarise, categoriesFor, type CutoffData } from './pgcet-predictor.ts';
+import {
+  predict, summarise, categoryCode, CATEGORIES, REACH_MARGIN, type CutoffData,
+} from './pgcet-predictor.ts';
 
+// Two programmes at one college, deliberately far apart: this is the real shape
+// that makes collapsing to the college wrong.
 const data: CutoffData = {
   source: 'test',
-  years: ['2023', '2024', '2025'],
-  colleges: { B001: 'Alpha College', B002: 'Beta College', B003: 'Gamma College' },
+  years: ['2023', '2024'],
+  colleges: { B001: 'Alpha College', B002: 'Beta College' },
+  programmes: {
+    'MB - MBA': { code: 'MB', name: 'MBA' },
+    'BF - MBA-FINANCE': { code: 'BF', name: 'MBA Finance' },
+  },
   ranks: {
     MBA: {
-      B001: { GM: { '2023': 5000, '2024': 5200, '2025': 4800 } },
-      B002: { GM: { '2023': 20000, '2024': 21000, '2025': 19500 } },
-      B003: { SCG: { '2023': 30000 } },
+      B001: {
+        'MB - MBA': { GM: { '2023': 5000, '2024': 6000 }, SCG: { '2023': 30000 } },
+        'BF - MBA-FINANCE': { GM: { '2023': 35000, '2024': 36000 } },
+      },
+      B002: { 'MB - MBA': { GMH: { '2023': 20000, '2024': 21000 } } },
     },
     MCA: {},
   },
 };
 
-test('rank better than every year is safe', () => {
-  const { results } = predict({ rank: 1000, category: 'GM', course: 'MBA', data });
-  assert.equal(results.find((r) => r.collegeCode === 'B001')?.chance, 'safe');
+const base = { seat: 'rok' as const, course: 'MBA' as const, data };
+
+test('a rank ahead of every year is safe', () => {
+  const { results } = predict({ ...base, rank: 1000, category: 'GM' });
+  assert.equal(results.find((r) => r.programmeCode === 'MB')?.chance, 'safe');
 });
 
-test('rank worse than every year is unlikely', () => {
-  const { results } = predict({ rank: 99000, category: 'GM', course: 'MBA', data });
-  assert.ok(results.every((r) => r.chance === 'unlikely'));
+test('inside the easiest year but not the hardest is moderate', () => {
+  // 5500 clears 2024's 6000 but not 2023's 5000.
+  const r = predict({ ...base, rank: 5500, category: 'GM' })
+    .results.find((x) => x.programmeCode === 'MB');
+  assert.equal(r?.chance, 'moderate');
 });
 
-test('clearing 2 of 3 years is likely, 1 of 3 is possible', () => {
-  // 5100 clears 2024 (5200) and... 2023 is 5000 so no; 2025 is 4800 so no. 1 of 3.
-  const one = predict({ rank: 5100, category: 'GM', course: 'MBA', data })
-    .results.find((r) => r.collegeCode === 'B001');
-  assert.equal(one?.chance, 'possible');
-  assert.equal(one?.yearsCleared, 1);
+test('just past the easiest year is a reach, far past is dropped entirely', () => {
+  const reach = predict({ ...base, rank: 6500, category: 'GM' })
+    .results.find((x) => x.programmeCode === 'MB');
+  assert.equal(reach?.chance, 'reach');       // 6500 <= 6000 * 1.15
 
-  // 4900 clears 2023 (5000) and 2024 (5200) but not 2025 (4800). 2 of 3.
-  const two = predict({ rank: 4900, category: 'GM', course: 'MBA', data })
-    .results.find((r) => r.collegeCode === 'B001');
-  assert.equal(two?.chance, 'likely');
-  assert.equal(two?.yearsCleared, 2);
+  const gone = predict({ ...base, rank: 9000, category: 'GM' })
+    .results.find((x) => x.programmeCode === 'MB');
+  assert.equal(gone, undefined, 'out-of-reach rows must not pad the list');
 });
 
-test('boundary: rank exactly equal to closing rank counts as cleared', () => {
-  const r = predict({ rank: 5000, category: 'GM', course: 'MBA', data })
+test('the reach boundary is exactly REACH_MARGIN', () => {
+  const edge = Math.floor(6000 * REACH_MARGIN);           // 6900
+  assert.equal(
+    predict({ ...base, rank: edge, category: 'GM' }).results
+      .find((x) => x.programmeCode === 'MB')?.chance, 'reach');
+  assert.equal(
+    predict({ ...base, rank: edge + 1, category: 'GM' }).results
+      .find((x) => x.programmeCode === 'MB'), undefined);
+});
+
+test('two programmes at one college are judged separately, never merged', () => {
+  // The whole reason this is keyed by programme: at rank 30,000 the finance
+  // programme is reachable and the general one is long gone.
+  const { results } = predict({ ...base, rank: 30000, category: 'GM' });
+  const atB001 = results.filter((r) => r.collegeCode === 'B001');
+  assert.equal(atB001.length, 1);
+  assert.equal(atB001[0].programmeCode, 'BF');
+  assert.ok(!atB001.some((r) => r.programmeCode === 'MB'),
+    'a college must not inherit its easiest programme’s cutoff');
+});
+
+test('boundary: a rank equal to the closing rank counts as admitted', () => {
+  const r = predict({ ...base, rank: 5000, category: 'GM' })
+    .results.find((x) => x.programmeCode === 'MB');
+  assert.equal(r?.chance, 'safe');
+});
+
+test('seat type picks a different published category code', () => {
+  assert.equal(categoryCode('GM', 'rok'), 'GM');
+  assert.equal(categoryCode('GM', 'kk'), 'GMH');
+  assert.equal(categoryCode('2A', 'kk'), '2AH');
+  assert.equal(categoryCode('nope', 'rok'), null);
+
+  // B002 only ever published GMH, so it appears under 371(j) and not otherwise.
+  assert.ok(!predict({ ...base, rank: 1000, category: 'GM' })
+    .results.some((r) => r.collegeCode === 'B002'));
+  assert.ok(predict({ ...base, seat: 'kk', rank: 1000, category: 'GM' })
+    .results.some((r) => r.collegeCode === 'B002'));
+});
+
+test('a category the programme never published is omitted, not guessed', () => {
+  const { results } = predict({ ...base, rank: 1000, category: 'ST' });
+  assert.equal(results.length, 0);
+});
+
+test('a single-year programme still classifies', () => {
+  const r = predict({ ...base, rank: 1000, category: 'SC' })
     .results.find((x) => x.collegeCode === 'B001');
-  assert.equal(r?.yearsCleared, 2); // clears 5000 and 5200, not 4800
+  assert.equal(r?.chance, 'safe');
+  assert.deepEqual(Object.keys(r!.closingByYear), ['2023']);
 });
 
-test('colleges with no data for that category are omitted, not guessed', () => {
-  const { results } = predict({ rank: 1000, category: 'GM', course: 'MBA', data });
-  assert.ok(!results.some((r) => r.collegeCode === 'B003'));
+test('rejects a rank that is not a whole number above zero', () => {
+  for (const rank of [0, -5, 12.5, NaN]) {
+    assert.ok(predict({ ...base, rank, category: 'GM' }).error, `rank ${rank}`);
+  }
 });
 
-test('single-year college still classifies', () => {
-  const { results } = predict({ rank: 1000, category: 'SCG', course: 'MBA', data });
-  const g = results.find((r) => r.collegeCode === 'B003');
-  assert.equal(g?.yearsAvailable, 1);
-  assert.equal(g?.chance, 'safe');
+test('results run safest first', () => {
+  const { results } = predict({ ...base, rank: 5500, category: 'GM' });
+  const bands = results.map((r) => r.chance);
+  assert.deepEqual([...bands].sort(
+    (a, b) => ['safe','moderate','reach'].indexOf(a) - ['safe','moderate','reach'].indexOf(b),
+  ), bands);
 });
 
-test('rejects invalid rank', () => {
-  assert.ok(predict({ rank: 0, category: 'GM', course: 'MBA', data }).error);
-  assert.ok(predict({ rank: 12.5, category: 'GM', course: 'MBA', data }).error);
-  assert.ok(predict({ rank: NaN, category: 'GM', course: 'MBA', data }).error);
-});
-
-test('results are ordered most reachable first', () => {
-  const { results } = predict({ rank: 19000, category: 'GM', course: 'MBA', data });
-  assert.equal(results[0].collegeCode, 'B002'); // safe
-  assert.equal(results[1].collegeCode, 'B001'); // unlikely
-});
-
-test('summarise counts buckets', () => {
-  const { results } = predict({ rank: 19000, category: 'GM', course: 'MBA', data });
+test('summarise counts every returned row exactly once', () => {
+  const { results } = predict({ ...base, rank: 30000, category: 'GM' });
   const s = summarise(results);
-  assert.equal(s.safe + s.likely + s.possible + s.unlikely, results.length);
+  assert.equal(s.safe + s.moderate + s.reach, results.length);
 });
 
-test('categoriesFor lists every category present for the course', () => {
-  assert.deepEqual(categoriesFor(data, 'MBA'), ['GM', 'SCG']);
+test('every category maps to a distinct published code per seat type', () => {
+  const codes = CATEGORIES.flatMap((c) => [c.rok, c.kk]);
+  assert.equal(new Set(codes).size, codes.length);
 });

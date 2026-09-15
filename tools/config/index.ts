@@ -13,8 +13,10 @@ import studyPlan from './cat-mat-study-plan-generator.ts';
 import percentileTarget from './cat-percentile-target-calculator.ts';
 import cgpa from './cgpa-percentage-converter.ts';
 import costRoi from './mba-cost-and-roi-calculator.ts';
+import pgcetPredictor from './pgcet-college-predictor.ts';
 
 export const TOOLS: ToolConfig[] = [
+  pgcetPredictor,
   studyPlan,
   percentileTarget,
   examDates,
