@@ -4,9 +4,14 @@
     {
       "name": "tools",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "tools", "run", "dev"],
+      "runtimeArgs": [
+        "--prefix",
+        "tools",
+        "run",
+        "dev"
+      ],
       "port": 3000,
-      "url": "http://localhost:3000"
+      "autoPort": true
     }
   ]
 }

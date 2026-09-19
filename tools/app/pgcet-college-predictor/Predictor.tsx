@@ -3,8 +3,8 @@
 import { useId, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
-  CATEGORIES, CHANCE_LABEL, NO_CITY, SEATS, citiesFor, predict, summarise,
-  type Course, type CutoffData, type Seat,
+  CATEGORIES, CHANCE_LABEL, NO_CITY, SEATS, categoryCode, citiesFor, predict, summarise,
+  type Course, type CutoffData, type Round, type Seat,
 } from '../../calc/pgcet-predictor.ts';
 import raw from '../../data/pgcet-cutoffs.json' with { type: 'json' };
 import KpiRow from '../../components/KpiRow';
@@ -18,6 +18,22 @@ const DATA = raw as unknown as CutoffData;
 // first page is the useful one -- and the PDF carries every row regardless.
 const PAGE = 40;
 
+// Counted from the payload rather than typed into the copy, so the sentence in
+// the non-Karnataka panel cannot drift away from what actually shipped.
+const NK_COUNTS = (['MBA', 'MCA'] as const).reduce((acc, course) => {
+  acc[course] = Object.values(DATA.ranks[course] ?? {})
+    .flatMap((progs) => Object.values(progs))
+    .filter((cats) => cats.NKN?.r2 != null).length;
+  return acc;
+}, {} as Record<Course, number>);
+
+const ROUNDS: { id: Round; label: string; note: string }[] = [
+  { id: 'r2', label: 'Round 2 — what was still going',
+    note: 'Seats that were still being allotted in the second round.' },
+  { id: 'r1', label: 'Round 1 — the full picture',
+    note: 'Every seat allotted in the first round, including ones that then closed.' },
+];
+
 export default function Predictor() {
   const id = useId();
   const [course, setCourse] = useState<Course>('MBA');
@@ -25,16 +41,22 @@ export default function Predictor() {
   const [category, setCategory] = useState('GM');
   const [seat, setSeat] = useState<Seat>('rok');
   const [city, setCity] = useState('');
+  const [round, setRound] = useState<Round>('r2');
   const [showAll, setShowAll] = useState(false);
   const [pdfState, setPdfState] = useState<'idle' | 'working' | 'failed'>('idle');
 
   const reset = () => { setShowAll(false); setPdfState('idle'); };
-  const cities = useMemo(() => citiesFor(DATA, course), [course]);
+  const code = categoryCode(category, seat);
+  const cities = useMemo(() => citiesFor(DATA, course, code, round), [course, code, round]);
+  const nonKarnataka = seat === 'nk';
+  // The non-Karnataka pool exists in far fewer cities. Changing into it while a
+  // city is selected would otherwise leave a filter that quietly returns nothing.
+  const liveCity = city && cities.includes(city) ? city : '';
 
   const parsed = rank.trim() === '' ? NaN : Number(rank);
   const { results, error } = useMemo(
-    () => predict({ rank: parsed, category, seat, course, city, data: DATA }),
-    [parsed, category, seat, course, city],
+    () => predict({ rank: parsed, category, seat, course, city: liveCity, round, data: DATA }),
+    [parsed, category, seat, course, liveCity, round],
   );
 
   const counts = summarise(results);
@@ -50,7 +72,9 @@ export default function Predictor() {
       const { downloadPredictionPdf } = await import('../../lib/predictor-pdf.ts');
       await downloadPredictionPdf(results, {
         rank: parsed, course, category: catLabel, seat: seatLabel, city,
-        year: DATA.year, round: DATA.round, counts,
+        year: DATA.year,
+        round: ROUNDS.find((r) => r.id === round)?.label.split(' —')[0] ?? 'Round 2',
+        counts,
       });
       setPdfState('idle');
     } catch {
@@ -84,29 +108,63 @@ export default function Predictor() {
 
         <div className="field">
           <label htmlFor={`${id}-cat`}>Category</label>
-          <select id={`${id}-cat`} value={category}
+          <select id={`${id}-cat`} value={category} disabled={nonKarnataka}
+            aria-describedby={nonKarnataka ? `${id}-cat-note` : undefined}
             onChange={(e) => { setCategory(e.target.value); reset(); }}>
             {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
           </select>
+          {nonKarnataka ? (
+            <p className="muted pc-field-note" id={`${id}-cat-note`}>
+              Not used for a non-Karnataka candidate — there is one pool.
+            </p>
+          ) : null}
         </div>
 
         <div className="field">
           <label htmlFor={`${id}-seat`}>Seat type</label>
           <select id={`${id}-seat`} value={seat}
-            onChange={(e) => { setSeat(e.target.value as Seat); reset(); }}>
+            onChange={(e) => { setSeat(e.target.value as Seat); setCity(''); reset(); }}>
             {SEATS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
           </select>
         </div>
 
         <div className="field">
+          <label htmlFor={`${id}-round`}>Allotment round</label>
+          <select id={`${id}-round`} value={round}
+            onChange={(e) => { setRound(e.target.value as Round); setCity(''); reset(); }}>
+            {ROUNDS.map((r) => <option key={r.id} value={r.id}>{r.label}</option>)}
+          </select>
+        </div>
+
+        <div className="field">
           <label htmlFor={`${id}-city`}>City</label>
-          <select id={`${id}-city`} value={city}
+          <select id={`${id}-city`} value={liveCity}
             onChange={(e) => { setCity(e.target.value); reset(); }}>
             <option value="">All cities</option>
             {cities.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
       </ToolForm>
+
+      {nonKarnataka ? (
+        <div className="card pc-nk">
+          <p className="eyebrow"><span className="dot" />Non-Karnataka candidate</p>
+          <p>
+            You are not competing for the government quota. You are competing for seats
+            that college managements <strong>surrender back to KEA</strong>, which KEA
+            publishes under its NKN column, and those seats appear as the rounds
+            progress rather than on day one.
+          </p>
+          <p className="muted">
+            Two things follow, and both are worth knowing before you panic about the
+            numbers. The list is genuinely short &mdash; KEA published a non-Karnataka
+            closing rank for {NK_COUNTS.MBA} MBA and {NK_COUNTS.MCA} MCA programmes in
+            2025, not for hundreds. And your category does not apply: Karnataka&rsquo;s
+            reservation does not reach candidates from outside the state, so an SC, ST
+            or OBC certificate from your home state does not move these ranks.
+          </p>
+        </div>
+      ) : null}
 
       {showError ? <p className="error" role="alert">{error}</p> : null}
 
@@ -123,7 +181,8 @@ export default function Predictor() {
           <div className="card pc-empty">
             <p className="eyebrow"><span className="dot" />No match</p>
             <p>
-              No {course} programme in KEA&rsquo;s {DATA.year} tables closed at or near rank{' '}
+              No {course} programme in KEA&rsquo;s {DATA.year}{' '}
+              {round === 'r2' ? 'second' : 'first'}-round table closed at or near rank{' '}
               <strong>{parsed.toLocaleString('en-IN')}</strong> for {catLabel} on the{' '}
               {seatLabel} list{city ? <> in <strong>{city}</strong></> : null}.
             </p>
@@ -151,7 +210,7 @@ export default function Predictor() {
                 </h2>
                 <p className="muted pc-lede">
                   Most selective first, so the top of this list is the most competitive seat
-                  your rank still reaches.
+                  your rank still reaches. {ROUNDS.find((r) => r.id === round)?.note}
                 </p>
               </div>
               <div className="pc-dl">
@@ -180,8 +239,23 @@ export default function Predictor() {
                     {r.city ? <span className="pc-city">{r.city}</span> : null}
                   </p>
                   <p className="pc-years">
-                    <span><span className="pc-y">Closed at</span>{' '}
-                      {r.closingRank.toLocaleString('en-IN')}</span>
+                    <span>
+                      <span className="pc-y">Round 1</span>{' '}
+                      {r.round1 != null
+                        ? r.round1.toLocaleString('en-IN')
+                        : <span className="muted">none</span>}
+                    </span>
+                    <span>
+                      <span className="pc-y">Round 2</span>{' '}
+                      {r.round2 != null
+                        ? r.round2.toLocaleString('en-IN')
+                        : <span className="muted">nothing left</span>}
+                    </span>
+                    {r.tightened ? (
+                      <span className="pc-tight" title="Round 2 closed at a better rank than round 1">
+                        tightened in round 2
+                      </span>
+                    ) : null}
                   </p>
                 </li>
               ))}
@@ -197,8 +271,8 @@ export default function Predictor() {
 
             <p className="muted pc-src">
               Closing ranks as published by the Karnataka Examinations Authority for PGCET{' '}
-              {DATA.year}, {DATA.round.toLowerCase()}. An estimate for shortlisting, not an
-              allotment. Confirm everything on{' '}
+              {DATA.year}, first and second round allotments. An estimate for shortlisting,
+              not an allotment. Confirm everything on{' '}
               <a href="https://cetonline.karnataka.gov.in/kea/">KEA&rsquo;s own site</a>.
               {cities.includes(NO_CITY) ? (
                 <> KEA does not publish a district column, so a college whose city its text

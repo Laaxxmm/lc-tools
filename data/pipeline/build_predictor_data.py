@@ -25,6 +25,11 @@ from cities import city_of                                    # noqa: E402
 SRC = HERE.parent / "normalised" / "cutoffs.csv"
 OUT = HERE.parent.parent / "tools" / "data" / "pgcet-cutoffs.json"
 YEAR = "2025"
+# KEA publishes a cut-off table per round. Both are carried: round 2 is what a
+# late entrant (a non-Karnataka candidate, or anyone who did not take a round-1
+# seat) is actually choosing from, and round 1 is the context that makes a
+# round-2 number readable.
+ROUNDS = {"FIRST ROUND": "r1", "SECOND ROUND": "r2"}
 
 def clean_programme(raw: str) -> str:
     p = re.sub(r"\s+", " ", raw).strip()
@@ -36,7 +41,8 @@ def clean_programme(raw: str) -> str:
     return p
 
 def main() -> None:
-    rows = [r for r in csv.DictReader(SRC.open()) if r["year"] == YEAR]
+    rows = [r for r in csv.DictReader(SRC.open())
+            if r["year"] == YEAR and r["round"] in ROUNDS]
     if not rows:
         raise SystemExit(f"no {YEAR} rows in {SRC}")
 
@@ -57,19 +63,21 @@ def main() -> None:
                 "name": re.sub(r"\s+", " ", r["college_name"]).strip(),
                 "city": city_of(names_all.get(code, r["college_name"])) or "",
             }
+        rnd = ROUNDS.get(r["round"])
+        if rnd is None:
+            continue                       # mock allotment and anything unlabelled
         prog = clean_programme(r["programme"])
         slot = (ranks.setdefault(r["course"], {}).setdefault(code, {})
-                     .setdefault(prog, {}))
-        cat = r["category"]
-        # B360 aside, keys are unique. Where KEA did print two identical rows the
-        # most permissive number is the honest answer to "could I have got a seat".
-        slot[cat] = max(slot.get(cat, 0), int(r["closing_rank"]))
+                     .setdefault(prog, {}).setdefault(r["category"], {}))
+        # Where KEA printed two identical rows (B360) the most permissive number
+        # is the honest answer to "could I have got a seat".
+        slot[rnd] = max(slot.get(rnd, 0), int(r["closing_rank"]))
 
     cities = sorted({c["city"] for c in colleges.values() if c["city"]})
     payload = {
         "source": "Karnataka Examinations Authority (KEA), published PGCET cutoff PDFs",
         "year": YEAR,
-        "round": rows[0]["round"].title(),
+        "rounds": list(ROUNDS.values()),
         "cities": cities,
         "colleges": colleges,
         "ranks": ranks,
@@ -79,10 +87,13 @@ def main() -> None:
 
     kb = OUT.stat().st_size / 1024
     placed = sum(1 for c in colleges.values() if c["city"])
-    print(f"{OUT.name}: {kb:.0f} KB | {YEAR} {payload['round']}")
+    print(f"{OUT.name}: {kb:.0f} KB | {YEAR} rounds 1 and 2")
     for course, by_college in sorted(ranks.items()):
         combos = sum(len(p) for p in by_college.values())
-        print(f"  {course}: {len(by_college)} colleges, {combos} college+programme")
+        slots = [c for p in by_college.values() for prog in p.values() for c in prog.values()]
+        r2 = sum(1 for c in slots if "r2" in c)
+        print(f"  {course}: {len(by_college)} colleges, {combos} college+programme, "
+              f"{len(slots)} category slots ({r2} allotted in round 2)")
     print(f"  {len(colleges)} colleges, {placed} with a city ({100*placed//len(colleges)}%), "
           f"{len(cities)} cities")
 

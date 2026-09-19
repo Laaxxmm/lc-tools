@@ -90,6 +90,23 @@ const css = `
 }
 .pc-y { font-weight: var(--w-bold); color: var(--ink); }
 .pc-more { margin: var(--s3) 0 0; }
+.pc-field-note { margin: 6px 0 0; font-size: var(--t-sm); max-width: none; }
+/* The non-Karnataka explainer. Amber ground, because it is a change of rules
+   rather than a warning — a red box for a legitimate seat type reads as a
+   rejection to someone already anxious about their options. */
+.pc-nk {
+  margin: var(--s4) 0 0;
+  border-left: 4px solid var(--amber);
+  background: color-mix(in srgb, var(--amber) 7%, transparent);
+}
+.pc-nk p { max-width: none; }
+.pc-nk p + p { margin-top: var(--s2); }
+/* Round 2 closed at a BETTER rank than round 1 — worth spotting, not shouting. */
+.pc-tight {
+  font-size: var(--t-sm); font-weight: var(--w-semi);
+  padding: 2px 8px; border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--amber) 20%, transparent); color: var(--ink);
+}
 .pc-src { margin: var(--s3) 0 0; font-size: var(--t-sm); }
 .pc-cross { margin: var(--s5) 0 0; font-size: var(--t-base); }
 @media (max-width: 560px) {

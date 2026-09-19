@@ -2,13 +2,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   predict, summarise, categoryCode, citiesFor,
-  CATEGORIES, NO_CITY, REACH_MARGIN, SAFE_MARGIN, type CutoffData,
+  CATEGORIES, NON_KARNATAKA_CODE, NO_CITY, REACH_MARGIN, SAFE_MARGIN, type CutoffData,
 } from './pgcet-predictor.ts';
 
 // Two programmes at one college, deliberately far apart: the real shape that
 // makes collapsing to the college wrong.
 const data: CutoffData = {
-  source: 'test', year: '2025', round: 'Second Round',
+  source: 'test', year: '2025', rounds: ['r1', 'r2'],
   cities: ['Bengaluru', 'Mysuru'],
   colleges: {
     B001: { name: 'Alpha College', city: 'Bengaluru' },
@@ -17,14 +17,24 @@ const data: CutoffData = {
   },
   ranks: {
     MBA: {
-      B001: { MBA: { GM: 10000, SCG: 30000 }, 'MBA Finance': { GM: 35000 } },
-      B002: { MBA: { GM: 20000, GMH: 21000 } },
-      B003: { MBA: { GM: 12000 } },
+      B001: {
+        MBA: {
+          GM: { r1: 8000, r2: 10000 },        // still going in round 2, easier
+          SCG: { r1: 30000, r2: 30000 },
+          NKN: { r2: 9000 },                  // surrendered seat, round 2 only
+        },
+        'MBA Finance': { GM: { r1: 35000, r2: 35000 } },
+      },
+      // Filled in round 1 and never reopened: not an option for a late entrant.
+      B002: { MBA: { GM: { r1: 20000 }, GMH: { r1: 21000, r2: 21000 } } },
+      // Round 2 went to a BETTER rank than round 1 did.
+      B003: { MBA: { GM: { r1: 28000, r2: 12000 } } },
     },
     MCA: {},
   },
 };
 
+// Round 2 is the default everywhere; round 1 is asked for explicitly.
 const base = { seat: 'rok' as const, course: 'MBA' as const, data };
 
 test('comfortably inside the closing rank is safe', () => {
@@ -104,8 +114,64 @@ test('an unresolved city is filterable, not hidden', () => {
 });
 
 test('citiesFor lists only cities present for that course, plus Not stated', () => {
-  assert.deepEqual(citiesFor(data, 'MBA'), ['Bengaluru', 'Mysuru', NO_CITY]);
-  assert.deepEqual(citiesFor(data, 'MCA'), []);
+  assert.deepEqual(citiesFor(data, 'MBA', null), ['Bengaluru', 'Mysuru', NO_CITY]);
+  assert.deepEqual(citiesFor(data, 'MCA', null), []);
+});
+
+test('a programme that stopped allotting after round 1 is not a round-2 option', () => {
+  // B002's GM seat filled in round 1 and never reopened. Rank 1,000 clears its
+  // round-1 rank comfortably, so only the round filter can keep it out.
+  const r1 = predict({ ...base, round: 'r1', rank: 1000, category: 'GM' }).results;
+  assert.ok(r1.some((r) => r.collegeCode === 'B002'), 'should exist in round 1');
+
+  const r2 = predict({ ...base, round: 'r2', rank: 1000, category: 'GM' }).results;
+  assert.ok(!r2.some((r) => r.collegeCode === 'B002'),
+    'a seat with no round-2 allotment is not an option for a round-2 entrant');
+});
+
+test('round 2 is the default, and each row carries both rounds', () => {
+  const row = predict({ ...base, rank: 9000, category: 'GM' })
+    .results.find((r) => r.collegeCode === 'B001' && r.programme === 'MBA');
+  assert.equal(row?.closingRank, 10000, 'judged against round 2');
+  assert.equal(row?.round1, 8000);
+  assert.equal(row?.round2, 10000);
+  assert.equal(row?.tightened, false);
+});
+
+test('a round that went to a better rank than round 1 is flagged as tightened', () => {
+  const row = predict({ ...base, rank: 11000, category: 'GM' })
+    .results.find((r) => r.collegeCode === 'B003');
+  assert.equal(row?.closingRank, 12000);
+  assert.equal(row?.tightened, true, 'round 2 closed at 12,000 against round 1 28,000');
+});
+
+test('citiesFor respects the round too', () => {
+  // B002 (Mysuru) has a GMH seat in both rounds but its GM seat is round 1 only.
+  // B003 has GM in both rounds and no resolvable city, so Not stated is present
+  // in both; Mysuru (B002) drops out in round 2 because its GM seat closed.
+  assert.deepEqual(citiesFor(data, 'MBA', 'GM', 'r1'), ['Bengaluru', 'Mysuru', NO_CITY]);
+  assert.deepEqual(citiesFor(data, 'MBA', 'GM', 'r2'), ['Bengaluru', NO_CITY]);
+});
+
+test('citiesFor never offers a city with no seat in that category', () => {
+  // Only B001 (Bengaluru) has a non-Karnataka seat, so Mysuru must not be
+  // offered — picking it would be a dead end the student discovers by hand.
+  assert.deepEqual(citiesFor(data, 'MBA', NON_KARNATAKA_CODE), ['Bengaluru']);
+});
+
+test('a non-Karnataka candidate competes in one pool, whatever their category', () => {
+  // KEA's reservation does not reach candidates from outside the state, so the
+  // category picked must not change the answer.
+  const asGm = predict({ ...base, seat: 'nk', rank: 5000, category: 'GM' }).results;
+  const asSc = predict({ ...base, seat: 'nk', rank: 5000, category: 'SC' }).results;
+  assert.deepEqual(asSc, asGm);
+  assert.equal(categoryCode('SC', 'nk'), NON_KARNATAKA_CODE);
+  assert.equal(categoryCode('anything', 'nk'), NON_KARNATAKA_CODE);
+
+  // It reads the NKN column, not GM: 9,000 not 10,000.
+  assert.equal(asGm.find((r) => r.collegeCode === 'B001')?.closingRank, 9000);
+  // And a college with no surrendered seat simply is not on the list.
+  assert.ok(!asGm.some((r) => r.collegeCode === 'B002'));
 });
 
 test('a category the programme never published is omitted, not guessed', () => {

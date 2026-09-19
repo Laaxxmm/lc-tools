@@ -1,52 +1,57 @@
 {
-  "_comment": "KEA PGCET cutoff sources, discovered 2026-08-26. Each year uses a DIFFERENT naming scheme -- do not assume a pattern generalises. 2020-2022 have no cutoff PDFs published. 2026 counselling had not started as of 2026-08-26 (provisional result 19-08-2026), so no 2026 cutoffs exist yet.",
-  "base": "https://cetonline.karnataka.gov.in/keawebentry456",
-  "years": {
-    "2023": {
-      "dir": "pgcet2023",
-      "files": {
-        "mba": [
-          "PGCET_cutoff_2023_r1_mba_fin.pdf",
-          "PGCET_cutoff_2023_r2_mba_finkannada.pdf"
-        ],
-        "mca": [
-          "PGCET_cutoff_2023_r2_mca_finkannada.pdf"
-        ]
-      }
-    },
-    "2024": {
-      "dir": "pgcet24",
-      "files": {
-        "mba": [
-          "PGCET_cutoff_2024_r1_mba_finkannada.pdf"
-        ],
-        "mca": [
-          "PGCET_cutoff_2024_r1_fin_mcakannada.pdf"
-        ]
-      }
-    },
-    "2025": {
-      "dir": "pgcet2025",
-      "files": {
-        "mba": [
-          "PROF_CODE_B_R_FIN.pdf",
-          "PROF_CODE_B_H_FIN.pdf"
-        ],
-        "mca": [
-          "PROF_CODE_C_R_FIN.pdf",
-          "PROF_CODE_C_H_FIN.pdf"
-        ]
-      }
-    }
+ "_comment": "KEA PGCET cutoff sources, discovered 2026-08-26. Each year uses a DIFFERENT naming scheme -- do not assume a pattern generalises. 2020-2022 have no cutoff PDFs published. 2026 counselling had not started as of 2026-08-26 (provisional result 19-08-2026), so no 2026 cutoffs exist yet.",
+ "base": "https://cetonline.karnataka.gov.in/keawebentry456",
+ "years": {
+  "2023": {
+   "dir": "pgcet2023",
+   "files": {
+    "mba": [
+     "PGCET_cutoff_2023_r1_mba_fin.pdf",
+     "PGCET_cutoff_2023_r2_mba_finkannada.pdf"
+    ],
+    "mca": [
+     "PGCET_cutoff_2023_r2_mca_finkannada.pdf"
+    ]
+   }
   },
-  "_dead": {
-    "2019": "KEA links pgcet_2019/R1_cutoff_*.pdf but the files 404. Verified 2026-08-26."
+  "2024": {
+   "dir": "pgcet24",
+   "files": {
+    "mba": [
+     "PGCET_cutoff_2024_r1_mba_finkannada.pdf"
+    ],
+    "mca": [
+     "PGCET_cutoff_2024_r1_fin_mcakannada.pdf"
+    ]
+   }
   },
-  "mat_colleges": {
-    "url": "https://aima.in/mat/participating-b-schools/",
-    "what": "AIMA's own list of institutes accepting MAT, in four regions.",
-    "gives": "acceptance only \u2014 AIMA publishes no per-institute cutoff and no route strength",
-    "script": "fetch_mat_colleges.py",
-    "verified": "2026-08-26"
+  "2025": {
+   "dir": "pgcet2025",
+   "files": {
+    "mba": [
+     "PROF_CODE_B_Rkannada.pdf",
+     "PROF_CODE_B_Hkannada.pdf",
+     "PROF_CODE_B_R_FIN.pdf",
+     "PROF_CODE_B_H_FIN.pdf"
+    ],
+    "mca": [
+     "PROF_CODE_C_Rkannada.pdf",
+     "PROF_CODE_C_Hkannada.pdf",
+     "PROF_CODE_C_R_FIN.pdf",
+     "PROF_CODE_C_H_FIN.pdf"
+    ]
+   },
+   "note": "Three variants exist per course and seat type. '<name>kannada.pdf' is FIRST ROUND, '<name>_FIN.pdf' is SECOND ROUND, and '<name>_30092025kannada.pdf' is the MOCK allotment -- the mock is deliberately excluded, it allots nothing. M.Tech files (PROF_CODE_T_*) are published too and are not ingested: scope is MBA and MCA."
   }
+ },
+ "_dead": {
+  "2019": "KEA links pgcet_2019/R1_cutoff_*.pdf but the files 404. Verified 2026-08-26."
+ },
+ "mat_colleges": {
+  "url": "https://aima.in/mat/participating-b-schools/",
+  "what": "AIMA's own list of institutes accepting MAT, in four regions.",
+  "gives": "acceptance only \u2014 AIMA publishes no per-institute cutoff and no route strength",
+  "script": "fetch_mat_colleges.py",
+  "verified": "2026-08-26"
+ }
 }

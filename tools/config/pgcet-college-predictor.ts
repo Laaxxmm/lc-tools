@@ -35,6 +35,18 @@ const tool: ToolConfig = {
       a: 'KEA’s own published seat allotment table for PGCET 2025, second round, covering MBA and MCA. Second round is the right one to shortlist against: closing ranks move outward as stronger candidates take their seats elsewhere, so it is the most permissive published boundary and the honest answer to whether a seat could have reached you. Every row prints the exact rank that programme closed at, so you can check the reasoning rather than trust it.',
     },
     {
+      q: 'I am not from Karnataka. Which colleges can I actually get?',
+      a: 'Pick “Non-Karnataka candidate” as your seat type and the list rebuilds around the pool you are genuinely competing in. You are not in the government quota at all — you are competing for seats that college managements surrender back to KEA, which KEA publishes under its NKN column, and those appear as the rounds progress rather than on day one. Two consequences are worth knowing before the numbers alarm you. The list is genuinely short, because the pool is small — KEA published a non-Karnataka closing rank for about fifty MBA and MCA programmes in 2025, not for hundreds. And your category does not apply: Karnataka’s reservation does not extend to candidates from other states, so an SC, ST or OBC certificate from your home state does not move these ranks. The tool disables the category dropdown in that mode rather than letting it quietly do nothing.',
+    },
+    {
+      q: 'I am entering in the second round. How do I know what is still available?',
+      a: 'Use the allotment round selector, which is set to round 2 by default. A programme only appears in the round-2 view if KEA actually allotted a seat there in the second round — the ones that filled in round 1 and never reopened are removed, because they are not options for you however reachable their round-1 rank looks. In 2025, 581 of the seat-and-category combinations that went in round 1 did not allot again in round 2. Every row prints both rounds side by side, so you can see whether a boundary moved, stayed put, or appeared only in round 2.',
+    },
+    {
+      q: 'Why does a college show “Round 1 none” or “tightened in round 2”?',
+      a: '“Round 1 none” means nothing was allotted there in the first round and a seat appeared only in the second — usually a surrendered seat entering the pool, which is exactly the kind of opening a late entrant is looking for. “Tightened in round 2” means the opposite of what most people expect: the second round closed at a better rank than the first. That happens because KEA re-runs allotment over everyone’s full preference list each round, so stronger candidates can move into a seat that looked open. It is a warning not to assume later rounds are always easier — in 2025 about one in five closing ranks moved the wrong way for a late entrant.',
+    },
+    {
       q: 'Can I see only the colleges in my city?',
       a: 'Yes. The city filter holds about twenty-five Karnataka cities, from Bengaluru and Mysuru through Hubballi, Belagavi, Mangaluru and Kalaburagi. One caveat worth knowing: KEA publishes no district column, so the city is recovered from the college name and address it does print, which resolves roughly three quarters of them. The rest sit under “Not stated” and are never hidden from you — there is simply no city we can establish without guessing, and a guessed city on a two-year decision is worse than an honest blank.',
     },
