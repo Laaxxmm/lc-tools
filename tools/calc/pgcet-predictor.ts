@@ -11,7 +11,12 @@
 //
 // Pure: the data is passed in, so this is testable without a network or a DOM.
 
-export type Course = 'MBA' | 'MCA';
+// Matches the payload's own keys, so no course needs translating on the way in.
+export type Course = 'MBA' | 'MCA' | 'MTECH';
+
+export const COURSE_LABEL: Record<Course, string> = {
+  MBA: 'MBA', MCA: 'MCA', MTECH: 'M.Tech',
+};
 /** Which KEA allotment round to judge against. */
 export type Round = 'r1' | 'r2';
 export type Chance = 'safe' | 'moderate' | 'reach';
@@ -54,6 +59,11 @@ export interface PredictInput {
   /** '' means every city, including colleges whose city we could not resolve. */
   city?: string;
   /**
+   * '' means every programme. Only useful where a course has many: M.Tech runs
+   * 120 specialisations and a structural engineer has no use for the VLSI rows.
+   */
+  programme?: string;
+  /**
    * Which round to judge against. 'r2' is the one a late entrant needs: a
    * programme with no round-2 closing rank allotted nothing in round 2, so it
    * is not an option for them however reachable its round-1 rank looks.
@@ -95,6 +105,26 @@ export const CATEGORIES = [
   { id: 'SC', label: 'SC', rok: 'SCG', kk: 'SCH' },
   { id: 'ST', label: 'ST', rok: 'STG', kk: 'STH' },
 ] as const;
+
+/**
+ * Seat types that actually have a published cut-off for this course.
+ *
+ * M.Tech publishes no NKN column at all, so offering a non-Karnataka option
+ * there would be a dead end presented as a choice. Same reasoning as citiesFor.
+ */
+export function seatsFor(data: CutoffData, course: Course): { id: Seat; label: string }[] {
+  const present = new Set<string>();
+  for (const byProgramme of Object.values(data.ranks[course] ?? {})) {
+    for (const byCat of Object.values(byProgramme)) {
+      for (const cat of Object.keys(byCat)) present.add(cat);
+    }
+  }
+  return SEATS.filter((s) => {
+    if (s.id === 'nk') return present.has(NON_KARNATAKA_CODE);
+    const key = s.id;                       // narrowed to the two Karnataka pools
+    return CATEGORIES.some((c) => present.has(c[key]));
+  });
+}
 
 export const SEATS: { id: Seat; label: string }[] = [
   { id: 'rok', label: 'Rest of Karnataka' },
@@ -156,8 +186,28 @@ export function citiesFor(
   return out;
 }
 
+/**
+ * Programmes this course actually publishes for the given category and round,
+ * so the branch filter cannot offer a specialisation that returns nothing.
+ */
+export function programmesFor(
+  data: CutoffData, course: Course, categoryCodeOrNull: string | null, round: Round = 'r2',
+): string[] {
+  const seen = new Set<string>();
+  for (const byProgramme of Object.values(data.ranks[course] ?? {})) {
+    for (const [programme, byCat] of Object.entries(byProgramme)) {
+      if (!categoryCodeOrNull || byCat[categoryCodeOrNull]?.[round] != null) {
+        seen.add(programme);
+      }
+    }
+  }
+  return [...seen].sort((a, b) => a.localeCompare(b));
+}
+
 export function predict(input: PredictInput): { results: Prediction[]; error?: string } {
-  const { rank, category, seat, course, city = '', round = 'r2', data } = input;
+  const {
+    rank, category, seat, course, city = '', programme: wanted = '', round = 'r2', data,
+  } = input;
 
   if (!Number.isFinite(rank) || rank < 1) {
     return { results: [], error: 'Enter your PGCET rank.' };
@@ -182,6 +232,7 @@ export function predict(input: PredictInput): { results: Prediction[]; error?: s
     }
 
     for (const [programme, byCat] of Object.entries(byProgramme)) {
+      if (wanted && programme !== wanted) continue;
       const slot = byCat[code];
       if (!slot) continue;                      // never allotted this category
 

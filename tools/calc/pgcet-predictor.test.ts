@@ -1,8 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  predict, summarise, categoryCode, citiesFor,
-  CATEGORIES, NON_KARNATAKA_CODE, NO_CITY, REACH_MARGIN, SAFE_MARGIN, type CutoffData,
+  predict, summarise, categoryCode, citiesFor, programmesFor, seatsFor,
+  CATEGORIES, COURSE_LABEL, NON_KARNATAKA_CODE, NO_CITY, REACH_MARGIN, SAFE_MARGIN,
+  type CutoffData,
 } from './pgcet-predictor.ts';
 
 // Two programmes at one college, deliberately far apart: the real shape that
@@ -31,6 +32,14 @@ const data: CutoffData = {
       B003: { MBA: { GM: { r1: 28000, r2: 12000 } } },
     },
     MCA: {},
+    // M.Tech: many specialisations per college, and no non-Karnataka column.
+    MTECH: {
+      T001: {
+        'Computer Science And Engineering': { GM: { r1: 2804, r2: 3100 } },
+        'Structural Engineering': { GM: { r1: 6870, r2: 6870 } },
+        'VLSI Design And Embedded Systems': { GMH: { r1: 8146, r2: 8146 } },
+      },
+    },
   },
 };
 
@@ -194,6 +203,54 @@ test('summarise counts every returned row exactly once', () => {
   const { results } = predict({ ...base, rank: 11000, category: 'GM' });
   const s = summarise(results);
   assert.equal(s.safe + s.moderate + s.reach, results.length);
+});
+
+test('seat types are offered only where that course publishes them', () => {
+  // MBA has all three; M.Tech publishes no NKN column, so offering a
+  // non-Karnataka option there would be a choice that can only return nothing.
+  assert.deepEqual(seatsFor(data, 'MBA').map((s) => s.id), ['rok', 'kk', 'nk']);
+  assert.deepEqual(seatsFor(data, 'MTECH').map((s) => s.id), ['rok', 'kk']);
+  assert.deepEqual(seatsFor(data, 'MCA').map((s) => s.id), []);
+});
+
+test('M.Tech specialisations at one college are judged separately', () => {
+  // One college, two GM specialisations with very different boundaries. At rank
+  // 3,000 Structural (6,870) is comfortably safe while CSE (3,100) is only
+  // moderate, so safest-first puts Structural on top even though CSE is the
+  // more selective seat. That ordering is the point: the list leads with what
+  // the rank actually holds, not with what looks most impressive.
+  const rows = predict({ ...base, course: 'MTECH', rank: 3000, category: 'GM' }).results;
+  assert.deepEqual(rows.map((r) => r.programme),
+    ['Structural Engineering', 'Computer Science And Engineering']);
+  assert.deepEqual(rows.map((r) => r.chance), ['safe', 'moderate']);
+
+  // Past CSE's boundary only Structural survives — proof they are judged apart
+  // rather than sharing one college-level number.
+  const tight = predict({ ...base, course: 'MTECH', rank: 4000, category: 'GM' }).results;
+  assert.deepEqual(tight.map((r) => r.programme), ['Structural Engineering']);
+});
+
+test('the branch filter narrows to one specialisation', () => {
+  const only = predict({
+    ...base, course: 'MTECH', rank: 3000, category: 'GM',
+    programme: 'Structural Engineering',
+  }).results;
+  assert.deepEqual(only.map((r) => r.programme), ['Structural Engineering']);
+});
+
+test('programmesFor offers only specialisations with a seat in that category', () => {
+  // VLSI at T001 is published under GMH only, so it must not appear for GM.
+  assert.deepEqual(programmesFor(data, 'MTECH', 'GM'),
+    ['Computer Science And Engineering', 'Structural Engineering']);
+  assert.deepEqual(programmesFor(data, 'MTECH', 'GMH'),
+    ['VLSI Design And Embedded Systems']);
+});
+
+test('course labels cover every course key in the data', () => {
+  for (const course of Object.keys(data.ranks)) {
+    assert.ok(COURSE_LABEL[course as keyof typeof COURSE_LABEL],
+      `no label for course key ${course}`);
+  }
 });
 
 test('every category maps to a distinct published code per seat type', () => {

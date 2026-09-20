@@ -39,9 +39,15 @@
      "PROF_CODE_C_Hkannada.pdf",
      "PROF_CODE_C_R_FIN.pdf",
      "PROF_CODE_C_H_FIN.pdf"
+    ],
+    "mtech": [
+     "PROF_CODE_T_Rkannada.pdf",
+     "PROF_CODE_T_Hkannada.pdf",
+     "PROF_CODE_T_R_FIN.pdf",
+     "PROF_CODE_T_H_FIN.pdf"
     ]
    },
-   "note": "Three variants exist per course and seat type. '<name>kannada.pdf' is FIRST ROUND, '<name>_FIN.pdf' is SECOND ROUND, and '<name>_30092025kannada.pdf' is the MOCK allotment -- the mock is deliberately excluded, it allots nothing. M.Tech files (PROF_CODE_T_*) are published too and are not ingested: scope is MBA and MCA."
+   "note": "Three variants exist per course and seat type. '<name>kannada.pdf' is FIRST ROUND, '<name>_FIN.pdf' is SECOND ROUND, and '<name>_30092025kannada.pdf' is the MOCK allotment -- the mock is deliberately excluded, it allots nothing. Course letter in the filename: B = MBA, C = MCA, T = M.Tech."
   }
  },
  "_dead": {

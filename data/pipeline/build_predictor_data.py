@@ -23,7 +23,14 @@ sys.path.insert(0, str(HERE))
 from cities import city_of                                    # noqa: E402
 
 SRC = HERE.parent / "normalised" / "cutoffs.csv"
-OUT = HERE.parent.parent / "tools" / "data" / "pgcet-cutoffs.json"
+OUT_DIR = HERE.parent.parent / "tools" / "data"
+# Two payloads, one per predictor. M.Tech is a separate tool with a separate
+# audience -- shipping its 1,249 category slots to someone converting a CGPA for
+# an MBA seat costs them bytes for data they will never open.
+BUNDLES = {
+    "pgcet-cutoffs.json": ("MBA", "MCA"),
+    "pgcet-mtech-cutoffs.json": ("MTECH",),
+}
 YEAR = "2025"
 # KEA publishes a cut-off table per round. Both are carried: round 2 is what a
 # late entrant (a non-Karnataka candidate, or anyone who did not take a round-1
@@ -32,11 +39,19 @@ YEAR = "2025"
 ROUNDS = {"FIRST ROUND": "r1", "SECOND ROUND": "r2"}
 
 def clean_programme(raw: str) -> str:
+    """KEA's own label, tidied for display.
+
+    M.Tech names are real specialisations (STRUCTURAL ENGINEERING, VLSI DESIGN
+    AND EMBEDDED SYSTEMS) rather than one course per college, which is why the
+    programme is the key: a single college runs up to 21 of them and each has
+    its own closing rank.
+    """
     p = re.sub(r"\s+", " ", raw).strip()
     p = re.sub(r"\s*\(\s*", " (", p)
     p = p.title()
     for wrong, right in (("Mba", "MBA"), ("Mca", "MCA"), ("(Ai", "(AI"), ("Ml", "ML"),
-                         ("It", "IT"), ("Hr", "HR")):
+                         ("It", "IT"), ("Hr", "HR"), ("Vlsi", "VLSI"),
+                         ("Cad", "CAD"), ("Cam", "CAM"), ("Vhdl", "VHDL")):
         p = p.replace(wrong, right)
     return p
 
@@ -55,13 +70,35 @@ def main() -> None:
         if len(r["college_name"]) > len(names_all.get(c, "")):
             names_all[c] = r["college_name"]
 
+    # Direct resolution first, from the longest name seen in any year.
+    direct = {code: (city_of(name) or "") for code, name in names_all.items()}
+
+    # Then inherit. M.Tech colleges carry T-codes that appear only in the 2025
+    # M.Tech files, whose names are clean institution names with no address -- so
+    # only 4 of 123 resolve directly. But most of those colleges also run an MBA
+    # under a B-code whose name DOES carry the address, and the M.Tech name is a
+    # prefix of it ("BMS COLLEGE OF ENGINEERING" vs the same plus a postal
+    # address). Matching that way recovers 61 more. The length floor keeps a
+    # short name from prefixing its way onto the wrong institution.
+    def squash(n: str) -> str:
+        return " ".join(re.sub(r"[^A-Z0-9]+", " ", n.upper()).split())
+
+    donors = [(squash(names_all[c]), v) for c, v in direct.items() if v]
+    for code, city in direct.items():
+        if city:
+            continue
+        key = squash(names_all.get(code, ""))
+        if len(key) < 12:
+            continue
+        direct[code] = next((v for dn, v in donors if dn.startswith(key)), "")
+
     colleges, ranks = {}, {}
     for r in rows:
         code = r["college_code"]
         if code not in colleges:
             colleges[code] = {
                 "name": re.sub(r"\s+", " ", r["college_name"]).strip(),
-                "city": city_of(names_all.get(code, r["college_name"])) or "",
+                "city": direct.get(code, ""),
             }
         rnd = ROUNDS.get(r["round"])
         if rnd is None:
@@ -74,28 +111,33 @@ def main() -> None:
         slot[rnd] = max(slot.get(rnd, 0), int(r["closing_rank"]))
 
     cities = sorted({c["city"] for c in colleges.values() if c["city"]})
-    payload = {
-        "source": "Karnataka Examinations Authority (KEA), published PGCET cutoff PDFs",
-        "year": YEAR,
-        "rounds": list(ROUNDS.values()),
-        "cities": cities,
-        "colleges": colleges,
-        "ranks": ranks,
-    }
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps(payload, separators=(",", ":"), sort_keys=True))
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    for name, courses in BUNDLES.items():
+        mine = {c: v for c, v in ranks.items() if c in courses}
+        used = {code for by_college in mine.values() for code in by_college}
+        sub_colleges = {c: v for c, v in colleges.items() if c in used}
+        sub_cities = sorted({c["city"] for c in sub_colleges.values() if c["city"]})
+        payload = {
+            "source": "Karnataka Examinations Authority (KEA), published PGCET cutoff PDFs",
+            "year": YEAR,
+            "rounds": list(ROUNDS.values()),
+            "cities": sub_cities,
+            "colleges": sub_colleges,
+            "ranks": mine,
+        }
+        dest = OUT_DIR / name
+        dest.write_text(json.dumps(payload, separators=(",", ":"), sort_keys=True))
 
-    kb = OUT.stat().st_size / 1024
-    placed = sum(1 for c in colleges.values() if c["city"])
-    print(f"{OUT.name}: {kb:.0f} KB | {YEAR} rounds 1 and 2")
-    for course, by_college in sorted(ranks.items()):
-        combos = sum(len(p) for p in by_college.values())
-        slots = [c for p in by_college.values() for prog in p.values() for c in prog.values()]
-        r2 = sum(1 for c in slots if "r2" in c)
-        print(f"  {course}: {len(by_college)} colleges, {combos} college+programme, "
-              f"{len(slots)} category slots ({r2} allotted in round 2)")
-    print(f"  {len(colleges)} colleges, {placed} with a city ({100*placed//len(colleges)}%), "
-          f"{len(cities)} cities")
+        placed = sum(1 for c in sub_colleges.values() if c["city"])
+        print(f"{name}: {dest.stat().st_size / 1024:.0f} KB | {YEAR} rounds 1 and 2")
+        for course, by_college in sorted(mine.items()):
+            combos = sum(len(p) for p in by_college.values())
+            slots = [c for p in by_college.values() for prog in p.values() for c in prog.values()]
+            r2 = sum(1 for c in slots if "r2" in c)
+            print(f"  {course}: {len(by_college)} colleges, {combos} college+programme, "
+                  f"{len(slots)} category slots ({r2} allotted in round 2)")
+        print(f"  {len(sub_colleges)} colleges, {placed} with a city "
+              f"({100 * placed // max(len(sub_colleges), 1)}%), {len(sub_cities)} cities")
 
 if __name__ == "__main__":
     main()
