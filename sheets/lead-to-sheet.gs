@@ -15,7 +15,7 @@
  * SHARED_SECRET below is a second check in case the URL ever leaks.
  */
 
-var LEADS_SHEET = 'All Leads';   // the calling list
+var LEADS_SHEET = 'Tool Leads';   // the calling list
 var EMAIL_SHEET = 'Email List';  // the mailing list — created automatically
 
 /**
