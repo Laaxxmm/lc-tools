@@ -36,7 +36,7 @@ arrived before attribution shipped or with storage blocked.
 | Where | Why |
 |---|---|
 | WordPress database | the record. Written first, so a webhook outage never loses a lead |
-| **tool leads** tab | the source rows. The **All Leads** view imports them |
+| **Tool Leads** tab | the source rows. The **All Leads** view imports them |
 | **Email List** tab | your mailing list — created automatically on the first lead |
 
 Email gets its own tab so it can be exported straight into a mail tool without
