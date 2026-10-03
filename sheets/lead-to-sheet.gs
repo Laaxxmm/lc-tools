@@ -1,5 +1,20 @@
 /**
- * Learn Crew — tool leads into the All Leads sheet.
+ * Learn Crew — tool leads into their own source tab, "Tool Leads".
+ *
+ * WHY A SEPARATE TAB. "All Leads" is not a table, it is a VIEW: a LET/IMPORTRANGE
+ * formula that stacks every source tab (pgcet-page-form, home-mentor-form, …)
+ * and QUERYs them into one list. Appending rows directly into that sheet puts
+ * static cells under an array formula, the formula can no longer spill over
+ * them, and every imported row collapses into #REF!. That was the "reference
+ * error" and the "other fields disappear". So this script never touches
+ * All Leads. It writes to "Tool Leads", and one extra IMPORTRANGE line in the
+ * view formula brings the rows in exactly like the WordPress tabs.
+ *
+ * COLUMN ORDER matches the other source tabs, because the view selects by
+ * position (Col8 = date, Col9 = time, Col1 = source, Col4 = page, Col2 = course,
+ * Col5 = name, Col7 = mobile) and filters on "Col1 is not null". Get a column
+ * wrong here and the view shows a phone number under Course. Columns 3 and 6
+ * are not read by the view; they hold email and remarks.
  *
  * IMPORTANT: an Apps Script project can hold only ONE doPost. If this project
  * already has one receiving WordPress leads, adding this file will break it —
@@ -9,30 +24,35 @@
  * Deploy: Extensions → Apps Script → paste this → Deploy → New deployment →
  * type "Web app" → Execute as: Me → Who has access: Anyone → Deploy.
  * Copy the /exec URL it gives you; that is what WordPress posts to.
+ * Updating later: Deploy → Manage deployments → pencil → New version → Deploy.
+ * Pasting new code alone does NOT change what /exec serves.
  *
  * Anyone with the URL can append a row, so the URL is the secret. It is stored
  * in wp-config.php, never in the page, so it is never exposed to a browser.
  * SHARED_SECRET below is a second check in case the URL ever leaks.
  */
 
-var LEADS_SHEET = 'Tool Leads';   // the calling list
+var LEADS_SHEET = 'Tool Leads';  // a SOURCE tab, imported by the All Leads view
 var EMAIL_SHEET = 'Email List';  // the mailing list — created automatically
 
 /**
- * Column order of the All Leads sheet, 1-indexed, matching the CONFIG already in
- * this project's dashboard script. Note PAGE at 4 — it is collapsed in the normal
- * view, so an 8-value append silently shifts every column after Source.
+ * 1-indexed column of each field in the "Tool Leads" tab. Columns 1-9 are the
+ * A2:I window the view imports, in the same order as the WordPress tabs.
+ * Attribution sits in 10-15: outside the imported window on purpose, so the
+ * view stays 9 wide, but still stored beside the lead for anyone opening the tab.
  */
 var COL = {
-  DATE: 1, TIME: 2, SOURCE: 3, PAGE: 4, COURSE: 5,
-  NAME: 6, MOBILE: 7, REMARKS: 8, STATUS: 9,
-  // Attribution, appended AFTER Status on purpose. Columns 1-9 keep their
-  // positions, so the dashboard script's CONFIG keeps working untouched.
+  SOURCE: 1, COURSE: 2, EMAIL: 3, PAGE: 4, NAME: 5, REMARKS: 6, MOBILE: 7,
+  DATE: 8, TIME: 9,
   CHANNEL: 10, GCLID: 11, UTM_SOURCE: 12, UTM_MEDIUM: 13,
   UTM_CAMPAIGN: 14, LANDING_PAGE: 15
 };
 
-var ATTR_HEADERS = ['Channel', 'GCLID', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'Landing Page'];
+var HEADERS = [
+  'Source', 'Course', 'Email', 'Page', 'Name', 'Remarks', 'Mobile', 'Date', 'Time',
+  'Channel', 'GCLID', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'Landing Page'
+];
+
 var SHARED_SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';
 
 function doPost(e) {
@@ -45,26 +65,28 @@ function doPost(e) {
 
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var now = new Date();
-    var tz = Session.getScriptTimeZone();
-    var date = Utilities.formatDate(now, tz, 'M/d/yyyy');
-    var time = Utilities.formatDate(now, tz, 'h:mm:ss a');
 
-    // 1. The calling list. Column order matches the sheet exactly. Status is left
-    //    blank on purpose — that column belongs to your team, not to this script.
-    var leads = ss.getSheetByName(LEADS_SHEET);
-    if (!leads) return json({ ok: false, error: 'sheet not found: ' + LEADS_SHEET });
-    // Build by column index rather than by position, so a hidden or reordered
-    // column can never shift the data.
+    // Date and time go in as real serials, not text. The view sorts on d*1 and
+    // t*1 first and only falls back to parsing strings, so numbers sort exactly
+    // and never depend on the sheet's locale reading "4/9/2026" the right way.
+    var dateCell = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var timeCell = new Date(1899, 11, 30, now.getHours(), now.getMinutes(), now.getSeconds());
+
+    // 1. The source tab. Created on first use so a typo in the tab name cannot
+    //    send rows somewhere else; the view imports whatever this is called.
+    var leads = ss.getSheetByName(LEADS_SHEET) || createLeadsSheet(ss);
+
+    // Build by column index rather than by position, so nothing can shift.
     var row = [];
-    row[COL.DATE - 1]    = date;
-    row[COL.TIME - 1]    = time;
-    row[COL.SOURCE - 1]  = body.source || 'tools';
-    row[COL.PAGE - 1]    = body.page || body.tool || '';
+    row[COL.SOURCE - 1]  = body.source || 'tools';   // view drops rows where this is blank
     row[COL.COURSE - 1]  = body.course || '';
+    row[COL.EMAIL - 1]   = body.email || '';
+    row[COL.PAGE - 1]    = body.page || body.tool || '';
     row[COL.NAME - 1]    = body.name || '';
-    row[COL.MOBILE - 1]  = body.phone || '';
     row[COL.REMARKS - 1] = body.remarks || '';
-    row[COL.STATUS - 1]  = '';                    // yours to fill, never ours
+    row[COL.MOBILE - 1]  = body.phone || '';
+    row[COL.DATE - 1]    = dateCell;
+    row[COL.TIME - 1]    = timeCell;
 
     // Where this lead came from. 'unknown' when the visitor arrived before
     // attribution shipped, or with storage blocked — never blank, so a filter
@@ -79,8 +101,12 @@ function doPost(e) {
     for (var c = 0; c < row.length; c++) {
       if (row[c] === undefined) row[c] = '';
     }
-    prepareAttributionColumns(leads);
     leads.appendRow(row);
+    // appendRow leaves the new cells on the default format; keep date/time
+    // readable as the serials they are.
+    var last = leads.getLastRow();
+    leads.getRange(last, COL.DATE).setNumberFormat('M/d/yyyy');
+    leads.getRange(last, COL.TIME).setNumberFormat('h:mm:ss am/pm');
 
     // 2. The mailing list, kept separate so it can be exported straight into an
     //    email tool without dragging call notes and phone numbers along.
@@ -101,16 +127,16 @@ function doPost(e) {
           break;
         }
       }
-      var row = [date, body.email, body.name || '', body.source || 'tools',
-                 body.course || '', body.consent ? 'yes' : 'no', ''];
+      var mrow = [dateCell, body.email, body.name || '', body.source || 'tools',
+                  body.course || '', body.consent ? 'yes' : 'no', ''];
       if (found) {
         // Preserve an existing unsubscribe. Re-subscribing someone who opted out
         // is the fastest way to get a sending domain blocked.
         var unsub = mail.getRange(found, 7).getValue();
-        row[6] = unsub;
-        mail.getRange(found, 1, 1, row.length).setValues([row]);
+        mrow[6] = unsub;
+        mail.getRange(found, 1, 1, mrow.length).setValues([mrow]);
       } else {
-        mail.appendRow(row);
+        mail.appendRow(mrow);
       }
     }
 
@@ -120,29 +146,12 @@ function doPost(e) {
   }
 }
 
-/**
- * Make the Attribution columns safe to write to.
- *
- * Two jobs. appendRow() throws outright if the row is wider than the sheet, so
- * the sheet is widened first. Then the six new columns get labelled — but only
- * when row 1 is provably a header row (frozen) and the cells are still empty.
- * If either test fails the labels are skipped and the data still lands; the
- * columns just stay unlabelled. Never overwrite something already there: a
- * sheet whose row 1 holds data would otherwise lose that row to headers.
- */
-function prepareAttributionColumns(sheet) {
-  var needed = COL.LANDING_PAGE;
-  if (sheet.getMaxColumns() < needed) {
-    sheet.insertColumnsAfter(sheet.getMaxColumns(), needed - sheet.getMaxColumns());
-  }
-
-  if (sheet.getFrozenRows() < 1) return;   // cannot prove row 1 is a header
-  var range = sheet.getRange(1, COL.CHANNEL, 1, ATTR_HEADERS.length);
-  var current = range.getValues()[0];
-  for (var i = 0; i < current.length; i++) {
-    if (String(current[i]).trim() !== '') return;   // already labelled, leave it
-  }
-  range.setValues([ATTR_HEADERS]);
+/** The source tab, with the header row the other tabs have, frozen. */
+function createLeadsSheet(ss) {
+  var sheet = ss.insertSheet(LEADS_SHEET);
+  sheet.appendRow(HEADERS);
+  sheet.setFrozenRows(1);
+  return sheet;
 }
 
 function json(obj) {

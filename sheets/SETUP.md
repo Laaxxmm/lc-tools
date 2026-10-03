@@ -2,35 +2,41 @@
 
 Leads land in three places, on purpose:
 
-The All Leads sheet has **fifteen** columns. The first nine are yours and keep
-their positions: `Page` sits at 4 and is collapsed in the normal view. Rows are
-written by column index rather than by position, so a hidden or reordered column
-cannot shift the data.
+**All Leads is a view, not a table.** It is a LET/IMPORTRANGE formula that
+stacks every source tab (`pgcet-page-form`, `home-mentor-form`, `mat-blog-popup`,
+`contact-page-form`, `mat-page-form`, `pgcet-blog-popup`) and QUERYs them into
+one list. Nothing may ever be typed or appended into that sheet: a static row
+under an array formula stops the formula spilling, every imported row collapses
+to `#REF!`, and the other columns "disappear". That is exactly what happened
+when the first version of this script appended into it.
 
-Columns 10-15 are attribution, appended after `Status` so nothing above them
-moves and the dashboard script's CONFIG keeps working untouched:
+So tool leads get their own **source tab, `Tool Leads`**, created by the script
+on the first lead, and one extra line in the view formula imports it like the
+WordPress tabs (see section 4). Its first nine columns follow the same order
+as the other source tabs, because the view selects by position:
 
-| # | Column | What it holds |
+| # | Column | Read by the view as |
 |---|---|---|
-| 10 | Channel | `google-ads`, `campaign-<source>`, `google-organic`, `referral`, `direct`, `unknown` |
-| 11 | GCLID | Google's own click id, when the visit came from an ad |
-| 12-14 | UTM Source / Medium / Campaign | whatever the link carried |
-| 15 | Landing Page | the first tools page they opened |
+| 1 | Source | `Col1` — the view drops any row where this is blank |
+| 2 | Course | `Col2` |
+| 3 | Email | not read by the view; kept with the lead |
+| 4 | Page (which tool) | `Col4` |
+| 5 | Name | `Col5` |
+| 6 | Remarks | not read by the view |
+| 7 | Mobile | `Col7` |
+| 8 | Date | `Col8` — stored as a real date, so `d*1` sorts it exactly |
+| 9 | Time | `Col9` — stored as a time serial, same reason |
 
-**Channel is the paid-vs-organic answer.** Filter All Leads on it to see which
-leads your ad spend actually produced. `unknown` means the visitor arrived
-before attribution shipped, or with browser storage blocked — never blank, so
-filtering never silently hides rows.
-
-The script labels columns 10-15 for you on the first lead, but only when row 1
-is a frozen header row and those cells are empty. If your sheet has no frozen
-header row it leaves them unlabelled rather than risk overwriting a data row —
-the leads still land either way.
+Columns 10-15 are attribution (Channel, GCLID, UTM Source / Medium / Campaign,
+Landing Page). They sit outside the `A2:I` window the view imports on purpose,
+so the view stays nine wide, but they stay beside the lead for anyone opening
+the tab. `Channel` is the paid-vs-organic answer; `unknown` means the visitor
+arrived before attribution shipped or with storage blocked.
 
 | Where | Why |
 |---|---|
 | WordPress database | the record. Written first, so a webhook outage never loses a lead |
-| **All Leads** tab | your calling list — name, phone, course, remarks |
+| **tool leads** tab | the source rows. The **All Leads** view imports them |
 | **Email List** tab | your mailing list — created automatically on the first lead |
 
 Email gets its own tab so it can be exported straight into a mail tool without
@@ -71,15 +77,16 @@ be created. Delete the test row afterwards.
 
 ## Checking the column mapping
 
-`Page` sits at column 4 and is collapsed, so an append that is one value short
-writes Course into Page without any error. That has happened once already. To
-check the mapping after editing the script:
+The All Leads view selects source columns by position, so a column that moves in
+the script shows a phone number under Course with no error anywhere. To check
+the mapping after editing the script:
 
 ```bash
 node sheets/lead-to-sheet.test.js
 ```
 
-It runs `doPost` against stubbed Google APIs and fails if any column moves.
+It runs `doPost` against stubbed Google APIs, fails if any column moves, and
+fails if the script ever writes into All Leads.
 
 ## Updating the script later
 
@@ -92,8 +99,38 @@ webhook keeps running the old code and nothing appears to change:
 Keep the same deployment rather than creating a new one — a new deployment
 gives a different `/exec` URL, which would mean editing `wp-config.php` too.
 
-Run `testAppend` from the editor afterwards. A row should appear in All Leads
-with `google-ads` in Channel and `TEST_GCLID` in GCLID. Delete that row.
+Run `testAppend` from the editor afterwards. A row should appear in the
+`Tool Leads` tab (created if missing) with `google-ads` in Channel, and then in
+the All Leads view via the formula. Delete that row from `Tool Leads`.
+
+## 4. Add the tab to the All Leads view formula
+
+In the sheet that holds the `=LET(` formula, add one block to `data`, after the
+last `IMPORTRANGE` and before the closing `}`:
+
+```
+    IMPORTRANGE(id, "pgcet-blog-popup!A2:I");
+    IFERROR(QUERY(IMPORTRANGE(id, "Tool Leads!A2:I"), "select * where Col1 is not null", 0),
+            {"","","","","","","","",""})
+```
+
+The `IFERROR(... , {nine blanks})` wrapper matters. An IMPORTRANGE of an empty
+range returns a single cell, and a one-column block inside a `{ ; }` stack
+throws `#REF! In ARRAY_LITERAL, an Array Literal was missing values for one or
+more rows` — the whole view goes blank until the first lead lands. The wrapper
+substitutes a blank nine-wide row instead, which the outer
+`where Col1 is not null` then drops. The six WordPress lines have the same
+exposure; wrapping them the same way costs nothing.
+
+Two things to check if the view still shows `#REF!` afterwards:
+
+- **Any typed or pasted rows left in All Leads.** Delete them. A single stray
+  value in the formula's spill range is enough.
+- **The IMPORTRANGE needs one "Allow access" click** the first time it points at
+  a new tab. Click the `#REF!` cell and allow it.
+
+The tab name in the formula must match the script's `LEADS_SHEET` exactly,
+including the space and capitals: `Tool Leads`.
 
 ## 3. Deploy it
 
