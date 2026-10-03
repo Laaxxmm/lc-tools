@@ -1,20 +1,20 @@
 /**
  * Learn Crew — tool leads into their own source tab, "Tool Leads".
  *
- * WHY A SEPARATE TAB. "All Leads" is not a table, it is a VIEW: a LET/IMPORTRANGE
- * formula that stacks every source tab (pgcet-page-form, home-mentor-form, …)
- * and QUERYs them into one list. Appending rows directly into that sheet puts
- * static cells under an array formula, the formula can no longer spill over
- * them, and every imported row collapses into #REF!. That was the "reference
- * error" and the "other fields disappear". So this script never touches
- * All Leads. It writes to "Tool Leads", and one extra IMPORTRANGE line in the
- * view formula brings the rows in exactly like the WordPress tabs.
+ * WHY A SEPARATE TAB. "All Leads" is not a table, it is a VIEW: a LET formula
+ * that stacks every source tab and QUERYs them into one list. Appending rows
+ * directly into that sheet puts static cells under an array formula, the
+ * formula can no longer spill over them, and every imported row collapses into
+ * #REF!. That was the "reference error" and the "other fields disappear". So
+ * this script never touches All Leads. It writes to "Tool Leads", and the
+ * view's own `tools` block reads that tab back in.
  *
- * COLUMN ORDER matches the other source tabs, because the view selects by
- * position (Col8 = date, Col9 = time, Col1 = source, Col4 = page, Col2 = course,
- * Col5 = name, Col7 = mobile) and filters on "Col1 is not null". Get a column
- * wrong here and the view shows a phone number under Course. Columns 3 and 6
- * are not read by the view; they hold email and remarks.
+ * COLUMN ORDER mirrors the view's first seven columns — Date, Time, Source,
+ * Page, Course, Name, Mobile — because the view's `tools` block is
+ * FILTER('Tool Leads'!A2:G, 'Tool Leads'!A2:A<>"") stacked straight under the
+ * website rows with no reordering. Move a column here and the view shows a
+ * phone number under Course with no error anywhere. Column A must never be
+ * blank: that FILTER keys on it.
  *
  * IMPORTANT: an Apps Script project can hold only ONE doPost. If this project
  * already has one receiving WordPress leads, adding this file will break it —
@@ -32,25 +32,27 @@
  * SHARED_SECRET below is a second check in case the URL ever leaks.
  */
 
-var LEADS_SHEET = 'Tool Leads';  // a SOURCE tab, imported by the All Leads view
+var LEADS_SHEET = 'Tool Leads';  // read by the All Leads view's `tools` block
 var EMAIL_SHEET = 'Email List';  // the mailing list — created automatically
 
 /**
- * 1-indexed column of each field in the "Tool Leads" tab. Columns 1-9 are the
- * A2:I window the view imports, in the same order as the WordPress tabs.
- * Attribution sits in 10-15: outside the imported window on purpose, so the
- * view stays 9 wide, but still stored beside the lead for anyone opening the tab.
+ * 1-indexed column of each field in the "Tool Leads" tab. 1-7 are what the
+ * view's `tools` block reads (A2:G), in the view's order. 8-9 match the old
+ * All Leads layout the dashboard CONFIG describes; the view ignores them.
+ * Email and attribution sit from 10 on: outside the A:G window, so the view
+ * stays seven wide, but still stored beside the lead for anyone opening the tab.
  */
 var COL = {
-  SOURCE: 1, COURSE: 2, EMAIL: 3, PAGE: 4, NAME: 5, REMARKS: 6, MOBILE: 7,
-  DATE: 8, TIME: 9,
-  CHANNEL: 10, GCLID: 11, UTM_SOURCE: 12, UTM_MEDIUM: 13,
-  UTM_CAMPAIGN: 14, LANDING_PAGE: 15
+  DATE: 1, TIME: 2, SOURCE: 3, PAGE: 4, COURSE: 5, NAME: 6, MOBILE: 7,
+  REMARKS: 8, STATUS: 9,
+  EMAIL: 10,
+  CHANNEL: 11, GCLID: 12, UTM_SOURCE: 13, UTM_MEDIUM: 14,
+  UTM_CAMPAIGN: 15, LANDING_PAGE: 16
 };
 
 var HEADERS = [
-  'Source', 'Course', 'Email', 'Page', 'Name', 'Remarks', 'Mobile', 'Date', 'Time',
-  'Channel', 'GCLID', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'Landing Page'
+  'Date', 'Time', 'Source', 'Page', 'Course', 'Name', 'Mobile', 'Remarks', 'Status',
+  'Email', 'Channel', 'GCLID', 'UTM Source', 'UTM Medium', 'UTM Campaign', 'Landing Page'
 ];
 
 var SHARED_SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';
@@ -78,15 +80,16 @@ function doPost(e) {
 
     // Build by column index rather than by position, so nothing can shift.
     var row = [];
-    row[COL.SOURCE - 1]  = body.source || 'tools';   // view drops rows where this is blank
-    row[COL.COURSE - 1]  = body.course || '';
-    row[COL.EMAIL - 1]   = body.email || '';
-    row[COL.PAGE - 1]    = body.page || body.tool || '';
-    row[COL.NAME - 1]    = body.name || '';
-    row[COL.REMARKS - 1] = body.remarks || '';
-    row[COL.MOBILE - 1]  = body.phone || '';
-    row[COL.DATE - 1]    = dateCell;
+    row[COL.DATE - 1]    = dateCell;                 // column A: the view's FILTER keys on it
     row[COL.TIME - 1]    = timeCell;
+    row[COL.SOURCE - 1]  = body.source || 'tools';   // final QUERY drops rows where this is blank
+    row[COL.PAGE - 1]    = body.page || body.tool || '';
+    row[COL.COURSE - 1]  = body.course || '';
+    row[COL.NAME - 1]    = body.name || '';
+    row[COL.MOBILE - 1]  = body.phone || '';
+    row[COL.REMARKS - 1] = body.remarks || '';
+    row[COL.STATUS - 1]  = '';                       // yours to fill, never ours
+    row[COL.EMAIL - 1]   = body.email || '';
 
     // Where this lead came from. 'unknown' when the visitor arrived before
     // attribution shipped, or with storage blocked — never blank, so a filter

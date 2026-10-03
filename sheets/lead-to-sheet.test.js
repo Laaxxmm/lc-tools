@@ -2,11 +2,12 @@
  * Guard for the "Tool Leads" column mapping. Run: node sheets/lead-to-sheet.test.js
  *
  * Apps Script cannot run locally, so this loads lead-to-sheet.gs as text and
- * executes doPost against stubbed Google APIs. The All Leads view selects source
- * columns BY POSITION (Col8 date, Col9 time, Col1 source, Col4 page, Col2 course,
- * Col5 name, Col7 mobile) and drops rows whose Col1 is blank, so a column that
- * moves here shows a phone number under Course in the view with no error at all.
- * These checks fail loudly instead.
+ * executes doPost against stubbed Google APIs. The All Leads view's `tools`
+ * block is FILTER('Tool Leads'!A2:G, A2:A<>"") stacked under the website rows
+ * with NO reordering, so Tool Leads A-G must be the view's own order — Date,
+ * Time, Source, Page, Course, Name, Mobile — and column A must never be blank.
+ * A column that moves here shows a phone number under Course in the view with
+ * no error at all. These checks fail loudly instead.
  */
 const fs = require('fs');
 const assert = require('assert');
@@ -80,51 +81,52 @@ const LEAD = { secret: 'S', source: 'tools', page: 'cgpa-percentage-converter', 
   console.log('ok  tab created with frozen header');
 }
 
-// 3. Positions the All Leads view reads BY NUMBER. Col8/Col9 date/time,
-//    Col1 source, Col4 page, Col2 course, Col5 name, Col7 mobile.
+// 3. A-G in the view's order, because the view's `tools` block stacks them
+//    under the website rows with no reordering.
 {
   const { sheets, COL } = run(LEAD);
   const r = sheets['Tool Leads'].rows[1];
-  assert.equal(COL.SOURCE, 1); assert.equal(COL.COURSE, 2); assert.equal(COL.PAGE, 4);
-  assert.equal(COL.NAME, 5);   assert.equal(COL.MOBILE, 7); assert.equal(COL.DATE, 8);
-  assert.equal(COL.TIME, 9);
-  assert.equal(r[0], 'tools',                     'Col1 must be Source (view filters on it)');
-  assert.equal(r[1], 'PGCET MBA',                 'Col2 must be Course');
-  assert.equal(r[3], 'cgpa-percentage-converter', 'Col4 must be Page');
-  assert.equal(r[4], 'Asha R',                    'Col5 must be Name');
-  assert.equal(r[6], '9800000000',                'Col7 must be Mobile');
-  assert.ok(r[7] instanceof Date,                 'Col8 must be a real Date (sorts as d*1)');
-  assert.ok(r[8] instanceof Date,                 'Col9 must be a time serial (sorts as t*1)');
-  assert.equal(r[8].getFullYear(), 1899,          'time serial anchored at the Sheets epoch');
-  assert.equal(r[2], 'asha@example.com');         // not read by the view; still stored
-  assert.equal(r[5], 'note');
-  console.log('ok  columns 1-9 in the order the view selects');
+  assert.deepEqual(
+    [COL.DATE, COL.TIME, COL.SOURCE, COL.PAGE, COL.COURSE, COL.NAME, COL.MOBILE],
+    [1, 2, 3, 4, 5, 6, 7], 'A-G must be Date, Time, Source, Page, Course, Name, Mobile');
+  assert.ok(r[0] instanceof Date,                 'A must be a real Date — the FILTER keys on A<>"" and the view sorts on d*1');
+  assert.ok(r[1] instanceof Date,                 'B must be a time serial (sorts as t*1)');
+  assert.equal(r[1].getFullYear(), 1899,          'time serial anchored at the Sheets epoch');
+  assert.equal(r[2], 'tools',                     'C must be Source (final QUERY filters on it)');
+  assert.equal(r[3], 'cgpa-percentage-converter', 'D must be Page');
+  assert.equal(r[4], 'PGCET MBA',                 'E must be Course');
+  assert.equal(r[5], 'Asha R',                    'F must be Name');
+  assert.equal(r[6], '9800000000',                'G must be Mobile');
+  assert.equal(r[7], 'note',                      'H Remarks, outside the view');
+  assert.equal(r[8], '',                          'I Status left blank');
+  assert.equal(r[9], 'asha@example.com',          'J Email, outside the view');
+  console.log('ok  A-G in the order the view stacks them');
 }
 
 // 4. Source never blank — a blank Col1 is silently dropped by the view.
 {
   const { sheets } = run({ secret: 'S', name: 'No Source', phone: '9800000001' });
-  assert.equal(sheets['Tool Leads'].rows[1][0], 'tools');
+  assert.equal(sheets['Tool Leads'].rows[1][2], 'tools');
   console.log('ok  blank source defaults to "tools" so the view keeps the row');
 }
 
-// 5. Attribution lands in 10-15, outside the A2:I window the view imports.
+// 5. Email and attribution land from column 10 on, outside the A2:G window.
 {
   const { sheets, COL } = run(LEAD);
   const r = sheets['Tool Leads'].rows[1];
-  assert.ok(COL.CHANNEL >= 10, 'attribution must sit outside A:I');
+  assert.ok(COL.EMAIL >= 8 && COL.CHANNEL >= 8, 'nothing extra may sit inside A:G');
   assert.equal(r[COL.CHANNEL - 1], 'google-ads');
   assert.equal(r[COL.LANDING_PAGE - 1], '/tools/');
-  assert.equal(r.length, 15);
-  console.log('ok  attribution in 10-15, view stays 9 wide');
+  assert.equal(r.length, 16);
+  console.log('ok  email + attribution from column 10, view stays 7 wide');
 }
 
 // 6. Date/time cells get a readable number format.
 {
   const { sheets, COL } = run(LEAD);
   const f = sheets['Tool Leads'].formats;
-  assert.equal(f[`2,${COL.DATE}`], 'M/d/yyyy');
-  assert.equal(f[`2,${COL.TIME}`], 'h:mm:ss am/pm');
+  assert.equal(f['2,1'], 'M/d/yyyy',     'A formatted as a date');
+  assert.equal(f['2,2'], 'h:mm:ss am/pm', 'B formatted as a time');
   console.log('ok  date/time formatted');
 }
 

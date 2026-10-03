@@ -10,28 +10,33 @@ under an array formula stops the formula spilling, every imported row collapses
 to `#REF!`, and the other columns "disappear". That is exactly what happened
 when the first version of this script appended into it.
 
-So tool leads get their own **source tab, `Tool Leads`**, created by the script
-on the first lead, and one extra line in the view formula imports it like the
-WordPress tabs (see section 4). Its first nine columns follow the same order
-as the other source tabs, because the view selects by position:
+So tool leads get their own tab, **`Tool Leads`**, created by the script on
+the first lead. The view's `tools` block reads it back:
 
-| # | Column | Read by the view as |
+```
+tools, IFERROR(FILTER('Tool Leads'!A2:G, 'Tool Leads'!A2:A<>""), {"","","","","","",""})
+```
+
+and stacks it straight under the website rows with no reordering. So columns
+A-G of `Tool Leads` mirror the view's own order exactly:
+
+| # | Column | Why it sits here |
 |---|---|---|
-| 1 | Source | `Col1` — the view drops any row where this is blank |
-| 2 | Course | `Col2` |
-| 3 | Email | not read by the view; kept with the lead |
-| 4 | Page (which tool) | `Col4` |
-| 5 | Name | `Col5` |
-| 6 | Remarks | not read by the view |
-| 7 | Mobile | `Col7` |
-| 8 | Date | `Col8` — stored as a real date, so `d*1` sorts it exactly |
-| 9 | Time | `Col9` — stored as a time serial, same reason |
+| 1 | Date | the FILTER keys on A being non-blank; stored as a real date so `d*1` sorts it exactly |
+| 2 | Time | stored as a time serial, same reason |
+| 3 | Source | the final QUERY drops any row where this is blank |
+| 4 | Page (which tool) | |
+| 5 | Course | |
+| 6 | Name | |
+| 7 | Mobile | |
+| 8 | Remarks | outside the view's A:G window |
+| 9 | Status | left blank for the team; outside the window |
 
-Columns 10-15 are attribution (Channel, GCLID, UTM Source / Medium / Campaign,
-Landing Page). They sit outside the `A2:I` window the view imports on purpose,
-so the view stays nine wide, but they stay beside the lead for anyone opening
-the tab. `Channel` is the paid-vs-organic answer; `unknown` means the visitor
-arrived before attribution shipped or with storage blocked.
+Columns 10-16 are Email and attribution (Channel, GCLID, UTM Source / Medium /
+Campaign, Landing Page). They sit outside the `A2:G` window the view reads on
+purpose, so the view stays seven wide, but they stay beside the lead for anyone
+opening the tab. `Channel` is the paid-vs-organic answer; `unknown` means the
+visitor arrived before attribution shipped or with storage blocked.
 
 | Where | Why |
 |---|---|
@@ -103,33 +108,19 @@ Run `testAppend` from the editor afterwards. A row should appear in the
 `Tool Leads` tab (created if missing) with `google-ads` in Channel, and then in
 the All Leads view via the formula. Delete that row from `Tool Leads`.
 
-## 4. Add the tab to the All Leads view formula
+## 4. The view formula needs no change
 
-In the sheet that holds the `=LET(` formula, add one block to `data`, after the
-last `IMPORTRANGE` and before the closing `}`:
+The `tools` block above already brings the tab in, and its `IFERROR(...,
+{seven blanks})` guard means an empty or not-yet-created tab contributes a
+blank row that the final `where Col3 is not null` drops, rather than breaking
+the stack. Because the tab is read locally (not via IMPORTRANGE) there is no
+"Allow access" step either.
 
-```
-    IMPORTRANGE(id, "pgcet-blog-popup!A2:I");
-    IFERROR(QUERY(IMPORTRANGE(id, "Tool Leads!A2:I"), "select * where Col1 is not null", 0),
-            {"","","","","","","","",""})
-```
+If the view shows `#REF!` after the script is deployed, the cause is a typed or
+pasted value left somewhere in All Leads' spill range. Delete it. A single
+stray cell is enough.
 
-The `IFERROR(... , {nine blanks})` wrapper matters. An IMPORTRANGE of an empty
-range returns a single cell, and a one-column block inside a `{ ; }` stack
-throws `#REF! In ARRAY_LITERAL, an Array Literal was missing values for one or
-more rows` — the whole view goes blank until the first lead lands. The wrapper
-substitutes a blank nine-wide row instead, which the outer
-`where Col1 is not null` then drops. The six WordPress lines have the same
-exposure; wrapping them the same way costs nothing.
-
-Two things to check if the view still shows `#REF!` afterwards:
-
-- **Any typed or pasted rows left in All Leads.** Delete them. A single stray
-  value in the formula's spill range is enough.
-- **The IMPORTRANGE needs one "Allow access" click** the first time it points at
-  a new tab. Click the `#REF!` cell and allow it.
-
-The tab name in the formula must match the script's `LEADS_SHEET` exactly,
+The tab name in the formula and the script's `LEADS_SHEET` must match exactly,
 including the space and capitals: `Tool Leads`.
 
 ## 3. Deploy it
