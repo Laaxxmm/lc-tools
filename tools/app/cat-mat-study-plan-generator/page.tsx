@@ -155,6 +155,24 @@ function Explainer() {
         nothing else, which is the point.
       </p>
 
+      <h2>Which topics, in which week</h2>
+      <p>
+        Every section has its own topic list, ordered so the foundations come first and the
+        least-asked material comes last. For PGCET the lists follow KEA&rsquo;s published syllabus
+        and its 2026 papers. CAT and MAT have no official syllabus, so those lists follow what
+        recent papers have actually asked. Each topic carries a first-pass estimate in hours,
+        and your weekly hours for that section walk down the list. A six-hour topic on two hours
+        a week spans three weeks and says so, rather than pretending to fit.
+      </p>
+      <p>
+        Once a topic is taught, it comes back as practice sets in later weeks, so nothing you
+        learned in week two is cold by the mocks. A student starting fresh only practises what
+        the plan has already taught. Someone revising gets a check-and-rebuild pass instead, and a
+        final sprint revises from the top of each list. If your hours cannot reach every topic,
+        the plan names the ones it dropped. They are always the tail of the list, never the
+        topics the paper leans on.
+      </p>
+
       <h2>What the checkpoints are for</h2>
       <p>
         Every phase opens with one checkpoint, and none of them is a score. Score targets at the end

@@ -10,6 +10,7 @@ import { EXAMS } from '../../calc/exam-dates';
 import {
   buildPlan, formatDay, todayIso,
   CONFIRMED_DATES, SECTIONS,
+  TOPIC_PREFIX,
   type Exam, type Level, type SectionId, type StudyPlan, type WeekPlan,
 } from '../../calc/study-plan';
 
@@ -36,7 +37,8 @@ const TEASER_WEEKS = 3;
 
 function WeekRow({ w }: { w: WeekPlan }) {
   return (
-    <tr>
+    <>
+    <tr className="week-main">
       <td className="num"><strong>{w.week}</strong></td>
       <td className="num">{formatDay(w.from)} – {formatDay(w.to)}</td>
       <td>
@@ -47,6 +49,16 @@ function WeekRow({ w }: { w: WeekPlan }) {
       <td className="num">{w.hours}h</td>
       <td className="num">{w.mocks}</td>
     </tr>
+    <tr className="week-topics">
+      <td colSpan={5}>
+        <ul>
+          {w.topics.length ? w.topics.map((t) => (
+            <li key={`${t.id}-${t.mode}`}><strong>{t.short}</strong> {TOPIC_PREFIX[t.mode]}{t.topics.join(' · ')}</li>
+          )) : <li>Full mocks, then the questions in your error log. No new topics.</li>}
+        </ul>
+      </td>
+    </tr>
+    </>
   );
 }
 
@@ -248,8 +260,7 @@ export default function StudyPlanTool() {
               </>
             )}
             <p className="muted" style={{ fontSize: 13.5 }}>
-              What to actually do each week — the focus, the section split and the checkpoints — is
-              in the PDF.
+              Hours per section, the focus for each phase and the checkpoints are in the PDF.
             </p>
           </>
         ) : (

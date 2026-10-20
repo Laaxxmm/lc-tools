@@ -1146,3 +1146,11 @@ html:has(.lead-dialog[open]) { overflow: hidden; }
 /* The plan's honest caveats: an unannounced exam date, hours nobody keeps up. */
 .lcp .plan-flags { list-style: none; padding: 0; margin: var(--s3) 0 0; display: grid; gap: var(--s2); }
 .lcp .plan-flags li { border-left: 3px solid var(--amber); padding-left: var(--s3); font-size: 14px; color: var(--ink); }
+
+/* Each week's topics sit under its row, so the row itself drops its rule. */
+.lcp table.plan tr.week-main td { border-bottom: none; padding-bottom: 4px; }
+.lcp table.plan tr.week-topics td { padding-top: 0; font-size: 13px; color: var(--muted); }
+.lcp table.plan tr.week-topics ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; }
+.lcp table.plan tr.week-topics strong { color: var(--ink); margin-right: .35em; }
+/* Hover would light half a week; one week is two rows. */
+.lcp table.plan tbody tr.week-main:hover, .lcp table.plan tbody tr.week-topics:hover { background: none; }

@@ -4,12 +4,12 @@ const tool: ToolConfig = {
   slug: 'cat-mat-study-plan-generator',
   title: 'CAT, MAT & PGCET Study Plan Generator: weeks to exam day',
   tagline:
-    'Give it your exam date, the hours you actually have, and your weakest section. It returns a week-by-week plan with the sectional split and the mock checkpoints already placed.',
+    'Give it your exam date, the hours you actually have, and your weakest section. It returns a week-by-week plan that names the topics to study each week, with the mock checkpoints already placed.',
   eyebrow: 'CAT · MAT · PGCET · Study planner',
   family: 'cat',
   alsoServes: ['mat', 'pgcet'],
   description:
-    'Free study plan generator for CAT, MAT and Karnataka PGCET MBA and MCA. Enter exam date, daily hours and weakest section for a week-by-week plan.',
+    'Free study plan generator for CAT, MAT and Karnataka PGCET MBA and MCA. Enter exam date, daily hours and weakest section for a week-by-week topic plan.',
   keywords: [
     'cat study plan',
     'mat study plan',
@@ -47,6 +47,10 @@ const tool: ToolConfig = {
     {
       q: 'Does the plan cover MAT’s Indian & Global Environment section?',
       a: 'It gives it a small fixed slice and refuses to give it more. AIMA builds the MAT composite score from four sections and keeps Indian & Global Environment outside it, so hours moved there do not move your percentile. Fifteen minutes of news a day covers what you need. If you pick IGE as your weakest section the plan says so rather than quietly handing it a tenth of your preparation.',
+    },
+    {
+      q: 'Does the plan tell me which topics to study each week?',
+      a: 'Yes. Every week names the topics for each section. Early weeks teach them one after another, starting from the foundations later topics lean on and ending with what the paper asks least. A long topic carries over into the next week instead of being squeezed. Once a topic is taught it comes back as practice sets, and mock weeks switch to your own error log. If your hours cannot cover everything, the plan says which topics it left out instead of pretending.',
     },
     {
       q: 'Does it plan for Karnataka PGCET MBA and MCA?',

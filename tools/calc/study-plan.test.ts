@@ -4,6 +4,7 @@ import {
   buildPlan, planToText, sectionShares, shapeFor, todayIso, SECTIONS,
   type Exam, type StudyPlan, type PlanInput,
 } from './study-plan.ts';
+import { TOPICS } from './study-topics.ts';
 
 const TODAY = '2026-08-26';
 
@@ -186,4 +187,70 @@ test('the headline names the real heaviest section, not just the boosted one', (
 test('CAT and MAT plans carry no PGCET date warning', () => {
   assert.ok(!plan().flags.some((f) => f.includes('PGCET')));
   assert.ok(!plan({ exam: 'mat', examDate: '2026-12-20', weakest: 'ms' }).flags.some((f) => f.includes('PGCET')));
+});
+
+test('every section of every exam has its own topic list', () => {
+  for (const exam of Object.keys(SECTIONS) as Exam[]) {
+    for (const s of SECTIONS[exam]) {
+      const list = TOPICS[exam][s.id] ?? [];
+      assert.ok(list.length >= 3, `${exam}/${s.id} has ${list.length} topics`);
+      assert.ok(list.every((t) => t.hours > 0), `${exam}/${s.id} has a zero-hour topic`);
+      assert.equal(new Set(list.map((t) => t.name)).size, list.length, `${exam}/${s.id} repeats a topic`);
+    }
+  }
+});
+
+test('a fresh plan teaches each section top-down and carries long topics across weeks', () => {
+  const p = plan();
+  for (const t of p.weeks[0].topics) {
+    assert.equal(t.mode, 'learn');
+    assert.equal(t.topics[0], TOPICS.cat[t.id]![0].name, `${t.id} must start at the top of its list`);
+  }
+  assert.ok(p.weeks[1].topics.some((t) => t.topics.some((n) => n.endsWith('(continued)'))));
+});
+
+test('mock and taper weeks hand out no topics', () => {
+  for (const w of plan().weeks) {
+    if (['mock-block', 'mock-density', 'taper'].includes(w.phase)) assert.deepEqual(w.topics, [], `week ${w.week}`);
+  }
+});
+
+test('a fresh student only practises what the plan has already taught', () => {
+  const p = plan({ hoursPerDay: 1.5 });
+  const taught = new Set<string>();
+  for (const w of p.weeks) {
+    for (const t of w.topics.filter((x) => x.mode === 'practise')) {
+      for (const n of t.topics) assert.ok(taught.has(n), `week ${w.week} practises ${n} before teaching it`);
+    }
+    for (const t of w.topics.filter((x) => x.mode === 'learn')) {
+      for (const n of t.topics) taught.add(n.replace(' (continued)', ''));
+    }
+  }
+});
+
+test('too few hours drops the tail of each list, and the plan says which', () => {
+  const p = plan({ hoursPerDay: 1 });
+  const flag = p.flags.find((f) => f.includes('lowest-priority'));
+  assert.ok(flag, 'one hour a day for CAT cannot teach everything, and must say so');
+  assert.ok(flag.startsWith('At 1 hour a day'));
+  assert.ok(flag.includes('Permutations, combinations and probability') || flag.includes('more'));
+  // A long PGCET runway at three hours teaches everything and moves on to practice.
+  const long = plan({ exam: 'pgcet-mba', start: '2026-10-20', examDate: '2027-05-23', weakest: 'gk' });
+  assert.ok(!long.flags.some((f) => f.includes('lowest-priority')));
+  assert.ok(long.weeks.some((w) => w.phase === 'foundation' && w.topics.some((t) => t.mode === 'practise')));
+});
+
+test('revising students check and rebuild; sprinters revise from the top of the list', () => {
+  const rev = plan({ exam: 'mat', start: '2026-10-20', examDate: '2026-12-20', level: 'revising', weakest: 'ms' });
+  assert.ok(rev.weeks[0].topics.every((t) => t.mode === 'repair'));
+  const sprint = plan({ exam: 'mat', start: '2026-11-25', examDate: '2026-12-20', weakest: 'ms' });
+  const first = sprint.weeks[0].topics.find((t) => t.id === 'ms')!;
+  assert.equal(first.mode, 'revise');
+  assert.equal(first.topics[0], TOPICS.mat.ms![0].name);
+});
+
+test('the plain-text plan lists the topics week by week', () => {
+  const txt = planToText(plan());
+  assert.ok(txt.includes('QA: Percentages, profit and loss'));
+  assert.ok(txt.includes('Practice sets: '));
 });

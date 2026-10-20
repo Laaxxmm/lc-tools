@@ -6,6 +6,8 @@
 // map is chosen by weeks-remaining and then capped by how far along the student says
 // they are — never by multiplying one template up or down.
 
+import { TOPICS } from './study-topics.ts';
+
 export type Exam = 'cat' | 'mat' | 'pgcet-mba' | 'pgcet-mca';
 export type Level = 'fresh' | 'revising' | 'sprint';
 export type Shape = 'sprint' | 'condensed' | 'build';
@@ -250,6 +252,87 @@ const MAX_HOURS_PER_DAY = 14;
 
 const DAY = 86_400_000;
 
+// Learning phases spend a section's hours walking down its topic list. A repair pass
+// costs half, because the student has met the topic before.
+const LEARN_COST: Partial<Record<Phase, number>> = { foundation: 1, repair: 0.5 };
+// Later phases loop over topics instead: timed sets, or recall only in a sprint.
+const LOOP_MODE: Partial<Record<Phase, TopicMode>> = { application: 'practise', sectional: 'practise', triage: 'revise' };
+/** Roughly one topic's timed set per this many hours, capped at three a week. */
+const HOURS_PER_SET = 1.5;
+
+/**
+ * Hands out topics week by week. Topics carry over between weeks when a section's
+ * hours run out mid-topic, so a six-hour topic on two hours a week spans three weeks.
+ */
+function topicScheduler(exam: Exam, shape: Shape) {
+  const all = (id: SectionId) => (TOPICS[exam][id] ?? []).map((t) => t.name);
+  const queue = new Map<SectionId, { name: string; left: number; started: boolean }[]>();
+  const learned = new Map<SectionId, string[]>();
+  const cursor = new Map<SectionId, number>();
+  for (const s of SECTIONS[exam]) {
+    queue.set(s.id, (TOPICS[exam][s.id] ?? []).map((t) => ({ name: t.name, left: t.hours, started: false })));
+    learned.set(s.id, []);
+    cursor.set(s.id, 0);
+  }
+
+  function learn(id: SectionId, budget: number, cost: number): string[] {
+    const q = queue.get(id)!;
+    const names: string[] = [];
+    while (budget > 0 && q.length) {
+      const t = q[0];
+      names.push(t.started ? `${t.name} (continued)` : t.name);
+      t.started = true;
+      if (t.left * cost <= budget) {
+        budget -= t.left * cost;
+        learned.get(id)!.push(t.name);
+        q.shift();
+      } else {
+        t.left -= budget / cost;
+        budget = 0;
+      }
+    }
+    return names;
+  }
+
+  function loop(id: SectionId, hours: number): string[] {
+    // A fresh student practises only what the plan taught. Anyone revising or in a
+    // sprint already owns the syllabus, so the loop runs over all of it.
+    const pool = shape === 'build' ? learned.get(id)! : all(id);
+    if (!pool.length || hours <= 0) return [];
+    const n = Math.min(3, Math.max(1, Math.floor(hours / HOURS_PER_SET)), pool.length);
+    const at = cursor.get(id)!;
+    cursor.set(id, at + n);
+    return Array.from({ length: n }, (_, k) => pool[(at + k) % pool.length]);
+  }
+
+  function week(phase: Phase, split: SectionSplit[]): WeekTopics[] {
+    const cost = LEARN_COST[phase];
+    const mode = LOOP_MODE[phase];
+    const out: WeekTopics[] = [];
+    const add = (s: SectionSplit, m: TopicMode, topics: string[]) => {
+      if (topics.length) out.push({ id: s.id, short: s.short, mode: m, topics });
+    };
+    for (const s of split) {
+      const left = queue.get(s.id)!.length > 0;
+      if (cost !== undefined && left) {
+        add(s, phase === 'repair' ? 'repair' : 'learn', learn(s.id, s.hours, cost));
+      } else if (phase === 'application' && shape === 'build' && left) {
+        // Topics the foundation weeks did not reach still get taught, on half the
+        // hours, rather than silently vanishing once the timed sets start.
+        add(s, 'learn', learn(s.id, s.hours / 2, 1));
+        add(s, 'practise', loop(s.id, s.hours / 2));
+      } else if (cost !== undefined || mode !== undefined) {
+        add(s, mode ?? 'practise', loop(s.id, s.hours));
+      }
+    }
+    return out;
+  }
+
+  /** Topics a fresh student never reached, in list order. */
+  const dropped = () => [...queue.values()].flat().map((t) => t.name);
+  return { week, dropped };
+}
+
 function parseIso(s: string): number | null {
   const m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!m) return null;
@@ -322,6 +405,16 @@ export interface SectionSplit {
   id: SectionId; label: string; short: string; share: number; hours: number;
 }
 
+/** learn = first pass; repair = check and rebuild; practise = timed sets; revise = recall only. */
+export type TopicMode = 'learn' | 'repair' | 'practise' | 'revise';
+
+export interface WeekTopics {
+  id: SectionId;
+  short: string;
+  mode: TopicMode;
+  topics: string[];
+}
+
 export interface WeekPlan {
   week: number;
   from: string;
@@ -335,6 +428,8 @@ export interface WeekPlan {
   mockHours: number;
   drillHours: number;
   split: SectionSplit[];
+  /** What to study this week, per section. Empty in mock and taper weeks. */
+  topics: WeekTopics[];
   milestone?: string;
 }
 
@@ -404,6 +499,7 @@ export function buildPlan(input: PlanInput): PlanResult {
   const firstWeekDays = daysLeft - (totalWeeks - 1) * 7;
 
   const weeks: WeekPlan[] = [];
+  const topics = topicScheduler(exam, shape);
   let cursor = start;
   let previous: Phase | null = null;
 
@@ -446,6 +542,7 @@ export function buildPlan(input: PlanInput): PlanResult {
       mockHours: spentOnMocks,
       drillHours,
       split,
+      topics: topics.week(phase, split),
       milestone: i === 0
         ? DIAGNOSTIC[exam]
         : phase !== previous ? PHASE_MILESTONE[phase][exam] : undefined,
@@ -482,6 +579,12 @@ export function buildPlan(input: PlanInput): PlanResult {
   if (weakest === 'ige') {
     flags.push('AIMA builds the MAT composite score from four sections and keeps Indian & Global Environment outside it, so this plan gives IGE a small fixed slice rather than a full weak-section boost. Fifteen minutes of news a day covers it.');
   }
+  const dropped = shape === 'build' ? topics.dropped() : [];
+  if (dropped.length) {
+    const total = SECTIONS[exam].reduce((t, s) => t + (TOPICS[exam][s.id]?.length ?? 0), 0);
+    const list = dropped.length > 4 ? `${dropped.slice(0, 4).join(', ')} and ${dropped.length - 4} more` : dropped.join(', ');
+    flags.push(`At ${hoursPerDay} hour${hoursPerDay === 1 ? '' : 's'} a day the plan teaches ${total - dropped.length} of ${total} topics before the mocks take over. It leaves out the lowest-priority ones: ${list}. More hours a day or an earlier start brings them back.`);
+  }
   const dateConfirmed = CONFIRMED_DATES.some((d) => d.exam === exam && d.date === input.examDate);
   if (exam.startsWith('pgcet') && !dateConfirmed) {
     flags.push('KEA has not announced PGCET 2027. The 2026 paper was first set for 24 May and moved to 14 June, so plan for late May and regenerate this plan the day the bulletin is out. If the date lands later, spend the extra weeks on full papers.');
@@ -517,6 +620,10 @@ export function buildPlan(input: PlanInput): PlanResult {
   };
 }
 
+export const TOPIC_PREFIX: Record<TopicMode, string> = {
+  learn: '', repair: 'Check and rebuild: ', practise: 'Practice sets: ', revise: 'Revise: ',
+};
+
 /** The gated deliverable: the same plan as a plain-text file the student can keep. */
 export function planToText(plan: StudyPlan): string {
   const dateNote = plan.dateConfirmed
@@ -542,6 +649,7 @@ export function planToText(plan: StudyPlan): string {
       `  ${w.hours}h available · ${w.mocks} full mock${w.mocks === 1 ? '' : 's'} (${w.mockHours}h) · ${w.drillHours}h drilling`,
       `  ${w.focus}`,
       `  ${w.split.map((s) => `${s.short} ${s.hours}h`).join(' · ')}`,
+      ...w.topics.map((t) => `  ${t.short}: ${TOPIC_PREFIX[t.mode]}${t.topics.join(' · ')}`),
     );
     if (w.milestone) lines.push(`  ${w.milestone}`);
     lines.push('');
