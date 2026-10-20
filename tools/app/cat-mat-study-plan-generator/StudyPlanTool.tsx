@@ -5,6 +5,8 @@ import SoftGate, { Locked } from '../../components/SoftGate';
 import { CTA } from '../../lib/types';
 import Icon from '../../components/Icon';
 import { downloadPlanPdf } from '../../lib/plan-pdf';
+import type { Stream } from '../../lib/lead';
+import { EXAMS } from '../../calc/exam-dates';
 import {
   buildPlan, formatDay, todayIso,
   CONFIRMED_DATES, SECTIONS,
@@ -12,7 +14,12 @@ import {
 } from '../../calc/study-plan';
 
 const SLUG = 'cat-mat-study-plan-generator';
-const DEFAULT_DATE: Record<Exam, string> = { cat: '2026-11-29', mat: '2026-12-20' };
+// One source for the PGCET 2027 guess: the dates tool's row. KEA has not announced it.
+const PGCET_EXPECTED = EXAMS.find((e) => e.id === 'karnataka-pgcet')?.examDate ?? '2027-05-23';
+const DEFAULT_DATE: Record<Exam, string> = {
+  cat: '2026-11-29', mat: '2026-12-20', 'pgcet-mba': PGCET_EXPECTED, 'pgcet-mca': PGCET_EXPECTED,
+};
+const STREAM: Record<Exam, Stream> = { cat: 'CAT', mat: 'MAT', 'pgcet-mba': 'MBA', 'pgcet-mca': 'MCA' };
 
 const LEVELS: { id: Level; label: string }[] = [
   { id: 'fresh', label: 'Starting fresh' },
@@ -91,6 +98,8 @@ export default function StudyPlanTool() {
   const plan: StudyPlan | null = result?.ok ? result : null;
   const error = result && !result.ok ? result.error : null;
   const official = CONFIRMED_DATES.find((d) => d.exam === exam && d.date === examDate);
+  const pgcet = exam === 'pgcet-mba' || exam === 'pgcet-mca';
+  const next = pgcet ? CTA.pgcetMocks : CTA.matMocks;
 
   async function getPdf() {
     if (!plan || busy) return;
@@ -104,8 +113,9 @@ export default function StudyPlanTool() {
 
   return (
     <SoftGate
-      slug={SLUG}
-      stream={exam === 'cat' ? 'CAT' : 'MAT'}
+      // A 'pgcet' tool name is what files the lead under PGCET MBA / MCA in the sheet.
+      slug={pgcet ? 'pgcet-study-plan' : SLUG}
+      stream={STREAM[exam]}
       inputs={{ exam, examDate, hours: Number(hours), level, weakest }}
       heading="Unlock your full plan"
     >
@@ -121,6 +131,8 @@ export default function StudyPlanTool() {
           <select id={`${id}-exam`} value={exam} onChange={(e) => pickExam(e.target.value as Exam)}>
             <option value="cat">CAT 2026</option>
             <option value="mat">MAT December 2026</option>
+            <option value="pgcet-mba">Karnataka PGCET 2027 — MBA</option>
+            <option value="pgcet-mca">Karnataka PGCET 2027 — MCA</option>
           </select>
         </div>
 
@@ -129,7 +141,9 @@ export default function StudyPlanTool() {
           <input id={`${id}-date`} type="date" value={examDate} min={start || undefined}
                  onChange={(e) => setExamDate(e.target.value)} />
           <span className="field-note">
-            {official ? 'Confirmed by the exam body' : 'Expected date — check the official site'}
+            {official ? 'Confirmed by the exam body'
+              : pgcet ? 'Expected — KEA has not announced PGCET 2027 yet'
+              : 'Expected date — check the official site'}
           </span>
         </div>
 
@@ -188,6 +202,11 @@ export default function StudyPlanTool() {
             </div>
 
             <p className="muted" style={{ marginTop: 0 }}>{plan.shapeNote}</p>
+            {plan.flags.length ? (
+              <ul className="plan-flags">
+                {plan.flags.map((f) => <li key={f}>{f}</li>)}
+              </ul>
+            ) : null}
 
             <h3 style={{ marginTop: 'var(--s4)' }}>Where the time goes</h3>
             <div style={{ display: 'flex', height: 10, borderRadius: 999, overflow: 'hidden', margin: 'var(--s2) 0' }} aria-hidden="true">
@@ -213,7 +232,7 @@ export default function StudyPlanTool() {
                     lean on hardest — before you have spent them.
                   </p>
                   <div className="upsell-actions">
-                    <a className="btn btn-primary" href={CTA.matMocks.href}>{CTA.matMocks.label}</a>
+                    <a className="btn btn-primary" href={next.href}>{next.label}</a>
                   </div>
                 </aside>
                 <WeekTable weeks={plan.weeks} />

@@ -55,8 +55,8 @@ function Explainer() {
       <p>
         One rest day a week is removed from every total before you see it. Six study days at three
         hours reads as eighteen hours, not twenty-one, because a schedule that fills all seven days
-        is one you quietly stop following by week three. Mock hours come out too. A CAT mock is
-        booked at four and a half hours and a MAT mock at five, since the
+        is one you quietly stop following by week three. Mock hours come out too. A CAT or PGCET
+        mock is booked at four and a half hours and a MAT mock at five, since the
         analysis has to run longer than the paper for the mock to have been worth taking.
       </p>
 
@@ -101,6 +101,25 @@ function Explainer() {
         roughly 6% and will not give it more, even when you name it as your weakest section. Time
         moved there does not move your percentile, and fifteen minutes of news a day covers what
         the paper asks.
+      </p>
+      <p>
+        Karnataka PGCET is planned as two papers, MBA and MCA, because the only thing they share is
+        the format: 100 one-mark questions in 120 minutes on an OMR sheet, with no negative
+        marking. KEA publishes the syllabus but not how many questions each section gets, so the
+        split comes from the{' '}
+        <a href="https://cetonline.karnataka.gov.in/kea/QP2026">2026 papers KEA put online</a>.
+        The MBA paper ran 25 computer awareness, 15 reasoning, 15 quantitative, 15 English and 30
+        general knowledge questions. The MCA paper ran 30 maths, 25 computer awareness, 15
+        reasoning, 20 general awareness and 10 English. Time follows marks you can actually buy
+        per hour, not marks alone. General knowledge carries 30 MBA marks but moves slowly, so it
+        gets a daily news habit at about a quarter of your time rather than a third. Maths leads
+        the MCA plan at 36%, because it is the deepest syllabus and it comes first in the paper.
+      </p>
+      <p>
+        KEA has not announced PGCET 2027. In 2026 it set the paper for 24 May and then moved it to
+        14 June to avoid a clash with the UPSC preliminary exam. The planner aims at late May and
+        says so in the plan. A plan that ends three weeks early costs you nothing; one that ends
+        three weeks late costs you the taper.
       </p>
       <p>
         Your weakest section then takes a boost, drawn proportionally from the others. The boost

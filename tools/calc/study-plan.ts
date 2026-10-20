@@ -1,4 +1,4 @@
-// Week-by-week study plan for CAT and MAT.
+// Week-by-week study plan for CAT, MAT and Karnataka PGCET (MBA and MCA).
 //
 // The plan changes SHAPE with the runway; it does not scale. Thirteen weeks buys a
 // foundation phase. Three weeks does not, and pretending otherwise is how students
@@ -6,7 +6,7 @@
 // map is chosen by weeks-remaining and then capped by how far along the student says
 // they are — never by multiplying one template up or down.
 
-export type Exam = 'cat' | 'mat';
+export type Exam = 'cat' | 'mat' | 'pgcet-mba' | 'pgcet-mca';
 export type Level = 'fresh' | 'revising' | 'sprint';
 export type Shape = 'sprint' | 'condensed' | 'build';
 
@@ -16,7 +16,9 @@ export type Phase =
 
 export type SectionId =
   | 'varc' | 'dilr' | 'quant'                     // CAT
-  | 'lc' | 'ms' | 'da' | 'icr' | 'ige';           // MAT
+  | 'lc' | 'ms' | 'da' | 'icr' | 'ige'            // MAT
+  | 'comp' | 'reason' | 'english' | 'gk'          // PGCET MBA (+ 'quant')
+  | 'maths' | 'ga';                               // PGCET MCA (+ comp, reason, english)
 
 export interface Section {
   id: SectionId;
@@ -43,6 +45,28 @@ export const SECTIONS: Record<Exam, readonly Section[]> = {
     { id: 'icr', label: 'Intelligence & Critical Reasoning', short: 'ICR', base: 0.16 },
     { id: 'ige', label: 'Indian & Global Environment', short: 'IGE', base: 0.06 },
   ],
+  // KEA publishes the PGCET syllabus but not the section sizes, and the booklet prints
+  // no section breaks. These are counted from the 2026 papers on KEA's question-paper
+  // page (100 one-mark questions, no negative marking):
+  //   MBA  computer 1-25, reasoning 26-40, quant 41-55, English 56-70, GK 71-100
+  //   MCA  maths 1-30, computer 31-55, reasoning 56-70, general awareness 71-90, English 91-100
+  // Time follows marks per hour of study, not marks alone. GK and general awareness
+  // move slowly and reward a daily news habit, so they sit below their mark share;
+  // MBA quant leaned on statistics in 2026 and sits above it.
+  'pgcet-mba': [
+    { id: 'comp', label: 'Computer Awareness', short: 'Comp', base: 0.24 },
+    { id: 'reason', label: 'Analytical Ability & Logical Reasoning', short: 'LR', base: 0.18 },
+    { id: 'quant', label: 'Quantitative Analysis', short: 'QA', base: 0.20 },
+    { id: 'english', label: 'English Language', short: 'Eng', base: 0.14 },
+    { id: 'gk', label: 'General Knowledge', short: 'GK', base: 0.24 },
+  ],
+  'pgcet-mca': [
+    { id: 'maths', label: 'Mathematics', short: 'Maths', base: 0.36 },
+    { id: 'comp', label: 'Computer Awareness', short: 'Comp', base: 0.26 },
+    { id: 'reason', label: 'Analytical Ability & Logical Reasoning', short: 'LR', base: 0.16 },
+    { id: 'ga', label: 'General Awareness', short: 'GA', base: 0.12 },
+    { id: 'english', label: 'General English', short: 'Eng', base: 0.10 },
+  ],
 };
 
 export interface ExamMeta {
@@ -62,9 +86,20 @@ export const EXAM_META: Record<Exam, ExamMeta> = {
     paper: '150 minutes, five sections, 200 questions, and you move between sections freely.',
     source: 'https://mat.aima.in/',
   },
+  'pgcet-mba': {
+    name: 'PGCET 2027 (MBA)',
+    paper: '120 minutes, 100 one-mark questions on an OMR sheet, no negative marking. That was the 2026 format; check the 2027 bulletin, because KEA can change it.',
+    source: 'https://cetonline.karnataka.gov.in/kea/',
+  },
+  'pgcet-mca': {
+    name: 'PGCET 2027 (MCA)',
+    paper: '120 minutes, 100 one-mark questions on an OMR sheet, no negative marking. That was the 2026 format; check the 2027 bulletin, because KEA can change it.',
+    source: 'https://cetonline.karnataka.gov.in/kea/',
+  },
 };
 
-/** Dates published by the exam body. Anything else the user types is unverified. */
+/** Dates published by the exam body. Anything else the user types is unverified.
+ *  PGCET 2027 has none yet: KEA has not announced it. */
 export interface ExamDateOption { exam: Exam; date: string; label: string; }
 export const CONFIRMED_DATES: readonly ExamDateOption[] = [
   { exam: 'cat', date: '2026-11-29', label: 'CAT 2026 — Sunday 29 November 2026' },
@@ -87,34 +122,50 @@ const FOCUS: Record<Phase, Record<Exam, string>> = {
   foundation: {
     cat: 'Build the topics you do not have yet. One QA area and one DILR set type a week, plus an hour of unfamiliar non-fiction most days — reading width moves VARC further right now than any question bank does.',
     mat: 'Learn what you skipped. Arithmetic and algebra carry most of Mathematical Skills, and Data Analysis rewards calculation speed you build once and then keep.',
+    'pgcet-mba': 'Build the two blocks most graduates never studied: computer awareness and statistics. One computer topic a week — number systems, binary arithmetic, memory, operating systems — one quant area alongside, and twenty minutes of business news every day for GK.',
+    'pgcet-mca': 'Maths is 30 of the 100 marks, so it gets the foundation. One chapter a week from KEA\'s list — matrices and determinants, coordinate geometry, probability and statistics — with one computer topic alongside, starting with number systems and Boolean algebra, which feed both sections.',
   },
   repair: {
     cat: 'Fix only what is breaking. Take the three topics that cost you the most in your diagnostic, rebuild those, and leave the rest of the syllabus alone.',
     mat: 'Repair two weak areas, not five. Breadth beats depth on MAT, because a section you half know still returns marks across 40 questions.',
+    'pgcet-mba': 'Fix only what your diagnostic exposed. Rebuild the two weakest areas and leave the rest alone. Computer awareness and statistics repay repair fastest, because their question types repeat year to year.',
+    'pgcet-mca': 'Repair two areas, not five. If maths is one of them, work chapter by chapter down KEA\'s syllabus list rather than a textbook\'s order, since the paper samples every chapter lightly.',
   },
   application: {
     cat: 'Stop learning and start applying. Timed sets of 20 to 25 minutes, then a written note on every wrong question saying which of the three it was: technique, calculation, or reading.',
     mat: 'Move to timed sets. MAT asks for steady accuracy across 200 questions rather than depth on any one, so practise at the pace the paper actually demands.',
+    'pgcet-mba': 'Stop learning and start timing. A hundred questions in 120 minutes is 72 seconds each, and there is no negative marking, so practise finishing every question and guessing the ones you cannot crack.',
+    'pgcet-mca': 'Timed sets from here. Maths questions on this paper are short calculations, not proofs, so drill them at about a minute each and keep the clock for the 70 marks that come after them.',
   },
   sectional: {
     cat: 'Full sections on the clock, one at a time. Forty minutes, no pausing, then half an hour of analysis before you open anything else.',
     mat: 'Full sections on the clock. Thirty minutes a section is the real budget, so practise finishing rather than perfecting.',
+    'pgcet-mba': 'Full sections on the clock, in paper order: computer awareness, reasoning, quant, English, then the 30 GK questions. Note where the minutes go, because GK sits last and a slow start steals from it.',
+    'pgcet-mca': 'Full sections on the clock. Try two orders across the week — the paper\'s own, maths first, and the quick sections first — and keep whichever finishes more questions.',
   },
   triage: {
     cat: 'Revise what you already own. New topics this close cost more than they return. Drill your strong areas until they are automatic and take only the easy marks in the weak one.',
     mat: 'Revise, do not rebuild. Work through your own notes and formula sheet, then drill the question types you recognise on sight.',
+    'pgcet-mba': 'Revise what you already own. Computer facts and English idioms are pure recall, so they go on flashcards now. Leave any new quant topic alone.',
+    'pgcet-mca': 'Revise, do not rebuild. One page of maths formulas, one of computer facts — number systems, memory, operating-system terms — then drill the question types you recognise on sight.',
   },
   'mock-block': {
     cat: 'Two to three full mocks this week, each followed by an analysis longer than the mock. Your attempt-versus-accuracy pattern per section tells you more than the percentile does.',
     mat: 'Two to three full mocks with the analysis written down. Watch accuracy section by section rather than the composite.',
+    'pgcet-mba': 'Two to three full papers this week on a printed OMR sheet, each followed by an analysis longer than the paper. With no negative marking, your blank count should be zero.',
+    'pgcet-mca': 'Two to three full papers on a printed OMR sheet, with the analysis written down. Count marks lost to the clock separately from marks lost to mistakes.',
   },
   'mock-density': {
     cat: 'Mocks are the syllabus now. Take them at your slot time, analyse the same day, and carry exactly one fix into the next one.',
     mat: 'Take mocks at the time of day your paper runs. Same-day analysis, one correction carried forward each time.',
+    'pgcet-mba': 'Full papers at the time of day your paper runs, analysed the same day, with one fix carried into the next.',
+    'pgcet-mca': 'Full papers at the time of day your paper runs, analysed the same day, with one fix carried into the next.',
   },
   taper: {
     cat: 'Volume drops, sharpness holds. Two mocks early in the week, revision after that, and nothing new once the last one is done.',
     mat: 'Cut the volume. Two mocks early in the week, formula and vocabulary revision after that, and an early night before the paper.',
+    'pgcet-mba': 'Cut the volume. Two papers early in the week, flashcards after that, and nothing new. Pack the admit card, photo ID and two blue or black ballpoint pens the night before.',
+    'pgcet-mca': 'Cut the volume. Two papers early in the week, flashcards after that, and nothing new. Pack the admit card, photo ID and two blue or black ballpoint pens the night before.',
   },
 };
 
@@ -122,40 +173,58 @@ const PHASE_MILESTONE: Record<Phase, Record<Exam, string>> = {
   foundation: {
     cat: 'Checkpoint: by the end of this phase you should name the topic behind any question in about ten seconds, even when you cannot solve it yet.',
     mat: 'Checkpoint: you should be able to start every Mathematical Skills question without hunting for the method first.',
+    'pgcet-mba': 'Checkpoint: you convert between binary, decimal and hexadecimal without a table, and start any mean, median or correlation question without hunting for the formula.',
+    'pgcet-mca': 'Checkpoint: you can start a question from every maths chapter on KEA\'s list, Boolean algebra and conics included, without opening the textbook.',
   },
   repair: {
     cat: 'Checkpoint: write down the three costliest topics from your diagnostic. They are the only new work you take on.',
     mat: 'Checkpoint: name the two sections dragging your composite down, and cap your new learning to those.',
+    'pgcet-mba': 'Checkpoint: name the two sections costing you the most marks in your diagnostic. They are the only new work you take on.',
+    'pgcet-mca': 'Checkpoint: name the two sections costing you the most marks in your diagnostic. They are the only new work you take on.',
   },
   application: {
     cat: 'Checkpoint: every set from here runs on a clock. When you cannot finish, record what you would have skipped instead of finishing anyway.',
     mat: 'Checkpoint: you finish a 40-question section inside 30 minutes, even if the accuracy is not there yet.',
+    'pgcet-mba': 'Checkpoint: 100 questions inside 120 minutes with every bubble filled, even if the accuracy is not there yet.',
+    'pgcet-mca': 'Checkpoint: 100 questions inside 120 minutes with every bubble filled, even if the accuracy is not there yet.',
   },
   sectional: {
     cat: 'Checkpoint: one full section, real clock, no pausing, start to finish.',
     mat: 'Checkpoint: one full section at exam pace, then the analysis, on the same day.',
+    'pgcet-mba': 'Checkpoint: one full section at exam pace, then the analysis, on the same day.',
+    'pgcet-mca': 'Checkpoint: one full section at exam pace, then the analysis, on the same day.',
   },
   triage: {
     cat: 'Checkpoint: your formula sheet and error log exist and are one page each. If they do not exist yet, that is this week’s first job.',
     mat: 'Checkpoint: one page of formulas, one page of errors. Build them now, because you will read nothing else in the last three days.',
+    'pgcet-mba': 'Checkpoint: one page of computer facts, one of quant formulas, one of errors. You will read nothing else in the last three days.',
+    'pgcet-mca': 'Checkpoint: one page of maths formulas, one of computer facts, one of errors. You will read nothing else in the last three days.',
   },
   'mock-block': {
     cat: 'Checkpoint: your mock scores should stop swinging. A steady band beats one high score you cannot repeat.',
     mat: 'Checkpoint: sectional accuracy should be steady across your last three mocks.',
+    'pgcet-mba': 'Checkpoint: your last three papers sit in a narrow band, and none of them has a blank answer.',
+    'pgcet-mca': 'Checkpoint: your last three papers sit in a narrow band, and none of them has a blank answer.',
   },
   'mock-density': {
     cat: 'Checkpoint: same slot, same rules, same-day analysis. Treat every mock as the real thing from here.',
     mat: 'Checkpoint: same start time as your paper, full 150 minutes, no breaks.',
+    'pgcet-mba': 'Checkpoint: same start time as your paper, the full 120 minutes, an OMR sheet, no breaks.',
+    'pgcet-mca': 'Checkpoint: same start time as your paper, the full 120 minutes, an OMR sheet, no breaks.',
   },
   taper: {
     cat: 'Checkpoint: no new topic and no new material. Rehearse exam morning, including travel time, food, and the admit card.',
     mat: 'Checkpoint: nothing new. Rehearse the morning of the paper, including travel and the documents you have to carry.',
+    'pgcet-mba': 'Checkpoint: nothing new. Rehearse exam morning, including travel to the centre and the documents you carry.',
+    'pgcet-mca': 'Checkpoint: nothing new. Rehearse exam morning, including travel to the centre and the documents you carry.',
   },
 };
 
 const DIAGNOSTIC: Record<Exam, string> = {
   cat: 'Take one full mock this week before anything else. Record section-wise accuracy and time per question. The score is not the point; the pattern is.',
   mat: 'Take one full mock this week before anything else. Record accuracy per section. You need to know which four sections carry your composite before you spend a single hour.',
+  'pgcet-mba': 'Sit KEA\'s own 2026 MBA paper this week before anything else; it is free on the KEA website. Score it section by section. The total is not the point; which block loses you marks is.',
+  'pgcet-mca': 'Sit KEA\'s own 2026 MCA paper this week before anything else; it is free on the KEA website. Score it section by section, and time the maths block on its own.',
 };
 
 const SHAPE_NOTE: Record<Shape, string> = {
@@ -170,7 +239,7 @@ const PLANNED_MOCKS: Record<Phase, number> = {
 };
 
 /** One mock plus the analysis that makes it worth taking. */
-const MOCK_HOURS: Record<Exam, number> = { cat: 4.5, mat: 5 };
+const MOCK_HOURS: Record<Exam, number> = { cat: 4.5, mat: 5, 'pgcet-mba': 4.5, 'pgcet-mca': 4.5 };
 /** One rest day a week is built in. A plan without one is a plan you abandon. */
 const REST_FACTOR = 6 / 7;
 const BOOST: Record<Shape, number> = { build: 0.10, condensed: 0.07, sprint: 0.04 };
@@ -397,7 +466,6 @@ export function buildPlan(input: PlanInput): PlanResult {
   }));
 
   const flags: string[] = [];
-  const weakLabel = sections.find((s) => s.id === weakest)?.short ?? '';
 
   if (hoursPerDay > 8) {
     flags.push('Eight-plus hours a day reads well on paper and usually collapses in week two. Plan for the number you will still be doing in week six.');
@@ -414,21 +482,28 @@ export function buildPlan(input: PlanInput): PlanResult {
   if (weakest === 'ige') {
     flags.push('AIMA builds the MAT composite score from four sections and keeps Indian & Global Environment outside it, so this plan gives IGE a small fixed slice rather than a full weak-section boost. Fifteen minutes of news a day covers it.');
   }
+  const dateConfirmed = CONFIRMED_DATES.some((d) => d.exam === exam && d.date === input.examDate);
+  if (exam.startsWith('pgcet') && !dateConfirmed) {
+    flags.push('KEA has not announced PGCET 2027. The 2026 paper was first set for 24 May and moved to 14 June, so plan for late May and regenerate this plan the day the bulletin is out. If the date lands later, spend the extra weeks on full papers.');
+  }
   if (totalWeeks === 1) {
     flags.push('One week left, so nothing new goes in. Sleep, timing, and your own error log are the only things that still move the score.');
   }
 
+  // The weak-section boost does not always make it the biggest slice (MCA maths
+  // outweighs a boosted English), so name the section that really is.
+  const heaviest = split.reduce((a, b) => (b.share > a.share ? b : a));
   const weekWord = totalWeeks === 1 ? 'week' : 'weeks';
   const headline =
     `${totalWeeks} ${weekWord} to ${EXAM_META[exam].name} at ${hoursPerDay} hours a day: about ` +
-    `${totalHours} study hours, ${totalMocks} full mocks, and the heaviest slice on ${weakLabel}.`;
+    `${totalHours} study hours, ${totalMocks} full mocks, and the heaviest slice on ${heaviest.short}.`;
 
   return {
     ok: true,
     exam,
     examName: EXAM_META[exam].name,
     examDate: input.examDate,
-    dateConfirmed: CONFIRMED_DATES.some((d) => d.exam === exam && d.date === input.examDate),
+    dateConfirmed,
     start: input.start,
     daysLeft,
     shape,

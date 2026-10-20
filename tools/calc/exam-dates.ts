@@ -264,12 +264,15 @@ export const EXAMS: Exam[] = [
     conductedBy: 'Karnataka Examinations Authority (KEA)',
     stream: 'both',
     site: 'https://cetonline.karnataka.gov.in/kea/',
-    examDate: '2027-07-01',
-    examLabel: 'Expected July 2027',
+    // KEA set the 2026 MBA/MCA paper for 24 May, then moved it to 14 June because
+    // of a UPSC prelims clash (notice of 10-05-2026). Registration ran 23 March to
+    // 8 April. Plan for the earlier date: a plan that ends early wastes nothing.
+    examDate: '2027-05-23',
+    examLabel: 'Expected late May to mid-June 2027',
     examConfirmed: false,
-    regOpens: '2027-04-01',
-    regCloses: '2027-05-31',
-    regLabel: 'Expected around April to May 2027, on the KEA portal.',
+    regOpens: '2027-03-22',
+    regCloses: '2027-04-09',
+    regLabel: 'Expected late March to early April 2027, on the KEA portal. The 2026 window ran 23 March to 8 April.',
     regConfirmed: false,
     note: 'The 2026 cycle has concluded. KEA counselling and seat allotment against it are the live activity right now, not the exam.',
   },

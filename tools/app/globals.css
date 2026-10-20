@@ -1142,3 +1142,7 @@ html:has(.lead-dialog[open]) { overflow: hidden; }
   .lcp .lead-form { padding: 18px; }
 }
 @media (prefers-reduced-motion: reduce) { .lcp .tool-menu-toggle svg { transition: none; } }
+
+/* The plan's honest caveats: an unannounced exam date, hours nobody keeps up. */
+.lcp .plan-flags { list-style: none; padding: 0; margin: var(--s3) 0 0; display: grid; gap: var(--s2); }
+.lcp .plan-flags li { border-left: 3px solid var(--amber); padding-left: var(--s3); font-size: 14px; color: var(--ink); }

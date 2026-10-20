@@ -41,7 +41,7 @@ const GROUPS: Record<ExamFamily, { heading: string; blurb: ReactNode }> = {
   },
   pgcet: {
     heading: 'Karnataka PGCET',
-    blurb: <>Exam done. <a href="https://cetonline.karnataka.gov.in/kea/">KEA counselling</a> is where the decisions happen now.</>,
+    blurb: <>2026 is done and <a href="https://cetonline.karnataka.gov.in/kea/">KEA counselling</a> is where the decisions happen. Writing in 2027? The study plan covers MBA and MCA.</>,
   },
   general: {
     heading: 'Works for any entrance',

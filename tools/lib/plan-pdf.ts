@@ -80,6 +80,22 @@ export async function downloadPlanPdf(plan: StudyPlan): Promise<void> {
   });
   y += 6;
 
+  if (plan.flags.length) {
+    doc.setTextColor(...INK);
+    doc.setFontSize(12);
+    doc.text('Worth knowing', M, y);
+    y += 6;
+    doc.setFontSize(9);
+    doc.setTextColor(...MUTED);
+    plan.flags.forEach((f) => {
+      const lines = doc.splitTextToSize(f, W - M * 2 - 4);
+      room(lines.length * 4 + 3);
+      doc.text(lines, M + 4, y);
+      y += lines.length * 4 + 3;
+    });
+    y += 4;
+  }
+
   // Week by week — the detail the screen deliberately omits
   doc.setTextColor(...INK);
   doc.setFontSize(12);

@@ -2,19 +2,22 @@ import { CTA, type ToolConfig } from '../lib/types.ts';
 
 const tool: ToolConfig = {
   slug: 'cat-mat-study-plan-generator',
-  title: 'CAT & MAT Study Plan Generator: weeks to exam day',
+  title: 'CAT, MAT & PGCET Study Plan Generator: weeks to exam day',
   tagline:
     'Give it your exam date, the hours you actually have, and your weakest section. It returns a week-by-week plan with the sectional split and the mock checkpoints already placed.',
-  eyebrow: 'CAT & MAT · Study planner',
+  eyebrow: 'CAT · MAT · PGCET · Study planner',
   family: 'cat',
-  alsoServes: ['mat'],
+  alsoServes: ['mat', 'pgcet'],
   description:
-    'Free CAT and MAT study plan generator. Enter your exam date, daily hours and weakest section for a week-by-week plan with mock checkpoints.',
+    'Free study plan generator for CAT, MAT and Karnataka PGCET MBA and MCA. Enter exam date, daily hours and weakest section for a week-by-week plan.',
   keywords: [
     'cat study plan',
     'mat study plan',
     'cat 2026 study plan',
-    'mat september 2026 preparation',
+    'mat december 2026 preparation',
+    'pgcet 2027 study plan',
+    'pgcet mba preparation plan',
+    'pgcet mca preparation plan',
     'cat 3 month preparation plan',
     'mat 3 week plan',
     'study plan generator mba entrance',
@@ -39,11 +42,15 @@ const tool: ToolConfig = {
     },
     {
       q: 'How many mocks should I take before the exam?',
-      a: 'Take as many as you can analyse properly, which is the real limit. The plan budgets four and a half hours for a CAT mock and five for a MAT mock, because the analysis has to be longer than the paper. One mock a fortnight during foundation is enough while you are still learning topics. Two a week once you are applying them, three a week in the mock block, and two in the final week with nothing new after the last one.',
+      a: 'Take as many as you can analyse properly, which is the real limit. The plan budgets four and a half hours for a CAT or PGCET mock and five for a MAT mock, because the analysis has to be longer than the paper. One mock a fortnight during foundation is enough while you are still learning topics. Two a week once you are applying them, three a week in the mock block, and two in the final week with nothing new after the last one.',
     },
     {
       q: 'Does the plan cover MAT’s Indian & Global Environment section?',
       a: 'It gives it a small fixed slice and refuses to give it more. AIMA builds the MAT composite score from four sections and keeps Indian & Global Environment outside it, so hours moved there do not move your percentile. Fifteen minutes of news a day covers what you need. If you pick IGE as your weakest section the plan says so rather than quietly handing it a tenth of your preparation.',
+    },
+    {
+      q: 'Does it plan for Karnataka PGCET MBA and MCA?',
+      a: 'Yes, as two separate papers, because they share almost nothing but the format: 100 one-mark questions in 120 minutes on an OMR sheet, with no negative marking. KEA does not publish section sizes, so the plan uses the 2026 papers on its own website. MBA ran 25 computer awareness, 15 reasoning, 15 quantitative, 15 English and 30 general knowledge questions. MCA ran 30 maths, 25 computer awareness, 15 reasoning, 20 general awareness and 10 English. KEA has not announced PGCET 2027. The 2026 paper was first set for 24 May and moved to 14 June, so the plan aims at late May and tells you so. Regenerate it the day the bulletin is out.',
     },
     {
       q: 'Why does the plan ask for my WhatsApp number?',
@@ -60,6 +67,7 @@ const tool: ToolConfig = {
     'mba-exam-eligibility-checker',
     'mba-cost-and-roi-calculator',
     'cgpa-percentage-converter',
+    'pgcet-college-predictor',
   ],
   gate: 'soft',
   cta: CTA.matMocks,
@@ -67,6 +75,7 @@ const tool: ToolConfig = {
   sources: [
     { label: 'IIM CAT 2026 — official site', href: 'https://iimcat.ac.in/' },
     { label: 'AIMA MAT 2026 — official site', href: 'https://mat.aima.in/' },
+    { label: 'KEA — PGCET 2026 question papers', href: 'https://cetonline.karnataka.gov.in/kea/QP2026' },
   ],
 };
 

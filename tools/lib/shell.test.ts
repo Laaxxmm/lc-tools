@@ -140,7 +140,7 @@ test('a slug with no config is dropped rather than rendered as a dead link', () 
 test('a tool appears under every family it serves, not just its ground colour', () => {
   const studyPlan = TOOLS.find((t) => t.slug === 'cat-mat-study-plan-generator');
   assert.ok(studyPlan, 'study plan tool must exist');
-  assert.deepEqual(studyPlan.alsoServes, ['mat']);
+  assert.deepEqual(studyPlan.alsoServes, ['mat', 'pgcet']);
 
   const groups = groupByFamily(TOOLS);
   const mat = groups.find((g) => g.family === 'mat');

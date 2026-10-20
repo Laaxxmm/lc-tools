@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildPlan, planToText, sectionShares, shapeFor, todayIso, SECTIONS,
-  type StudyPlan, type PlanInput,
+  type Exam, type StudyPlan, type PlanInput,
 } from './study-plan.ts';
 
 const TODAY = '2026-08-26';
@@ -74,7 +74,7 @@ test('level caps the shape: final sprint never gets a foundation phase', () => {
 });
 
 test('shares always sum to 1 and the weakest section gets the biggest boost far out', () => {
-  for (const exam of ['cat', 'mat'] as const) {
+  for (const exam of Object.keys(SECTIONS) as Exam[]) {
     for (const s of SECTIONS[exam]) {
       for (const shape of ['build', 'condensed', 'sprint'] as const) {
         const shares = sectionShares(exam, s.id, shape);
@@ -148,4 +148,42 @@ test('the downloadable text carries every week and the official source', () => {
 test('todayIso reads the local calendar date, not UTC', () => {
   assert.equal(todayIso(new Date(2026, 7, 26, 0, 30)), '2026-08-26');
   assert.equal(todayIso(new Date(2026, 0, 1, 23, 59)), '2026-01-01');
+});
+
+test('PGCET MBA and MCA are separate papers with KEA\'s own five sections each', () => {
+  assert.deepEqual(SECTIONS['pgcet-mba'].map((x) => x.id), ['comp', 'reason', 'quant', 'english', 'gk']);
+  assert.deepEqual(SECTIONS['pgcet-mca'].map((x) => x.id), ['maths', 'comp', 'reason', 'ga', 'english']);
+  for (const exam of ['pgcet-mba', 'pgcet-mca'] as const) {
+    const base = SECTIONS[exam].reduce((t, x) => t + x.base, 0);
+    assert.ok(Math.abs(base - 1) < 1e-9, `${exam} base shares sum to ${base}`);
+  }
+});
+
+test('PGCET 2027 from 20 Oct is a long build that admits the date is a guess', () => {
+  const p = plan({ exam: 'pgcet-mba', start: '2026-10-20', examDate: '2027-05-23', weakest: 'gk' });
+  assert.equal(p.daysLeft, 215);
+  assert.equal(p.weeks.length, 31);
+  assert.equal(p.shape, 'build');
+  assert.deepEqual(phases(p), ['foundation', 'application', 'mock-block', 'taper']);
+  assert.equal(p.dateConfirmed, false);
+  assert.ok(p.flags.some((f) => f.includes('KEA has not announced PGCET 2027')));
+  assert.ok(p.weeks[0].milestone?.includes('2026 MBA paper'));
+  const txt = planToText(p);
+  assert.ok(txt.includes('https://cetonline.karnataka.gov.in/kea/'));
+  assert.ok(txt.includes('not verified by us'));
+});
+
+test('the headline names the real heaviest section, not just the boosted one', () => {
+  // A boosted MCA English (10% + 10%) still trails maths, so saying "heaviest slice on
+  // English" would be false.
+  const p = plan({ exam: 'pgcet-mca', start: '2026-10-20', examDate: '2027-05-23', weakest: 'english' });
+  const top = p.split.reduce((a, b) => (b.share > a.share ? b : a));
+  assert.equal(top.id, 'maths');
+  assert.ok(p.headline.endsWith('heaviest slice on Maths.'), p.headline);
+  assert.ok(plan().headline.endsWith('heaviest slice on QA.'));
+});
+
+test('CAT and MAT plans carry no PGCET date warning', () => {
+  assert.ok(!plan().flags.some((f) => f.includes('PGCET')));
+  assert.ok(!plan({ exam: 'mat', examDate: '2026-12-20', weakest: 'ms' }).flags.some((f) => f.includes('PGCET')));
 });
