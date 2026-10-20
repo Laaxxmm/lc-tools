@@ -31,7 +31,7 @@ const tool: ToolConfig = {
     },
     {
       q: 'Can I still do something useful for MAT with three weeks left?',
-      a: 'Yes, and the plan looks nothing like a three-month plan. With MAT on 13 September you get roughly 18 days, which is one triage week, one high-density mock week, and a taper. You revise what you already own, drill the question types you recognise on sight, and take mocks at the time of day your paper runs. What you do not do is start a new topic. Three weeks is not enough to build Mathematical Skills from scratch, and the hours spent trying come out of the sections that were already going to score.',
+      a: 'Yes, and the plan looks nothing like a three-month plan. Eighteen days out — where MAT December’s paper-based test sits from the start of December — is one triage week, one high-density mock week, and a taper. You revise what you already own, drill the question types you recognise on sight, and take mocks at the time of day your paper runs. What you do not do is start a new topic. Three weeks is not enough to build Mathematical Skills from scratch, and the hours spent trying come out of the sections that were already going to score.',
     },
     {
       q: 'Should I spend most of my time on my weakest section?',
@@ -46,12 +46,12 @@ const tool: ToolConfig = {
       a: 'It gives it a small fixed slice and refuses to give it more. AIMA builds the MAT composite score from four sections and keeps Indian & Global Environment outside it, so hours moved there do not move your percentile. Fifteen minutes of news a day covers what you need. If you pick IGE as your weakest section the plan says so rather than quietly handing it a tenth of your preparation.',
     },
     {
-      q: 'What do I get if I enter my email and phone number?',
-      a: 'The downloadable copy of the plan, and nothing else is held back. Every week, every hour split, every checkpoint and every warning is on this page before you type anything. The download exists so the plan lives somewhere other than a browser tab. The WhatsApp checkbox is separate and unticked; leave it alone if you do not want exam updates.',
+      q: 'Why does the plan ask for my WhatsApp number?',
+      a: 'The shape of the plan is free: days left, total hours, the section split and the first two weeks are on this page before you type anything. The remaining weeks and the printable PDF sit behind one short form — your name and WhatsApp number — so we can send you the plan and exam updates. You fill it once and it unlocks every Learn Crew tool for 30 days. Reply STOP on WhatsApp any time, or ask us to delete your details.',
     },
     {
       q: 'I am writing both CAT and MAT. Which one do I plan for?',
-      a: 'Generate the nearer one first. MAT on 13 or 20 September sits inside your CAT foundation phase, so run the MAT plan, let it own those weeks, then generate the CAT plan starting the day after your MAT. The overlap is smaller than it looks: MAT rewards speed and breadth across 200 questions, CAT rewards depth inside a locked 40-minute section, and the fortnight you spend on MAT speed does no harm to CAT.',
+      a: 'Generate the nearer one first. CAT on 29 November comes before MAT December, so run the CAT plan, let it own the weeks up to CAT day, then generate the MAT plan starting the day after — three weeks to the paper-based test on 20 December, four to the computer-based one on the 27th. The overlap is smaller than it looks: CAT rewards depth inside a locked 40-minute section, MAT rewards speed and breadth across 200 questions, and the three weeks you then spend on MAT speed cost CAT nothing because CAT is already behind you.',
     },
   ],
   related: [
@@ -61,9 +61,9 @@ const tool: ToolConfig = {
     'mba-cost-and-roi-calculator',
     'cgpa-percentage-converter',
   ],
-  gate: 'email+phone',
+  gate: 'soft',
   cta: CTA.matMocks,
-  updated: '2026-08-26',
+  updated: '2026-10-20',
   sources: [
     { label: 'IIM CAT 2026 — official site', href: 'https://iimcat.ac.in/' },
     { label: 'AIMA MAT 2026 — official site', href: 'https://mat.aima.in/' },

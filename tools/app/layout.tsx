@@ -64,7 +64,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {/* The ribbon promises rolling admissions, so it lands on the contact
               page, where the reader can enrol. */}
           <a href="https://learncrew.org/contact/">
-            <strong>Rolling admissions</strong> — join any week · Live classes Mon · Wed · Fri, 6:30–8 PM IST{' '}
+            <strong>Rolling admissions</strong>
+            {/* Two lengths: the long line wraps to two rows on a phone and pushes
+                the tool itself further below the fold. */}
+            <span className="ann-long"> — join any week · Live classes Mon · Wed · Fri, 6:30–8 PM IST</span>
+            <span className="ann-short"> · Live Mon · Wed · Fri, 6:30 PM</span>{' '}
             <span className="lc-arrow" aria-hidden="true">&rarr;</span>
           </a>
         </div>
@@ -81,8 +85,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <a key={p.href} href={p.href}>{p.label}</a>
               ))}
             </nav>
+            {/* On a phone this was hidden outright, leaving the header a logo and an
+                empty bar. The money action stays; the label shortens. */}
             <a className="btn btn-primary lc-header-cta" href="https://learncrew.org/contact/">
-              Book a free demo
+              <span className="cta-long">Book a free demo</span>
+              <span className="cta-short">Free demo</span>
             </a>
           </div>
         </header>

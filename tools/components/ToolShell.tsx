@@ -22,7 +22,7 @@ interface Props {
 // the LMS, where it inherits the Management ladder at Rs.999.
 const RAIL: Record<string, RailOffer[]> = {
   mat: [
-    { eyebrow: 'MAT · 13 September', title: 'Full-length MAT papers',
+    { eyebrow: 'MAT · 20 December', title: 'Full-length MAT papers',
       href: 'https://learn.learncrew.org/tests/1279/management-aptitude-test-mat',
       cta: 'Get the MAT series', icon: 'clock' },
     { eyebrow: 'Books & ebooks', title: 'Solved papers and topic books',
@@ -154,7 +154,12 @@ export default function ToolShell({ tool, children, explainer }: Props) {
         </div>
       </section>
       <BuyRail offers={RAIL[tool.family] ?? RAIL.general} />
-      <UpdatesPopup tool={tool.slug} exam={EXAM_NAME[tool.family] ?? 'MBA entrance'} />
+      {/* A soft-gated tool already asks for the WhatsApp number at the moment it
+          matters. A second popup asking for the same number, landing on a phone
+          right as the student reaches the gate, covered the whole screen. */}
+      {tool.gate === 'soft' ? null : (
+        <UpdatesPopup tool={tool.slug} exam={EXAM_NAME[tool.family] ?? 'MBA entrance'} />
+      )}
     </article>
   );
 }

@@ -9,6 +9,9 @@ import {
 import raw from '../../data/pgcet-cutoffs.json' with { type: 'json' };
 import KpiRow from '../../components/KpiRow';
 import ToolForm from '../../components/ToolForm';
+import SoftGate, { Locked } from '../../components/SoftGate';
+import { PredictorUpsell } from '../../components/Upsell';
+import type { Prediction } from '../../calc/pgcet-predictor.ts';
 
 const DATA = raw as unknown as CutoffData;
 
@@ -17,6 +20,42 @@ const DATA = raw as unknown as CutoffData;
 // reachable programme first, which is the end a student is choosing from, so the
 // first page is the useful one -- and the PDF carries every row regardless.
 const PAGE = 40;
+// The value-first gate: the answer and the top of the list are free, the rest
+// of the list and the PDF need one WhatsApp form.
+const FREE_ROWS = 3;
+const TEASER_ROWS = 3;
+
+function Row({ r }: { r: Prediction }) {
+  return (
+    <li className={`card pc-row pc-${r.chance}`}>
+      <div className="pc-head">
+        <p className="pc-name">{r.collegeName}</p>
+        <span className={`pc-tag pc-tag-${r.chance}`}>{CHANCE_LABEL[r.chance]}</span>
+      </div>
+      <p className="pc-prog">
+        {r.programme}
+        <span className="pc-college-code">{r.collegeCode}</span>
+        {r.city ? <span className="pc-city">{r.city}</span> : null}
+      </p>
+      <p className="pc-years">
+        <span>
+          <span className="pc-y">Round 1</span>{' '}
+          {r.round1 != null ? r.round1.toLocaleString('en-IN') : <span className="muted">none</span>}
+        </span>
+        <span>
+          <span className="pc-y">Round 2</span>{' '}
+          {r.round2 != null ? r.round2.toLocaleString('en-IN') : <span className="muted">nothing left</span>}
+        </span>
+        {r.tightened ? (
+          <span className="pc-tight" title="Round 2 closed at a better rank than round 1">
+            tightened in round 2
+          </span>
+        ) : null}
+      </p>
+    </li>
+  );
+}
+const rowKey = (r: Prediction) => `${r.collegeCode}-${r.programme}`;
 
 // Counted from the payload rather than typed into the copy, so the sentence in
 // the non-Karnataka panel cannot drift away from what actually shipped.
@@ -85,6 +124,13 @@ export default function Predictor() {
   }
 
   return (
+    <SoftGate
+      slug="pgcet-college-predictor"
+      stream={course}
+      inputs={{ rank: Number.isFinite(parsed) ? parsed : null, category, seat, course, city: liveCity, round }}
+      heading="Unlock your full college list"
+    >
+    {({ unlocked, request }) => (
     <>
       <ToolForm title="Your PGCET rank">
         <div className="field">
@@ -214,60 +260,48 @@ export default function Predictor() {
                 </p>
               </div>
               <div className="pc-dl">
-                <button type="button" className="btn btn-primary" onClick={onDownload}
+                <button type="button" className="btn btn-primary" onClick={() => request(onDownload)}
                   disabled={pdfState === 'working'}>
                   {pdfState === 'working' ? 'Building PDF…' : 'Download all as PDF'}
                 </button>
                 <p className="muted pc-dl-note">
                   {pdfState === 'failed'
                     ? 'Could not build the PDF. Check your connection and try again.'
-                    : `All ${results.length.toLocaleString('en-IN')} rows, ready for option entry.`}
+                    : unlocked
+                      ? `All ${results.length.toLocaleString('en-IN')} rows, ready for option entry.`
+                      : 'Free with your WhatsApp number — every row, ready for option entry.'}
                 </p>
               </div>
             </div>
 
-            <ul className="pc-list">
-              {shown.map((r) => (
-                <li className={`card pc-row pc-${r.chance}`} key={`${r.collegeCode}-${r.programme}`}>
-                  <div className="pc-head">
-                    <p className="pc-name">{r.collegeName}</p>
-                    <span className={`pc-tag pc-tag-${r.chance}`}>{CHANCE_LABEL[r.chance]}</span>
-                  </div>
-                  <p className="pc-prog">
-                    {r.programme}
-                    <span className="pc-college-code">{r.collegeCode}</span>
-                    {r.city ? <span className="pc-city">{r.city}</span> : null}
+            {unlocked ? (
+              <>
+                <ul className="pc-list">
+                  {shown.map((r) => <Row key={rowKey(r)} r={r} />)}
+                </ul>
+                {results.length > PAGE && !showAll ? (
+                  <p className="pc-more">
+                    <button type="button" className="btn btn-ghost" onClick={() => setShowAll(true)}>
+                      Show the remaining {(results.length - PAGE).toLocaleString('en-IN')}
+                    </button>
                   </p>
-                  <p className="pc-years">
-                    <span>
-                      <span className="pc-y">Round 1</span>{' '}
-                      {r.round1 != null
-                        ? r.round1.toLocaleString('en-IN')
-                        : <span className="muted">none</span>}
-                    </span>
-                    <span>
-                      <span className="pc-y">Round 2</span>{' '}
-                      {r.round2 != null
-                        ? r.round2.toLocaleString('en-IN')
-                        : <span className="muted">nothing left</span>}
-                    </span>
-                    {r.tightened ? (
-                      <span className="pc-tight" title="Round 2 closed at a better rank than round 1">
-                        tightened in round 2
-                      </span>
-                    ) : null}
-                  </p>
-                </li>
-              ))}
-            </ul>
-
-            {results.length > PAGE && !showAll ? (
-              <p className="pc-more">
-                <button type="button" className="btn btn-ghost" onClick={() => setShowAll(true)}>
-                  Show the remaining {(results.length - PAGE).toLocaleString('en-IN')}
-                </button>
-              </p>
-            ) : null}
+                ) : null}
+                {course !== 'MTECH' ? <PredictorUpsell rank={parsed} course={course} /> : null}
+              </>
+            ) : (
+              <>
+                <ul className="pc-list">
+                  {results.slice(0, FREE_ROWS).map((r) => <Row key={rowKey(r)} r={r} />)}
+                </ul>
+                {results.length > FREE_ROWS ? (
+                  <Locked hidden={results.length - FREE_ROWS} noun="programmes" onUnlock={() => request()}>
+                    <ul className="pc-list">
+                      {results.slice(FREE_ROWS, FREE_ROWS + TEASER_ROWS).map((r) => <Row key={rowKey(r)} r={r} />)}
+                    </ul>
+                  </Locked>
+                ) : null}
+              </>
+            )}
 
             <p className="muted pc-src">
               Closing ranks as published by the Karnataka Examinations Authority for PGCET{' '}
@@ -288,5 +322,7 @@ export default function Predictor() {
         <Link href="/mba-exam-eligibility-checker/">Check PGCET eligibility</Link>.
       </p>
     </>
+    )}
+    </SoftGate>
   );
 }

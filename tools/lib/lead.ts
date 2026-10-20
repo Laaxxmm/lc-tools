@@ -3,38 +3,84 @@
 
 import { getAttribution, type Attribution } from './attribution.ts';
 
+export type Stream = 'MBA' | 'MCA' | 'MTECH' | 'CAT' | 'MAT';
+export type Segment = '2027_FINAL_YEAR' | '2027_WORKING_PRO_REPEATER' | '2026_ADMITTED_FRESHER';
+
 export interface LeadPayload {
   /** The team works from a leads sheet whose rows all carry a name. */
   name?: string;
-  email: string;
+  /** Optional on the WhatsApp gate; required where the deliverable is an email. */
+  email?: string;
   phone?: string;
   whatsappConsent: boolean;
   tool: string;
+  stream?: Stream;
+  segment?: Segment;
   payload?: Record<string, unknown>;
   website?: string;             // honeypot — must stay empty
   /** Where the visitor came from. Attached by submitLead, not by callers. */
   attribution?: Attribution;
 }
 
+/** Which contact field a form actually depends on. */
+export type Need = 'email' | 'phone' | 'either' | 'both';
+
+/**
+ * Flip to true once wp/lc-leads.php v1.1 is uploaded to mu-plugins.
+ *
+ * The tools deploy on every push; the WordPress handler is uploaded by hand. The
+ * old handler rejects any lead without an email, so a WhatsApp-only form going
+ * live first would show students "Enter a valid email address" on a form with
+ * no email box — and every lead would be lost. While false, the soft gate also
+ * asks for email, which both handlers accept.
+ */
+export const PHONE_ONLY_LEADS = false;
+
 export const LEAD_ENDPOINT = '/wp-json/lc/v1/lead';
 
-export function validateLead(l: LeadPayload): string | null {
+/**
+ * A 10-digit Indian mobile, from whatever the student typed: spaces, dashes, a
+ * leading 0, or +91 are all common on a phone keyboard. null if it cannot be one.
+ */
+export function indianMobile(raw: string | undefined): string | null {
+  let d = (raw ?? '').replace(/\D/g, '');
+  if (d.length === 12 && d.startsWith('91')) d = d.slice(2);
+  else if (d.length === 11 && d.startsWith('0')) d = d.slice(1);
+  return /^[6-9]\d{9}$/.test(d) ? d : null;
+}
+
+export function validateLead(l: LeadPayload, need: Need = 'email'): string | null {
   if (l.website) return 'Something went wrong. Please try again.';
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(l.email)) return 'Enter a valid email address.';
-  if (l.phone !== undefined && l.phone !== '') {
-    const digits = l.phone.replace(/\D/g, '');
+  const email = (l.email ?? '').trim();
+  const phone = (l.phone ?? '').trim();
+
+  // Whatever is supplied must be valid, whichever field the form depends on.
+  if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(email)) return 'Enter a valid email address.';
+  if (need === 'phone' || need === 'both') {
+    if (!indianMobile(phone)) return 'Enter your 10-digit WhatsApp number.';
+  } else if (phone) {
+    const digits = phone.replace(/\D/g, '');
     if (digits.length < 10 || digits.length > 13) return 'Enter a valid 10-digit mobile number.';
   }
+  if ((need === 'email' || need === 'both') && !email) return 'Enter a valid email address.';
+  if (need === 'either' && !email && !phone) return 'Enter your WhatsApp number or email.';
   return null;
 }
 
-export async function submitLead(l: LeadPayload): Promise<{ ok: boolean; error?: string }> {
-  const err = validateLead(l);
+export async function submitLead(
+  l: LeadPayload, need: Need = 'email',
+): Promise<{ ok: boolean; error?: string }> {
+  const err = validateLead(l, need);
   if (err) return { ok: false, error: err };
   try {
     // Attached here rather than in the form so every caller gets it and no
     // component has to remember. Validation above ran on the caller's fields only.
-    const body: LeadPayload = { ...l, attribution: getAttribution() };
+    const body: LeadPayload = {
+      ...l,
+      // Normalised so the sheet and WhatsApp get one format, not whatever was typed.
+      phone: need === 'phone' || need === 'both' ? (indianMobile(l.phone) ?? l.phone) : l.phone,
+      attribution: getAttribution(),
+    };
     const res = await fetch(LEAD_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -1,17 +1,18 @@
 'use client';
 
 import { useEffect, useId, useState } from 'react';
-import LeadGate from '../../components/LeadGate';
+import SoftGate, { Locked } from '../../components/SoftGate';
+import { CTA } from '../../lib/types';
 import Icon from '../../components/Icon';
 import { downloadPlanPdf } from '../../lib/plan-pdf';
 import {
   buildPlan, formatDay, todayIso,
   CONFIRMED_DATES, SECTIONS,
-  type Exam, type Level, type SectionId, type StudyPlan,
+  type Exam, type Level, type SectionId, type StudyPlan, type WeekPlan,
 } from '../../calc/study-plan';
 
 const SLUG = 'cat-mat-study-plan-generator';
-const DEFAULT_DATE: Record<Exam, string> = { cat: '2026-11-29', mat: '2026-09-13' };
+const DEFAULT_DATE: Record<Exam, string> = { cat: '2026-11-29', mat: '2026-12-20' };
 
 const LEVELS: { id: Level; label: string }[] = [
   { id: 'fresh', label: 'Starting fresh' },
@@ -20,6 +21,47 @@ const LEVELS: { id: Level; label: string }[] = [
 ];
 
 const FILLS = ['var(--forest)', 'var(--amber)', 'var(--burnt)', 'var(--teal)', 'var(--muted)'];
+
+// Value first: the shape of the plan and its first two weeks are free; the rest
+// of the weeks and the PDF need one WhatsApp form.
+const FREE_WEEKS = 2;
+const TEASER_WEEKS = 3;
+
+function WeekRow({ w }: { w: WeekPlan }) {
+  return (
+    <tr>
+      <td className="num"><strong>{w.week}</strong></td>
+      <td className="num">{formatDay(w.from)} – {formatDay(w.to)}</td>
+      <td>
+        <span className={`phase-pill ${w.phase === 'taper' ? 'phase-taper' : ''}`}>
+          {w.phaseLabel}
+        </span>
+      </td>
+      <td className="num">{w.hours}h</td>
+      <td className="num">{w.mocks}</td>
+    </tr>
+  );
+}
+
+function WeekTable({ weeks, head = true }: { weeks: WeekPlan[]; head?: boolean }) {
+  return (
+    <div className="plan-table-wrap">
+      <table className="plan">
+        {head ? (
+          <thead>
+            <tr>
+              <th>Week</th><th>Dates</th><th>Phase</th>
+              <th>Hours</th><th>Mocks</th>
+            </tr>
+          </thead>
+        ) : null}
+        <tbody>
+          {weeks.map((w) => <WeekRow key={w.week} w={w} />)}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default function StudyPlanTool() {
   const id = useId();
@@ -61,6 +103,13 @@ export default function StudyPlanTool() {
   }
 
   return (
+    <SoftGate
+      slug={SLUG}
+      stream={exam === 'cat' ? 'CAT' : 'MAT'}
+      inputs={{ exam, examDate, hours: Number(hours), level, weakest }}
+      heading="Unlock your full plan"
+    >
+    {({ unlocked, request }) => (
     <>
       {/* Set-once controls, laid out across the width. */}
       <section className="tool-inputs" aria-label="Your details">
@@ -71,7 +120,7 @@ export default function StudyPlanTool() {
           <label htmlFor={`${id}-exam`}>Which exam</label>
           <select id={`${id}-exam`} value={exam} onChange={(e) => pickExam(e.target.value as Exam)}>
             <option value="cat">CAT 2026</option>
-            <option value="mat">MAT 2026</option>
+            <option value="mat">MAT December 2026</option>
           </select>
         </div>
 
@@ -115,18 +164,14 @@ export default function StudyPlanTool() {
 
       <div className="tool-layout">
         <aside className="pane">
-          <LeadGate
-            slug={SLUG}
-            mode="email+phone"
-            trigger="Download the full plan (PDF)"
-            heading="Where should we send it?"
-            submitLabel="Get my plan"
-          >
-            <button className="btn btn-primary btn-block" type="button" onClick={getPdf} disabled={!plan || busy}>
-              <Icon name="download" size={17} />
-              {busy ? 'Building your PDF…' : 'Download the plan'}
-            </button>
-          </LeadGate>
+          <button className="btn btn-primary btn-block" type="button"
+            onClick={() => request(getPdf)} disabled={!plan || busy}>
+            <Icon name="download" size={17} />
+            {busy ? 'Building your PDF…' : 'Download the full plan (PDF)'}
+          </button>
+          {unlocked ? null : (
+            <p className="muted gate-fine">Free with your WhatsApp number — every week, printable.</p>
+          )}
         </aside>
 
         {/* Output. Summary only — the week-by-week narrative lives in the PDF. */}
@@ -159,31 +204,30 @@ export default function StudyPlanTool() {
             </ul>
 
             <h3 style={{ marginTop: 'var(--s4)' }}>Your {plan.weeks.length} weeks</h3>
-            <div className="plan-table-wrap">
-              <table className="plan">
-                <thead>
-                  <tr>
-                    <th>Week</th><th>Dates</th><th>Phase</th>
-                    <th>Hours</th><th>Mocks</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {plan.weeks.map((w) => (
-                    <tr key={w.week}>
-                      <td className="num"><strong>{w.week}</strong></td>
-                      <td className="num">{formatDay(w.from)} – {formatDay(w.to)}</td>
-                      <td>
-                        <span className={`phase-pill ${w.phase === 'taper' ? 'phase-taper' : ''}`}>
-                          {w.phaseLabel}
-                        </span>
-                      </td>
-                      <td className="num">{w.hours}h</td>
-                      <td className="num">{w.mocks}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {unlocked ? (
+              <>
+                <aside className="upsell" aria-label="Next step">
+                  <p className="upsell-title">Plan ready? Now find your week-1 baseline.</p>
+                  <p className="upsell-body">
+                    A full-length paper under exam conditions tells you which of these weeks to
+                    lean on hardest — before you have spent them.
+                  </p>
+                  <div className="upsell-actions">
+                    <a className="btn btn-primary" href={CTA.matMocks.href}>{CTA.matMocks.label}</a>
+                  </div>
+                </aside>
+                <WeekTable weeks={plan.weeks} />
+              </>
+            ) : (
+              <>
+                <WeekTable weeks={plan.weeks.slice(0, FREE_WEEKS)} />
+                {plan.weeks.length > FREE_WEEKS ? (
+                  <Locked hidden={plan.weeks.length - FREE_WEEKS} noun="weeks" onUnlock={() => request()}>
+                    <WeekTable weeks={plan.weeks.slice(FREE_WEEKS, FREE_WEEKS + TEASER_WEEKS)} head={false} />
+                  </Locked>
+                ) : null}
+              </>
+            )}
             <p className="muted" style={{ fontSize: 13.5 }}>
               What to actually do each week — the focus, the section split and the checkpoints — is
               in the PDF.
@@ -195,5 +239,7 @@ export default function StudyPlanTool() {
         </div>
       </div>
     </>
+    )}
+    </SoftGate>
   );
 }

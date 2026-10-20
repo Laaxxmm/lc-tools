@@ -29,7 +29,8 @@ export interface ToolConfig {
   readMinutes: number;          // brand blog convention shows read time
   faq: FaqItem[];               // rendered + emitted as FAQPage schema
   related: string[];            // slugs of nearest tools
-  gate: 'none' | 'email' | 'email+phone';
+  // 'soft': the answer is free, the full list and the PDF need one WhatsApp form.
+  gate: 'none' | 'email' | 'email+phone' | 'soft';
   cta: { label: string; href: string; note?: string };
   updated: string;              // ISO date, shown to the user
   sources?: { label: string; href: string }[];

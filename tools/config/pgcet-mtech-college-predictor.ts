@@ -69,7 +69,7 @@ const tool: ToolConfig = {
     'cgpa-percentage-converter',
     'mba-exam-dates-2026',
   ],
-  gate: 'none',
+  gate: 'soft',
   cta: CTA.pgcetMocks,
   updated: '2026-09-20',
   sources: [

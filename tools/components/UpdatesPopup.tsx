@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from 'react';
 import Icon from './Icon';
 import { submitLead, validateLead } from '../lib/lead';
+import { browserStore, isUnlocked, markUnlocked, UNLOCK_EVENT } from '../lib/unlock';
 
 const SEEN = 'lc-updates-seen';
 
@@ -23,7 +24,11 @@ export default function UpdatesPopup({ tool, exam }: { tool: string; exam: strin
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem(SEEN)) return;
+    const store = browserStore();
+    // Seen it, or already gave a WhatsApp number on any tool: never ask again.
+    // Asking someone who unlocked a minute ago for the same number reads as broken.
+    try { if (store?.getItem(SEEN)) return; } catch { return; }
+    if (isUnlocked(store, Date.now())) return;
     // Wait for real engagement: half a screen of scrolling past the tool.
     const onScroll = () => {
       if (window.scrollY > window.innerHeight * 1.2) {
@@ -36,7 +41,7 @@ export default function UpdatesPopup({ tool, exam }: { tool: string; exam: strin
   }, []);
 
   function close() {
-    localStorage.setItem(SEEN, '1');
+    try { browserStore()?.setItem(SEEN, '1'); } catch { /* storage blocked */ }
     setOpen(false);
   }
 
@@ -59,7 +64,10 @@ export default function UpdatesPopup({ tool, exam }: { tool: string; exam: strin
     const res = await submitLead(payload);
     setBusy(false);
     if (!res.ok) { setError(res.error ?? 'Could not save right now.'); return; }
-    localStorage.setItem(SEEN, '1');
+    try { browserStore()?.setItem(SEEN, '1'); } catch { /* storage blocked */ }
+    // A saved WhatsApp opt-in is a lead like any other: open every gate.
+    markUnlocked(browserStore(), Date.now());
+    window.dispatchEvent(new Event(UNLOCK_EVENT));
     setDone(true);
   }
 

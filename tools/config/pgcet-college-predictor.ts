@@ -52,7 +52,7 @@ const tool: ToolConfig = {
     },
     {
       q: 'Can I download the list?',
-      a: 'Yes, as a PDF, and it carries every single match rather than the page you can see. The screen stops at forty rows because a strong rank can reach three hundred programmes and nobody reads that on a phone, but the document is the complete list. It is laid out for option entry — chance, closing rank, college, programme and city in columns, ordered safest first — so you can sit with it and build your preference order before the portal opens.',
+      a: 'Yes. Your top three programmes and the Safe / Moderate / Reach counts are on screen straight away; the full list and the PDF unlock with your name and WhatsApp number, once, for every Learn Crew tool. The PDF carries every single match rather than the page you can see. The screen stops at forty rows because a strong rank can reach three hundred programmes and nobody reads that on a phone, but the document is the complete list. It is laid out for option entry — chance, closing rank, college, programme and city in columns, ordered safest first — so you can sit with it and build your preference order before the portal opens.',
     },
     {
       q: 'Why does one college appear more than once in my results?',
@@ -85,7 +85,7 @@ const tool: ToolConfig = {
     'mba-cost-and-roi-calculator',
     'mba-exam-dates-2026',
   ],
-  gate: 'none',
+  gate: 'soft',
   cta: CTA.pgcetMocks,
   updated: '2026-09-15',
   sources: [

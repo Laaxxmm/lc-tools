@@ -8,6 +8,7 @@ const GATE_LABEL: Record<ToolConfig['gate'], string> = {
   none: 'Free, no signup',
   email: 'Free · email for the full breakdown',
   'email+phone': 'Free · email for the download',
+  soft: 'Free · WhatsApp for the full list',
 };
 
 export default function ToolCard({ tool }: { tool: ToolConfig }) {

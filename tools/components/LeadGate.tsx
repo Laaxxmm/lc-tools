@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useId, useState, type FormEvent, type ReactNode } from 'react';
+import { useId, useState, type FormEvent, type ReactNode } from 'react';
 import { submitLead } from '../lib/lead';
+import { browserStore, markUnlocked, UNLOCK_EVENT } from '../lib/unlock';
+import { useUnlocked } from './SoftGate';
 
 interface Props {
   /** Tool slug. Also the localStorage key, so unlocking is per tool. */
@@ -19,20 +21,14 @@ interface Props {
   submitLabel?: string;
 }
 
-const key = (slug: string) => `lc-unlock:${slug}`;
-
 export default function LeadGate({ slug, mode, children, heading, blurb, trigger, submitLabel }: Props) {
   const id = useId();
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlockedHere, setUnlocked] = useState(false);
+  // A lead given on any tool in the last 30 days opens this one too.
+  const unlocked = useUnlocked(slug) || unlockedHere;
   const [asked, setAsked] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-
-  // Read after mount: the page is prerendered, so localStorage cannot be read
-  // during render without a hydration mismatch.
-  useEffect(() => {
-    if (localStorage.getItem(key(slug)) === '1') setUnlocked(true);
-  }, [slug]);
 
   if (unlocked) return <>{children}</>;
 
@@ -62,7 +58,8 @@ export default function LeadGate({ slug, mode, children, heading, blurb, trigger
       setError(res.error ?? 'Could not save right now. Please try again.');
       return;
     }
-    localStorage.setItem(key(slug), '1');
+    markUnlocked(browserStore(), Date.now());
+    window.dispatchEvent(new Event(UNLOCK_EVENT));
     setUnlocked(true);
   }
 
