@@ -30,10 +30,10 @@
 (function () {
   'use strict';
 
-  // Keep in step with tools/lib/lead.ts PHONE_ONLY_LEADS. While false the form
-  // also asks for email, because the old WordPress handler rejects a lead
-  // without one. Flip both once wp/lc-leads.php v1.1 is uploaded.
-  var PHONE_ONLY = false;
+  // Keep in step with tools/lib/lead.ts PHONE_ONLY_LEADS. True since the
+  // wp/lc-leads.php v1.1 handler went live; the old one rejected leads without
+  // an email. After changing this file: re-upload it AND purge LiteSpeed.
+  var PHONE_ONLY = true;
   // Flip once learncrew.org/starter-kit/ is published.
   var STARTER_KIT_LIVE = false;
 

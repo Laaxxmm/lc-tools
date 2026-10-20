@@ -26,15 +26,12 @@ export interface LeadPayload {
 export type Need = 'email' | 'phone' | 'either' | 'both';
 
 /**
- * Flip to true once wp/lc-leads.php v1.1 is uploaded to mu-plugins.
- *
- * The tools deploy on every push; the WordPress handler is uploaded by hand. The
- * old handler rejects any lead without an email, so a WhatsApp-only form going
- * live first would show students "Enter a valid email address" on a form with
- * no email box — and every lead would be lost. While false, the soft gate also
- * asks for email, which both handlers accept.
+ * The soft gate asks for WhatsApp only. Safe since wp/lc-leads.php v1.1 went live
+ * (verified 20 Oct 2026: a body with neither contact returns lc_no_contact). The
+ * old handler rejected any lead without an email, so never ship this as true
+ * against a pre-1.1 handler: every lead would fail on "Enter a valid email".
  */
-export const PHONE_ONLY_LEADS = false;
+export const PHONE_ONLY_LEADS = true;
 
 export const LEAD_ENDPOINT = '/wp-json/lc/v1/lead';
 
