@@ -83,7 +83,10 @@ test('only the dates the exam bodies have actually published are marked confirme
   // breaks this test on purpose.
   const confirmed = EXAMS.filter((e) => e.examConfirmed).map((e) => e.id).sort();
   assert.deepEqual(confirmed, ['cat', 'mat-cbt', 'mat-pbt']);
-  assert.ok(EXAMS.every((e) => !e.regConfirmed), 'no registration deadline is published yet');
+  // MAT December's two deadlines are published on mat.aima.in (checked 20 Oct
+  // 2026). Every other registration date is still an expectation.
+  const regConfirmed = EXAMS.filter((e) => e.regConfirmed).map((e) => e.id).sort();
+  assert.deepEqual(regConfirmed, ['mat-cbt', 'mat-pbt'], 'only AIMA has published its deadlines');
 });
 
 test('every row links an official site and carries a date the tracker can read', () => {

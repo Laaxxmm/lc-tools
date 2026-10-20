@@ -68,8 +68,8 @@ export const EXAM_META: Record<Exam, ExamMeta> = {
 export interface ExamDateOption { exam: Exam; date: string; label: string; }
 export const CONFIRMED_DATES: readonly ExamDateOption[] = [
   { exam: 'cat', date: '2026-11-29', label: 'CAT 2026 — Sunday 29 November 2026' },
-  { exam: 'mat', date: '2026-09-13', label: 'MAT 2026 paper-based — Sunday 13 September 2026' },
-  { exam: 'mat', date: '2026-09-20', label: 'MAT 2026 computer-based — Sunday 20 September 2026' },
+  { exam: 'mat', date: '2026-12-20', label: 'MAT December 2026 paper-based — Sunday 20 December 2026' },
+  { exam: 'mat', date: '2026-12-27', label: 'MAT December 2026 computer-based — Sunday 27 December 2026' },
 ];
 
 export const PHASE_LABEL: Record<Phase, string> = {

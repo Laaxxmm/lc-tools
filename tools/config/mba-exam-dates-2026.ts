@@ -25,7 +25,7 @@ const config: ToolConfig = {
   faq: [
     {
       q: 'Which dates on this page are actually confirmed?',
-      a: 'Three. CAT 2026 on 29 November, MAT paper-based on 13 September 2026 and MAT computer-based on 20 September 2026. CAT registration opening on 3 August 2026 is confirmed too. Everything else is our expectation from the usual cycle and is tagged Expected on the row, including every registration closing date. We would rather show you a labelled estimate than an unlabelled guess.',
+      a: 'The three exam dates — CAT 2026 on 29 November, MAT December’s paper-based test on 20 December and its computer-based test on 27 December 2026 — plus MAT’s two registration deadlines, 14 and 21 December, all published by the exam bodies. Everything else is our expectation from the usual cycle and is tagged Expected on the row. We would rather show you a labelled estimate than an unlabelled guess.',
     },
     {
       q: 'When does CAT 2026 registration close?',
@@ -60,7 +60,7 @@ const config: ToolConfig = {
   ],
   gate: 'none',
   cta: CTA.matMocks,
-  updated: '2026-08-26',
+  updated: '2026-10-20',
   sources: [
     { label: 'IIM CAT (iimcat.ac.in)', href: 'https://iimcat.ac.in/' },
     { label: 'AIMA MAT (mat.aima.in)', href: 'https://mat.aima.in/' },

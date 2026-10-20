@@ -85,7 +85,7 @@ export default function Page() {
           on the LMS. */}
       <OfferRow offers={[
         {
-          eyebrow: 'MAT · 13 September',
+          eyebrow: 'MAT · 20 December',
           title: 'Full-length MAT papers',
           body: 'Sit the paper under real timing before the day itself, then read the analysis.',
           href: 'https://learn.learncrew.org/tests/1279/management-aptitude-test-mat',
@@ -139,14 +139,13 @@ function Explainer() {
 
       <h2>Confirmed and expected are not the same thing</h2>
       <p>
-        Three exam dates here are confirmed. CAT 2026 is on 29 November. MAT runs its
-        paper-based test on 13 September 2026 and its computer-based test on 20 September.
-        CAT registration opening on 3 August 2026 is confirmed as well. Those came from the
-        exam bodies, and they carry a Confirmed tag.
+        Three exam dates here are confirmed. CAT 2026 is on 29 November. MAT December runs
+        its paper-based test on 20 December 2026 and its computer-based test on 27 December,
+        and AIMA has published both registration deadlines — 14 and 21 December. Those came
+        from the exam bodies, and they carry a Confirmed tag.
       </p>
       <p>
-        Everything else is expected, including every single registration closing date on this
-        page. None of them have been published yet. What you get instead is the pattern from
+        Everything else is expected. None of it has been published yet. What you get instead is the pattern from
         recent cycles, tagged Expected on the row so you can tell at a glance which numbers
         you can bank and which ones you need to verify yourself.
       </p>
@@ -158,29 +157,28 @@ function Explainer() {
         you want only hard dates, and every card links the exam body&rsquo;s own site.
       </p>
 
-      <h2>A worked example: 26 August 2026</h2>
+      <h2>A worked example: 20 October 2026</h2>
       <p>
-        Say you are writing MAT in September as a safety net and CAT in November as the real
-        attempt. Take 26 August as your today and work it through.
+        Say you are writing CAT in November as the real attempt and MAT in December as the
+        safety net. Take 20 October as your today and work it through.
       </p>
       <p>
-        MAT&rsquo;s paper-based test on 13 September is 18 days out. AIMA has closed
-        registration roughly a week before each test date in recent cycles, which puts the
-        form near 6 September, or 11 days out. The number that belongs on your wall is 11,
-        not 18.
+        MAT&rsquo;s paper-based test on 20 December is 61 days out, but the form closes on
+        14 December — 55 days. The number that belongs on your wall is 55, not 61, and if
+        the paper slot fills or slips you still have the computer-based test on 27 December,
+        whose form closes on the 21st.
       </p>
       <p>
-        CAT&rsquo;s exam on 29 November is 95 days out. Registration is open and expected to
-        close around mid-September, call it 20 days. The smaller number wins again. Your CAT
-        deadline this month is the form, and those 95 days are study time you only get to
-        spend if you meet it.
+        CAT&rsquo;s exam on 29 November is 40 days out, and its form window ran through
+        August and September. If you registered, those 40 days are pure study time; if you
+        did not, CAT does not reopen, and MAT December is the entrance still taking forms.
       </p>
       <p>
-        Stack the two and the next three weeks look different from how they looked a minute
-        ago. Two forms close inside twenty days and one exam sits inside eighteen. The MAT
-        paper is your first hard stop, the CAT form is the second, and a study plan has to
-        survive both. This is why the tool sorts by urgency rather than by date. A calendar
-        in date order tells you what happens next. A tracker in urgency order tells you what
+        Stack the two and the order of work is plain. CAT is the first hard stop, 40 days
+        out. The MAT form is the second, 55 days out, and it is the one people miss because
+        it feels far away while CAT is close. This is why the tool sorts by urgency rather
+        than by date. A calendar in date order tells you what happens next. A tracker in
+        urgency order tells you what
         to do next, and on a month like this one they are not the same list.
       </p>
       <p>

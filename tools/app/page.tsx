@@ -36,8 +36,8 @@ const GROUPS: Record<ExamFamily, { heading: string; blurb: ReactNode }> = {
     blurb: <>Exam <a href="https://iimcat.ac.in/">29 November</a>. Registration is already open.</>,
   },
   mat: {
-    heading: 'MAT 2026',
-    blurb: <>Paper-based <a href="https://mat.aima.in/">13 September</a>, computer-based 20 September. The quickest entrance to get into.</>,
+    heading: 'MAT December 2026',
+    blurb: <>Paper-based <a href="https://mat.aima.in/">20 December</a>, computer-based 27 December. Registration closes 14 and 21 December.</>,
   },
   pgcet: {
     heading: 'Karnataka PGCET',

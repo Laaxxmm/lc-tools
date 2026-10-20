@@ -129,7 +129,7 @@ function Explainer() {
       </p>
       <p>
         Now change one input. Same candidate, same three hours, but the exam is{' '}
-        <Link href="/mba-exam-dates-2026/">MAT on 13 September</Link>. Eighteen days, three weeks,
+        <Link href="/mba-exam-dates-2026/">MAT</Link>, eighteen days away. Three weeks,
         roughly 46 hours and five mocks. There is no foundation phase and no application phase. Week
         one is triage on your own notes and formula sheet, week two runs mocks at the time of day
         your paper actually starts, and week three tapers. The two plans share a taper and share

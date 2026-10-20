@@ -94,38 +94,40 @@ export function trackerRows(exams: Exam[], today: string, stream: StreamFilter =
 }
 
 // ── The table ────────────────────────────────────────────────────────────────
-// Confirmed as of 26 Aug 2026: CAT 2026 on 29 Nov, MAT PBT on 13 Sep, MAT CBT on
-// 20 Sep, and CAT registration opening on 3 Aug. Nothing else is published yet,
-// so every other date below is an expectation drawn from the usual cycle and is
-// flagged as one. Re-check each against the site on the row before you plan money
+// Confirmed as of 20 Oct 2026 on the exam bodies' own sites: CAT 2026 on 29 Nov,
+// and MAT December 2026 — paper-based on 20 Dec (registration closes 14 Dec),
+// computer-based on 27 Dec (closes 21 Dec), per mat.aima.in. The September MAT
+// session is over and has been replaced, not kept as history: a past date on a
+// deadline tracker is a row that can only mislead. Everything not tagged
+// confirmed below is an expectation drawn from the usual cycle and is flagged. Re-check each against the site on the row before you plan money
 // or leave around it.
 
 export const EXAMS: Exam[] = [
   {
     id: 'mat-pbt',
-    name: 'MAT 2026 — paper-based test',
+    name: 'MAT December 2026 — paper-based test',
     conductedBy: 'All India Management Association (AIMA)',
     stream: 'mba',
     site: 'https://mat.aima.in/',
-    examDate: '2026-09-13',
-    examLabel: '13 September 2026',
+    examDate: '2026-12-20',
+    examLabel: '20 December 2026',
     examConfirmed: true,
-    regCloses: '2026-09-06',
-    regLabel: 'AIMA has closed registration roughly a week before each test date in recent cycles. Treat 6 September as a working assumption and confirm on mat.aima.in.',
-    regConfirmed: false,
+    regCloses: '2026-12-14',
+    regLabel: 'Registration closes 14 December 2026, as published on mat.aima.in. The admit card follows on 17 December.',
+    regConfirmed: true,
   },
   {
     id: 'mat-cbt',
-    name: 'MAT 2026 — computer-based test',
+    name: 'MAT December 2026 — computer-based test',
     conductedBy: 'All India Management Association (AIMA)',
     stream: 'mba',
     site: 'https://mat.aima.in/',
-    examDate: '2026-09-20',
-    examLabel: '20 September 2026',
+    examDate: '2026-12-27',
+    examLabel: '27 December 2026',
     examConfirmed: true,
-    regCloses: '2026-09-13',
-    regLabel: 'Expected to close about a week before the test date. The CBT slot is the later of the two, so it is the one to take if you need extra preparation days.',
-    regConfirmed: false,
+    regCloses: '2026-12-21',
+    regLabel: 'Registration closes 21 December 2026, as published on mat.aima.in. The CBT is the later of the two slots, so it is the one to take if you need another week.',
+    regConfirmed: true,
   },
   {
     id: 'cat',
