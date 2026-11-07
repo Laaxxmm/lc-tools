@@ -27,6 +27,9 @@
  * Updating later: Deploy → Manage deployments → pencil → New version → Deploy.
  * Pasting new code alone does NOT change what /exec serves.
  *
+ * When replacing the whole file, copy your current SHARED_SECRET line first and
+ * put it back over the placeholder: the repo copy never holds the real secret.
+ *
  * Anyone with the URL can append a row, so the URL is the secret. It is stored
  * in wp-config.php, never in the page, so it is never exposed to a browser.
  * SHARED_SECRET below is a second check in case the URL ever leaks.
@@ -57,12 +60,16 @@ var HEADERS = [
 
 var SHARED_SECRET = 'CHANGE_ME_TO_A_LONG_RANDOM_STRING';
 
+// Sent back with every response, including "bad secret", so which copy is live
+// can be checked from outside without writing a row. Bump it on every change.
+var SCRIPT_VERSION = '2026-11-07';
+
 function doPost(e) {
   try {
     var body = JSON.parse(e.postData.contents);
 
     if (body.secret !== SHARED_SECRET) {
-      return json({ ok: false, error: 'bad secret' });
+      return json({ ok: false, error: 'bad secret', version: SCRIPT_VERSION });
     }
 
     var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -143,9 +150,9 @@ function doPost(e) {
       }
     }
 
-    return json({ ok: true });
+    return json({ ok: true, version: SCRIPT_VERSION });
   } catch (err) {
-    return json({ ok: false, error: String(err) });
+    return json({ ok: false, error: String(err), version: SCRIPT_VERSION });
   }
 }
 
@@ -161,6 +168,44 @@ function json(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Run ONCE from the editor (pick repairToolLeads in the toolbar, then Run).
+ *
+ * The October copy of this script wrote Source, Course, Email, Page, Name,
+ * Remarks, Mobile, Date, Time, then attribution, so its rows show "tools" under
+ * Date and scramble the All Leads view. This moves each of those rows into the
+ * columns above and rewrites the header. A row that already has a real date in
+ * column A is left alone, so running it twice changes nothing.
+ */
+function repairToolLeads() {
+  var OLD = {
+    SOURCE: 1, COURSE: 2, EMAIL: 3, PAGE: 4, NAME: 5, REMARKS: 6, MOBILE: 7,
+    DATE: 8, TIME: 9, CHANNEL: 10, GCLID: 11, UTM_SOURCE: 12, UTM_MEDIUM: 13,
+    UTM_CAMPAIGN: 14, LANDING_PAGE: 15
+  };
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(LEADS_SHEET);
+  if (!sheet) return;
+  sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
+
+  var last = sheet.getLastRow();
+  if (last < 2) return;
+  var width = Math.max(sheet.getLastColumn(), HEADERS.length);
+  var rows = sheet.getRange(2, 1, last - 1, width).getValues();
+  var moved = 0;
+  for (var i = 0; i < rows.length; i++) {
+    var r = rows[i];
+    if (r[0] instanceof Date || !(r[OLD.DATE - 1] instanceof Date)) continue;
+    var out = [];
+    for (var c = 0; c < width; c++) out[c] = c < HEADERS.length ? '' : r[c];
+    for (var k in OLD) out[COL[k] - 1] = r[OLD[k] - 1];
+    sheet.getRange(i + 2, 1, 1, width).setValues([out]);
+    sheet.getRange(i + 2, COL.DATE).setNumberFormat('M/d/yyyy');
+    sheet.getRange(i + 2, COL.TIME).setNumberFormat('h:mm:ss am/pm');
+    moved++;
+  }
+  Logger.log('Moved ' + moved + ' row(s) into the right columns.');
 }
 
 /** Run once from the editor to confirm a row lands before wiring WordPress up. */

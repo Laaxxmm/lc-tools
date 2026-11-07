@@ -13,14 +13,15 @@ const fs = require('fs');
 const assert = require('assert');
 const src = fs.readFileSync(require('path').join(__dirname, 'lead-to-sheet.gs'), 'utf8');
 
-function makeSheet(name) {
-  const rows = [];                       // appended rows, in order
+function makeSheet(name, seed = []) {
+  const rows = seed.map((r) => r.slice()); // appended rows, in order
   const formats = {};                    // "r,c" -> number format
   let frozen = 0;
   return {
     name, rows, formats,
     appendRow(r) { rows.push(r.slice()); },
     getLastRow: () => rows.length,
+    getLastColumn: () => Math.max(0, ...rows.map((r) => r.length)),
     setFrozenRows(n) { frozen = n; },
     getFrozenRows: () => frozen,
     getRange(r, c, nr = 1, nc = 1) {
@@ -52,7 +53,7 @@ function run(payload, { existingTabs = [] } = {}) {
   };
   const fn = new Function(...Object.keys(ctx), src + `
     ; SHARED_SECRET = 'S';
-    return { res: doPost({ postData: { contents: JSON.stringify(arguments[arguments.length-1]) } }), COL: COL, HEADERS: HEADERS, LEADS_SHEET: LEADS_SHEET };`);
+    return { res: doPost({ postData: { contents: JSON.stringify(arguments[arguments.length-1]) } }), COL: COL, HEADERS: HEADERS, LEADS_SHEET: LEADS_SHEET, SCRIPT_VERSION: SCRIPT_VERSION };`);
   const out = fn(...Object.values(ctx), payload);
   return { sheets, ...out };
 }
@@ -139,4 +140,57 @@ const LEAD = { secret: 'S', source: 'tools', page: 'cgpa-percentage-converter', 
   console.log('ok  Email List still written');
 }
 
-console.log('\nall 7 checks passed');
+// 8. Every response names the script version, even a refused one, so the live
+//    copy can be identified from outside without writing a row.
+{
+  const ok = run(LEAD);
+  assert.equal(JSON.parse(ok.res.getContent()).version, ok.SCRIPT_VERSION);
+  const bad = run({ ...LEAD, secret: 'wrong' });
+  const body = JSON.parse(bad.res.getContent());
+  assert.equal(body.error, 'bad secret');
+  assert.equal(body.version, bad.SCRIPT_VERSION);
+  assert.equal(bad.sheets['Tool Leads'], undefined, 'a refused lead must write nothing');
+  console.log('ok  version reported, refused lead writes nothing');
+}
+
+// 9. repairToolLeads moves rows the October copy wrote (Source, Course, Email,
+//    Page, Name, Remarks, Mobile, Date, Time, attribution) into the view's order,
+//    fixes the header, leaves good rows alone, and is safe to run twice.
+{
+  const day = new Date(2026, 10, 1), time = new Date(1899, 11, 30, 10, 17, 7);
+  const good = [new Date(2026, 8, 11), new Date(1899, 11, 30, 23, 9, 33), 'tools',
+    'cat-mat-study-plan-generator', 'CAT / MAT', 'Arya', '9946783506', 'note', ''];
+  const old = ['tools', 'PGCET MCA', 'gs@example.com', 'pgcet-college-predictor', 'G Shashank',
+    'rank=1000', '7892855865', day, time, 'referral', '', 'google', 'organic', '', '/tools/x'];
+  const oldHeader = ['Date', 'Time', 'Source', 'Page', 'Course', 'Name', 'Mobile', 'Remarks',
+    'Status', 'Channel', 'GCLID', 'UTM Source'];
+  const tab = makeSheet('Tool Leads', [oldHeader, good, old]);
+  const ss = { getSheetByName: (n) => (n === 'Tool Leads' ? tab : null) };
+  const repair = new Function('SpreadsheetApp', 'Logger', 'ContentService', src + '; return repairToolLeads;')(
+    { getActiveSpreadsheet: () => ss }, { log() {} }, {});
+  repair();
+  const { HEADERS, COL } = run(LEAD);
+  assert.deepEqual(tab.rows[0], HEADERS, 'header rewritten, Email at J');
+  assert.deepEqual(tab.rows[1], good, 'a row with a date in A is untouched');
+  const r = tab.rows[2];
+  assert.equal(r[COL.DATE - 1], day);
+  assert.equal(r[COL.TIME - 1], time);
+  assert.equal(r[COL.SOURCE - 1], 'tools');
+  assert.equal(r[COL.PAGE - 1], 'pgcet-college-predictor');
+  assert.equal(r[COL.COURSE - 1], 'PGCET MCA');
+  assert.equal(r[COL.NAME - 1], 'G Shashank');
+  assert.equal(r[COL.MOBILE - 1], '7892855865');
+  assert.equal(r[COL.REMARKS - 1], 'rank=1000');
+  assert.equal(r[COL.STATUS - 1], '');
+  assert.equal(r[COL.EMAIL - 1], 'gs@example.com');
+  assert.equal(r[COL.CHANNEL - 1], 'referral');
+  assert.equal(r[COL.UTM_SOURCE - 1], 'google');
+  assert.equal(r[COL.LANDING_PAGE - 1], '/tools/x');
+  assert.equal(tab.formats['3,1'], 'M/d/yyyy');
+  const snapshot = JSON.stringify(tab.rows);
+  repair();
+  assert.equal(JSON.stringify(tab.rows), snapshot, 'second run changes nothing');
+  console.log('ok  repairToolLeads fixes October rows, idempotent');
+}
+
+console.log('\nall 9 checks passed');
